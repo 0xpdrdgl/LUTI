@@ -1,6 +1,7 @@
 titulo: CASA ALVORADA
 categoria: residenciais
 ano: 2024
+local: ''
 resumo: >-
   Residência unifamiliar que integra luz natural, ventilação cruzada e
   materiais brutos em uma narrativa de acolhimento.
@@ -10,6 +11,6 @@ descricao: >-
   enquanto os materiais — concreto aparente, madeira e pedra — envelhecem com
   graça. Os espaços fluem entre interior e exterior através de grandes vãos,
   tornando a natureza parte integrante da vivência diária.
-capa: projeto-alvorada.webp
+capa: /images/projetos/projeto-alvorada.webp
 galeria: []
 destaque: true

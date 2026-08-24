@@ -60,7 +60,7 @@ ano: ${ano}
 local: ''
 resumo: ''
 descricao: ''
-capa: ${arquivo}
+capa: /images/projetos/${arquivo}
 galeria: []
 destaque: false
 `;

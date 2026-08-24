@@ -1,11 +1,11 @@
-heroImagem: hero.webp
+heroImagem: /images/hero.webp
 heroTitulo: |-
   Transformando sonhos em espaços reais.
   Além da arquitetura.
 heroBotaoLabel: VER PROJETOS
 heroBotaoHref: /projetos
 sobreTitulo: Sobre a Autora
-sobreFoto: sobre-298808.webp
+sobreFoto: /images/sobre-298808.webp
 sobreParagrafos:
   - >-
     Acreditamos que a arquitetura deve ir além da forma; ela deve ser a

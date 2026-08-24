@@ -1,6 +1,7 @@
 titulo: APARTAMENTO JARDIM
 categoria: interiores
 ano: 2024
+local: ''
 resumo: >-
   Reforma de apartamento que traz o verde para dentro de casa, com
   vegetação integrada aos ambientes sociais.
@@ -11,6 +12,6 @@ descricao: >-
   sob medida e iluminação cênica compõem ambientes de serenidade, onde cada
   detalhe — dos revestimentos à escolha das plantas — foi pensado para o
   bem-estar dos moradores.
-capa: projeto-jardim.webp
+capa: /images/projetos/projeto-jardim.webp
 galeria: []
 destaque: true
