@@ -2,8 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { createReader } from '@keystatic/core/reader';
 import keystaticConfig from '../../keystatic.config';
-import retratoImage from '../assets/images/sobre/retrato.webp';
-import { Image } from 'astro:assets';
+import { siteImage } from '../lib/images';
 
 const pagina = await createReader(process.cwd(), keystaticConfig).singletons.paginaSobre.read();
 ---
@@ -24,15 +23,9 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
         <p class="hero-nota">{pagina?.nota}</p>
       </div>
       <figure class="hero-retrato" data-reveal>
-        <Image
-          src={retratoImage}
-          alt={pagina?.tituloItalico}
-          format="avif"
-          quality={95}
-          loading="eager"
-          width={896}
-          height={1120}
-        />
+        {pagina?.retrato && (
+          <img src={siteImage(pagina.retrato)} alt={pagina?.tituloItalico} />
+        )}
       </figure>
     </div>
   </section>

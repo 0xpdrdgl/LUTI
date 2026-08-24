@@ -2,44 +2,27 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { createReader } from '@keystatic/core/reader';
 import keystaticConfig from '../../keystatic.config';
-import heroImage from '../assets/images/hero/hero.webp';
-import projAlvorada from '../assets/images/projetos/projeto-alvorada.webp';
-import projJardim from '../assets/images/projetos/projeto-jardim.webp';
-import projStudio from '../assets/images/projetos/projeto-studio.webp';
-import sobreRetrato from '../assets/images/sobre/retrato.webp';
-import { Image } from 'astro:assets';
+import { projetosImage, siteImage } from '../lib/images';
 
 const reader = createReader(process.cwd(), keystaticConfig);
 const home = await reader.singletons.home.read();
 const projetos = await reader.collections.projetos.all();
 
-const projetoImagens = {
-  'projeto-alvorada': projAlvorada,
-  'projeto-jardim': projJardim,
-  'projeto-studio': projStudio,
-};
-
 const recentes = projetos
   .map(({ slug, entry }) => ({
     slug,
     titulo: entry.titulo,
-    categoria: entry.categoria,
-    capa: entry.capa,
+    capa: projetosImage(entry.capa),
   }))
   .slice(0, 3);
 ---
 
 <PageLayout title="LUIZA TINOCO — Arquitetura" fullBleed>
   <section class="hero">
-    <Image
-      src={heroImage}
+    <img
+      src={home?.heroImagem ? siteImage(home.heroImagem) ?? '/images/hero.webp' : '/images/hero.webp'}
       alt=""
       class="hero-image"
-      format="avif"
-      quality={95}
-      loading="eager"
-      width={1920}
-      height={1080}
     />
     <div class="hero-overlay"></div>
     <div class="hero-content" data-reveal>
@@ -82,31 +65,16 @@ const recentes = projetos
       <a href="/projetos" class="label ver-todos">VER TODOS</a>
     </div>
 
-<div class="grid" data-reveal>
+    <div class="grid" data-reveal>
       {
-        recentes.map((projeto) => {
-          const capaImage = projetoImagens[projeto.capa];
-          return (
-            <a href={`/projetos/${projeto.slug}`} class="card">
-              {capaImage && (
-                <>
-                  <Image
-                    src={capaImage}
-                    alt={projeto.titulo}
-                    format="avif"
-                    quality={95}
-                    loading="lazy"
-                    width={704}
-                    height={1000}
-                  />
-                </>
-              )}
-              <div class="card-overlay">
-                <h3>{projeto.titulo}</h3>
-              </div>
-            </a>
-          );
-        })
+        recentes.map((projeto) => (
+          <a href={`/projetos/${projeto.slug}`} class="card">
+            <img src={projeto.capa} alt={projeto.titulo} loading="lazy" />
+            <div class="card-overlay">
+              <h3>{projeto.titulo}</h3>
+            </div>
+          </a>
+        ))
       }
     </div>
   </section>
@@ -114,15 +82,9 @@ const recentes = projetos
   <section id="sobre" class="sobre">
     <div class="sobre-grid">
       <div class="sobre-image" data-reveal>
-        <Image
-          src={sobreRetrato}
-          alt={home?.sobreTitulo}
-          format="avif"
-          quality={95}
-          loading="eager"
-          width={896}
-          height={1120}
-        />
+        {home?.sobreFoto && (
+          <img src={siteImage(home.sobreFoto)} alt={home?.sobreTitulo} />
+        )}
       </div>
       <div class="sobre-texto" data-reveal>
         <h2>{home?.sobreTitulo}</h2>

@@ -1,7 +1,10 @@
 ---
+export const prerender = false;
+
 import PageLayout from '../../layouts/PageLayout.astro';
 import { createReader } from '@keystatic/core/reader';
 import keystaticConfig from '../../../keystatic.config';
+import { projetosImage } from '../../lib/images';
 
 const slug = Astro.params.slug as string;
 
@@ -19,6 +22,8 @@ const categoriaLabel =
   pagina?.filtros?.find((f) => f.slug === projeto.categoria)?.label ??
   projeto.categoria;
 
+const capa = projetosImage(projeto.capa);
+const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
 const paragrafos = (projeto.descricao ?? '')
   .split(/\n\s*\n/)
   .map((p) => p.trim())
@@ -38,29 +43,17 @@ const paragrafos = (projeto.descricao ?? '')
     </header>
 
     <div class="projeto-galeria">
-      {projeto.capa && (
+      {capa && (
         <figure class="projeto-capa">
-          <img
-            src={projeto.capa}
-            alt={projeto.titulo}
-            loading="eager"
-            width={1472}
-            height={1024}
-          />
+          <img src={capa} alt={projeto.titulo} />
         </figure>
       )}
 
-      {projeto.galeria.length > 0 && (
+      {galeria.length > 0 && (
         <div class="projeto-thumbs">
-          {projeto.galeria.map((img, i) => (
+          {galeria.map((img, i) => (
             <figure class="projeto-thumb">
-              <img
-                src={img}
-                alt={`${projeto.titulo} - vista ${i + 1}`}
-                loading="lazy"
-                width={736}
-                height={552}
-              />
+              <img src={img} alt={`${projeto.titulo} - vista ${i + 1}`} />
             </figure>
           ))}
         </div>
@@ -78,3 +71,89 @@ const paragrafos = (projeto.descricao ?? '')
     }
   </article>
 </PageLayout>
+
+<style>
+  .projeto-detalhe {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 8rem 5rem 5rem;
+  }
+
+  .projeto-header {
+    margin-bottom: 4rem;
+  }
+
+  .projeto-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .projeto-header h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .projeto-resumo {
+    margin-top: 1.5rem;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--body-color);
+    max-width: 45ch;
+  }
+
+  .projeto-galeria {
+    margin-bottom: 5rem;
+  }
+
+  .projeto-capa {
+    margin-bottom: 2rem;
+  }
+
+  .projeto-capa img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .projeto-thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .projeto-thumb img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: transform 300ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .projeto-thumb img:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  .projeto-descricao {
+    max-width: 45ch;
+  }
+
+  .projeto-descricao p {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--body-color);
+  }
+
+  @media (max-width: 64rem) {
+    .projeto-detalhe {
+      padding-inline: 1.5rem;
+    }
+  }
+</style>
