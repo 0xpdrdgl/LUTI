@@ -6,9 +6,10 @@ const projetosImage = {
 };
 
 export default config({
-  storage: {
-    kind: 'local',
-  },
+  storage:
+    process.env.NODE_ENV === 'development'
+      ? { kind: 'local' }
+      : { kind: 'github', repo: '0xpdrdgl/LUTI' },
   collections: {
     projetos: collection({
       label: 'Projetos',
