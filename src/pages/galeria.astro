@@ -1,0 +1,280 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+import { projetosImage } from '../lib/images';
+
+const projetos = await createReader(
+  process.cwd(),
+  keystaticConfig,
+).collections.projetos.all();
+
+const imagens = projetos.flatMap(({ slug, entry }) => {
+  const items = [];
+  if (entry.capa) {
+    items.push({ src: projetosImage(entry.capa), slug, titulo: entry.titulo });
+  }
+  for (const img of entry.galeria ?? []) {
+    items.push({ src: projetosImage(img), slug, titulo: entry.titulo });
+  }
+  return items;
+});
+---
+
+<PageLayout title="Galeria — LUIZA TINOCO">
+  <section class="galeria-hero" data-reveal>
+    <h1>Galeria</h1>
+    <p class="galeria-sub">
+      Detalhes, materiais e luz — um recorte visual dos nossos projetos.
+    </p>
+  </section>
+
+  <section class="galeria-grid" data-reveal>
+    {
+      imagens.map((img) => (
+        <button
+          type="button"
+          class="galeria-item"
+          data-src={img.src}
+          data-titulo={img.titulo}
+          data-slug={img.slug}
+          aria-label={`Ampliar imagem do projeto ${img.titulo}`}
+        >
+          <img src={img.src} alt={img.titulo} loading="lazy" />
+        </button>
+      ))
+    }
+  </section>
+</PageLayout>
+
+<dialog class="lightbox">
+  <button type="button" class="lightbox-fechar" aria-label="Fechar">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M4 4l12 12M16 4L4 16" stroke="currentColor"></path>
+    </svg>
+  </button>
+  <figure class="lightbox-corpo">
+    <img src="" alt="" />
+    <figcaption class="lightbox-legenda">
+      <span class="lightbox-titulo"></span>
+      <a href="#" class="label lightbox-link">
+        VER PROJETO
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M1 6h9M6.5 2 10.5 6 6.5 10" stroke="currentColor"></path>
+        </svg>
+      </a>
+    </figcaption>
+  </figure>
+</dialog>
+
+<script>
+  function initGaleria() {
+    const dialog = document.querySelector('dialog.lightbox');
+    if (!dialog || dialog.dataset.galeriaBound) return;
+    dialog.dataset.galeriaBound = '1';
+
+    const img = dialog.querySelector('.lightbox-corpo img');
+    const titulo = dialog.querySelector('.lightbox-titulo');
+    const link = dialog.querySelector('.lightbox-link');
+    const fechar = dialog.querySelector('.lightbox-fechar');
+
+    document.querySelectorAll('.galeria-item').forEach((item) => {
+      if (item.dataset.galeriaBound) return;
+      item.dataset.galeriaBound = '1';
+      item.addEventListener('click', () => {
+        img.src = item.dataset.src || '';
+        img.alt = item.dataset.titulo || '';
+        titulo.textContent = item.dataset.titulo || '';
+        link.href = `/projetos/${item.dataset.slug}`;
+        dialog.showModal();
+      });
+    });
+
+    fechar.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initGaleria);
+</script>
+
+<style>
+  .galeria-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 1.5rem 4rem;
+    text-align: center;
+  }
+
+  .galeria-hero h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .galeria-sub {
+    margin-top: 1.5rem;
+    max-width: 42rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: var(--body-color);
+  }
+
+  /* Mosaico masonry */
+  .galeria-grid {
+    columns: 4 240px;
+    column-gap: 8px;
+    max-width: 110rem;
+    margin-inline: auto;
+    padding: 0 1.5rem 8rem;
+  }
+
+  .galeria-item {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0;
+    border: 0;
+    background: var(--surface);
+    cursor: zoom-in;
+    break-inside: avoid;
+  }
+
+  .galeria-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 250ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .galeria-item:hover img {
+      opacity: 0.85;
+    }
+  }
+
+  /* Lightbox */
+  .lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border: 0;
+    padding: 4rem 1.5rem 3rem;
+    background: rgba(10, 10, 10, 0.96);
+    color: #fff;
+  }
+
+  .lightbox::backdrop {
+    background: rgba(10, 10, 10, 0.96);
+  }
+
+  .lightbox[open] {
+    animation: lightbox-entra 250ms var(--ease-out);
+  }
+
+  @keyframes lightbox-entra {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .lightbox-corpo {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    min-height: 100%;
+  }
+
+  .lightbox-corpo img {
+    max-width: 100%;
+    max-height: 72dvh;
+    object-fit: contain;
+  }
+
+  .lightbox-legenda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .lightbox-titulo {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.375rem;
+    color: #fff;
+    text-align: center;
+  }
+
+  .lightbox-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #fff;
+    color: #fff;
+    transition: opacity 150ms ease;
+  }
+
+  .lightbox-link:hover {
+    opacity: 0.7;
+  }
+
+  .lightbox-fechar {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .lightbox-fechar:hover {
+    background: #fff;
+    color: #0a0a0a;
+  }
+
+  .lightbox-fechar:focus-visible,
+  .lightbox-link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox[open] {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .galeria-hero {
+      padding-top: 3rem;
+    }
+
+    .galeria-grid {
+      padding-bottom: 5rem;
+    }
+  }
+</style>

@@ -4,7 +4,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const root = join(process.cwd(), 'dist', 'client');
+const roots = [join(process.cwd(), 'dist', 'client'), join(process.cwd(), '.vercel', 'output', 'static')];
 
 function walk(dir, files = []) {
   let entries;
@@ -30,13 +30,15 @@ const rewrites = [
 ];
 
 let alterados = 0;
-for (const file of walk(root)) {
-  const original = readFileSync(file, 'utf8');
-  let css = original;
-  for (const [re, rep] of rewrites) css = css.replace(re, rep);
-  if (css !== original) {
-    writeFileSync(file, css);
-    alterados++;
+for (const root of roots) {
+  for (const file of walk(root)) {
+    const original = readFileSync(file, 'utf8');
+    let css = original;
+    for (const [re, rep] of rewrites) css = css.replace(re, rep);
+    if (css !== original) {
+      writeFileSync(file, css);
+      alterados++;
+    }
   }
 }
 
