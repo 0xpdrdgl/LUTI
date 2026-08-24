@@ -10,31 +10,99 @@ const { brand, copyright, links, logo } = Astro.props;
 const year = new Date().getFullYear();
 
 const copyrightTexto = copyright?.replace('{ano}', String(year)) ?? '';
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/projetos', label: 'Projetos' },
+  { href: '/sobre', label: 'Sobre' },
+  { href: '/contato', label: 'Contato' },
+];
+
+const externos = (links ?? []).filter((link) => link.href.startsWith('http'));
 ---
 
 <footer class="footer">
   <div class="container">
-    {
-      logo ? (
-        <img src={logo} alt={brand} class="brand-img" />
-      ) : (
-        <span class="label brand">{brand}</span>
-      )
-    }
-    <p class="copyright">{copyrightTexto}</p>
-    <div class="social">
+    <div class="topo">
+      <div class="marca">
+        {
+          logo ? (
+            <img src={logo} alt={brand} class="marca-img" />
+          ) : (
+            <span class="wordmark">{brand}</span>
+          )
+        }
+      </div>
+
+      <nav class="coluna coluna--nav" aria-label="Navegação do rodapé">
+        <h2 class="label coluna-titulo">Navegação</h2>
+        <ul class="lista">
+          {
+            navLinks.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
       {
-        (links ?? []).map((link) => (
-          <a
-            href={link.href}
-            target={link.href.startsWith('http') ? '_blank' : undefined}
-            rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-            class="label"
-          >
-            {link.label}
-          </a>
-        ))
+        externos.length > 0 && (
+          <div class="coluna coluna--contato">
+            <h2 class="label coluna-titulo">Contato</h2>
+            <ul class="lista">
+              {externos.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="link-externo"
+                  >
+                    <span>{link.label}</span>
+                    <svg
+                      class="seta"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5"
+                        stroke="currentColor"
+                        stroke-width="1"
+                      />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
       }
+    </div>
+
+    <div class="base">
+      {copyrightTexto && <p class="label base-copy">{copyrightTexto}</p>}
+      <button type="button" class="label voltar-topo">
+        <span>Voltar ao topo</span>
+        <svg
+          class="seta-cima"
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M6 10V2M6 2L2.5 5.5M6 2L9.5 5.5"
+            stroke="currentColor"
+            stroke-width="1"
+          />
+        </svg>
+      </button>
     </div>
   </div>
 </footer>
@@ -46,57 +114,182 @@ const copyrightTexto = copyright?.replace('{ano}', String(year)) ?? '';
   }
 
   .container {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 5rem 5rem 0;
+  }
+
+  /* ---------- Topo: grid 12 colunas assimétrico ---------- */
+
+  .topo {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 32px;
+    padding-bottom: 6rem;
+  }
+
+  .marca {
+    grid-column: 1 / span 6;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .marca-img {
+    max-height: 2.25rem;
+    width: auto;
+  }
+
+  .coluna--nav {
+    grid-column: 8 / span 2;
+  }
+
+  .coluna--contato {
+    grid-column: 10 / span 3;
+  }
+
+  .coluna-titulo {
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .lista {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .lista a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--body-color);
+    transition: color 240ms var(--ease-out);
+  }
+
+  .lista a::after {
+    content: '';
+    position: absolute;
+    inset: -6px -10px;
+  }
+
+  @media (hover: hover) {
+    .lista a:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 6px;
+    }
+
+    .link-externo .seta {
+      transition: transform 240ms var(--ease-out);
+    }
+
+    .link-externo:hover .seta {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  /* ---------- Base: meta ---------- */
+
+  .base {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 2rem;
-    max-width: 80rem;
-    margin-inline: auto;
-    padding: 4rem 5rem;
+    padding-block: 1.75rem;
+    border-top: 1px solid var(--accent);
   }
 
-  .brand {
-    color: var(--ink);
-  }
-
-  .brand-img {
-    display: block;
-    max-height: 1.75rem;
-    width: auto;
-  }
-
-  .copyright {
-    font-size: 1rem;
-    line-height: 1.6;
+  .base-copy {
     color: var(--muted);
   }
 
-  .social {
-    display: flex;
-    gap: 2rem;
+  .voltar-topo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--body-color);
+    transition: color 240ms var(--ease-out);
   }
 
-  .social a {
-    position: relative;
-    color: var(--muted);
-    transition: color 150ms ease;
+  .seta-cima {
+    transition: transform 240ms var(--ease-out);
   }
 
-  .social a::after {
-    content: '';
-    position: absolute;
-    inset: -14px -10px;
+  @media (hover: hover) {
+    .voltar-topo:hover {
+      color: var(--ink);
+    }
+
+    .voltar-topo:hover .seta-cima {
+      transform: translateY(-2px);
+    }
   }
 
-  .social a:hover {
-    color: var(--ink);
+  .voltar-topo:focus-visible,
+  .lista a:focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 4px;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista a,
+    .link-externo .seta,
+    .voltar-topo,
+    .seta-cima {
+      transition: none;
+    }
+  }
+
+  /* ---------- Responsivo ---------- */
 
   @media (max-width: 64rem) {
     .container {
+      padding: 3.5rem 1.5rem 0;
+    }
+
+    .topo {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem 2rem;
+      padding-bottom: 4rem;
+    }
+
+    .marca {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .base {
       flex-direction: column;
-      text-align: center;
-      padding: 3rem 1.5rem;
+      align-items: flex-start;
+      gap: 1rem;
+      padding-block: 1.5rem;
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll('.voltar-topo').forEach((botao) => {
+    botao.addEventListener('click', () => {
+      const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduzir ? 'auto' : 'smooth' });
+    });
+  });
+</script>

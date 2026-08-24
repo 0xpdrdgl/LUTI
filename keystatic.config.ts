@@ -108,6 +108,32 @@ export default config({
         ctaTitulo: fields.text({ label: 'CTA — título', multiline: true }),
         ctaLinkLabel: fields.text({ label: 'CTA — link (texto)' }),
         ctaLinkHref: fields.text({ label: 'CTA — link (URL)' }),
+        areasTitulo: fields.text({ label: 'Áreas — título da seção' }),
+        areas: fields.array(
+          fields.object({
+            titulo: fields.text({ label: 'Título' }),
+            descricao: fields.text({ label: 'Descrição', multiline: true }),
+          }),
+          {
+            label: 'Áreas de atuação',
+            itemLabel: (props) => props.fields.titulo.value || 'Área',
+          },
+        ),
+        processoTitulo: fields.text({ label: 'Processo — título da seção' }),
+        processo: fields.array(
+          fields.object({
+            titulo: fields.text({ label: 'Título' }),
+            descricao: fields.text({ label: 'Descrição', multiline: true }),
+          }),
+          {
+            label: 'Processo (passos em ordem)',
+            itemLabel: (props) => props.fields.titulo.value || 'Passo',
+          },
+        ),
+        faixaFrase: fields.text({
+          label: 'Faixa editorial — frase',
+          multiline: true,
+        }),
       },
     }),
     paginaProjetos: singleton({
