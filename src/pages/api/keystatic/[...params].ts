@@ -1,5 +1,5 @@
 import { makeRouteHandler } from '@keystatic/astro/api';
-import keystaticConfig from '../../keystatic.config';
+import keystaticConfig from '../../../../../keystatic.config';
 
 export const prerender = false;
 
