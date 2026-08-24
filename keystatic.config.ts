@@ -160,7 +160,6 @@ export default config({
         ),
         moodboardTitulo: fields.text({ label: 'Moodboard — título', multiline: true }),
         moodboardTexto: fields.text({ label: 'Moodboard — texto', multiline: true }),
-        moodboardBotao: fields.text({ label: 'Moodboard — botão (texto)' }),
         moodboardImagem1: fields.image({
           label: 'Moodboard — imagem grande',
           ...projetosImage,

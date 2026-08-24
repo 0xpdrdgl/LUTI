@@ -75,14 +75,9 @@ cards.forEach((card, i) => (card.classe = classes[i % classes.length]));
   <section class="moodboard">
     <div class="moodboard-grid" data-reveal>
       <div class="moodboard-texto">
+        <div class="moodboard-divisor" aria-hidden="true"></div>
         <h2 class="moodboard-titulo">{pagina?.moodboardTitulo}</h2>
         <p>{pagina?.moodboardTexto}</p>
-        <a href="#" class="label manifesto-link">
-          {pagina?.moodboardBotao}
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-            <path d="M1 5h7M5 1.5 8.5 5 5 8.5" stroke="currentColor"></path>
-          </svg>
-        </a>
       </div>
       <div class="collage" aria-hidden="true">
         <div class="collage-bloco"></div>
@@ -342,13 +337,13 @@ cards.forEach((card, i) => (card.classe = classes[i % classes.length]));
   /* Moodboard */
   .moodboard {
     background: var(--surface);
-    padding: 8rem 1.5rem;
+    padding: 10rem 1.5rem;
   }
 
   .moodboard-grid {
     display: grid;
-    grid-template-columns: 2fr 6fr;
-    gap: 2rem;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 4rem;
     max-width: 70rem;
     margin-inline: auto;
   }
@@ -357,44 +352,28 @@ cards.forEach((card, i) => (card.classe = classes[i % classes.length]));
     align-self: center;
   }
 
+  .moodboard-divisor {
+    width: 3rem;
+    height: 1px;
+    background: var(--muted);
+    margin-bottom: 2rem;
+  }
+
   .moodboard-titulo {
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: 2rem;
-    line-height: 1.3;
+    font-size: clamp(1.875rem, 3vw, 2.5rem);
+    line-height: 1.25;
     color: var(--ink);
     white-space: pre-line;
   }
 
   .moodboard-texto p {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    line-height: 1.6;
+    margin-top: 1.75rem;
+    max-width: 30ch;
+    font-size: 1.0625rem;
+    line-height: 1.7;
     color: var(--body-color);
-  }
-
-  .manifesto-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--border-strong);
-    color: var(--ink);
-    transition:
-      background-color 200ms ease,
-      color 200ms ease,
-      transform 160ms var(--ease-out);
-  }
-
-  .manifesto-link:hover {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--bg);
-  }
-
-  .manifesto-link:active {
-    transform: scale(0.97);
   }
 
   /* Collage editorial */
@@ -405,10 +384,10 @@ cards.forEach((card, i) => (card.classe = classes[i % classes.length]));
 
   .collage-bloco {
     position: absolute;
-    left: 25%;
-    top: 33.3%;
-    width: 33.3%;
-    height: 54.5%;
+    left: 30%;
+    top: 38%;
+    width: 30%;
+    height: 50%;
     background: var(--accent);
     border: 1px solid var(--accent);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -422,17 +401,17 @@ cards.forEach((card, i) => (card.classe = classes[i % classes.length]));
   }
 
   .collage-grande {
-    left: 40%;
+    left: 38%;
     top: 0;
-    width: 60%;
-    height: 91.7%;
+    width: 62%;
+    height: 92%;
   }
 
   .collage-quadrada {
     left: 0;
-    top: 30.7%;
-    width: 50%;
-    height: 61.3%;
+    top: 28%;
+    width: 52%;
+    height: 62%;
   }
 
   /* CTA */
