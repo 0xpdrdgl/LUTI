@@ -22,13 +22,6 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
 ---
 
 <PageLayout title="Galeria — LUIZA TINOCO">
-  <section class="galeria-hero" data-reveal>
-    <h1>Galeria</h1>
-    <p class="galeria-sub">
-      Detalhes, materiais e luz — um recorte visual dos nossos projetos.
-    </p>
-  </section>
-
   <section class="galeria-grid" data-reveal>
     {
       imagens.map((img) => (
@@ -53,6 +46,18 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
       <path d="M4 4l12 12M16 4L4 16" stroke="currentColor"></path>
     </svg>
   </button>
+
+  <button type="button" class="lightbox-nav lightbox-nav--anterior" aria-label="Imagem anterior">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M12.5 3 6 10l6.5 7" stroke="currentColor"></path>
+    </svg>
+  </button>
+  <button type="button" class="lightbox-nav lightbox-nav--proxima" aria-label="Próxima imagem">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M7.5 3 14 10l-6.5 7" stroke="currentColor"></path>
+    </svg>
+  </button>
+
   <figure class="lightbox-corpo">
     <img src="" alt="" />
     <figcaption class="lightbox-legenda">
@@ -73,26 +78,44 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
     if (!dialog || dialog.dataset.galeriaBound) return;
     dialog.dataset.galeriaBound = '1';
 
+    const itens = [...document.querySelectorAll('.galeria-item')];
     const img = dialog.querySelector('.lightbox-corpo img');
     const titulo = dialog.querySelector('.lightbox-titulo');
     const link = dialog.querySelector('.lightbox-link');
-    const fechar = dialog.querySelector('.lightbox-fechar');
+    const fecharBtn = dialog.querySelector('.lightbox-fechar');
+    const anteriorBtn = dialog.querySelector('.lightbox-nav--anterior');
+    const proximaBtn = dialog.querySelector('.lightbox-nav--proxima');
+    let indice = 0;
 
-    document.querySelectorAll('.galeria-item').forEach((item) => {
+    function mostrar(i) {
+      indice = (i + itens.length) % itens.length;
+      const item = itens[indice];
+      img.src = item.dataset.src || '';
+      img.alt = item.dataset.titulo || '';
+      titulo.textContent = item.dataset.titulo || '';
+      link.href = `/projetos/${item.dataset.slug}`;
+    }
+
+    function abrir(i) {
+      mostrar(i);
+      dialog.showModal();
+    }
+
+    itens.forEach((item, i) => {
       if (item.dataset.galeriaBound) return;
       item.dataset.galeriaBound = '1';
-      item.addEventListener('click', () => {
-        img.src = item.dataset.src || '';
-        img.alt = item.dataset.titulo || '';
-        titulo.textContent = item.dataset.titulo || '';
-        link.href = `/projetos/${item.dataset.slug}`;
-        dialog.showModal();
-      });
+      item.addEventListener('click', () => abrir(i));
     });
 
-    fechar.addEventListener('click', () => dialog.close());
+    anteriorBtn.addEventListener('click', () => mostrar(indice - 1));
+    proximaBtn.addEventListener('click', () => mostrar(indice + 1));
+    fecharBtn.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', (e) => {
       if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') mostrar(indice - 1);
+      if (e.key === 'ArrowRight') mostrar(indice + 1);
     });
   }
 
@@ -100,39 +123,12 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
 </script>
 
 <style>
-  .galeria-hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 4rem 1.5rem 4rem;
-    text-align: center;
-  }
-
-  .galeria-hero h1 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(2.25rem, 5vw, 4rem);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-  }
-
-  .galeria-sub {
-    margin-top: 1.5rem;
-    max-width: 42rem;
-    font-size: 1.125rem;
-    line-height: 1.6;
-    letter-spacing: 0.01em;
-    color: var(--body-color);
-  }
-
-  /* Mosaico masonry */
   .galeria-grid {
     columns: 4 240px;
     column-gap: 8px;
     max-width: 110rem;
     margin-inline: auto;
-    padding: 0 1.5rem 8rem;
+    padding: 7rem 1.5rem 8rem;
   }
 
   .galeria-item {
@@ -166,7 +162,7 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
     max-width: none;
     max-height: none;
     border: 0;
-    padding: 4rem 1.5rem 3rem;
+    padding: 4rem 5rem 3rem;
     background: rgba(10, 10, 10, 0.96);
     color: #fff;
   }
@@ -233,10 +229,9 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
     opacity: 0.7;
   }
 
-  .lightbox-fechar {
+  .lightbox-fechar,
+  .lightbox-nav {
     position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
     display: grid;
     place-items: center;
     width: 44px;
@@ -251,12 +246,31 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
       color 200ms ease;
   }
 
-  .lightbox-fechar:hover {
+  .lightbox-fechar {
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .lightbox-nav--anterior {
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lightbox-nav--proxima {
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lightbox-fechar:hover,
+  .lightbox-nav:hover {
     background: #fff;
     color: #0a0a0a;
   }
 
   .lightbox-fechar:focus-visible,
+  .lightbox-nav:focus-visible,
   .lightbox-link:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 3px;
@@ -269,12 +283,20 @@ const imagens = projetos.flatMap(({ slug, entry }) => {
   }
 
   @media (max-width: 48rem) {
-    .galeria-hero {
-      padding-top: 3rem;
+    .galeria-grid {
+      padding: 7rem 1rem 5rem;
     }
 
-    .galeria-grid {
-      padding-bottom: 5rem;
+    .lightbox {
+      padding: 4.5rem 1rem 2rem;
+    }
+
+    .lightbox-nav--anterior {
+      left: 0.75rem;
+    }
+
+    .lightbox-nav--proxima {
+      right: 0.75rem;
     }
   }
 </style>
