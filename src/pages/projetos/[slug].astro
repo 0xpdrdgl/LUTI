@@ -23,6 +23,13 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
 
 <PageLayout title={`${projeto.titulo} — LUIZA TINOCO`} description={projeto.resumo}>
   <article class="projeto-detalhe">
+    <a href="/projetos" class="label voltar">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M14 8H3M7 3.5 2.5 8 7 12.5" stroke="currentColor"></path>
+      </svg>
+      VOLTAR
+    </a>
+
     <header class="projeto-header">
       <div class="projeto-meta">
         <span class="label">{projeto.categoria}</span>
@@ -65,6 +72,29 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
     max-width: 80rem;
     margin-inline: auto;
     padding: 4rem 5rem 5rem;
+  }
+
+  .voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    color: var(--muted);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .voltar svg {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .voltar:hover {
+    color: var(--ink);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .voltar:hover svg {
+      transform: translateX(-4px);
+    }
   }
 
   .projeto-header {
