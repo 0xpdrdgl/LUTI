@@ -50,7 +50,7 @@ const isCurrent = (href: string) =>
         )
       }
     </a>
-    <nav>
+    <nav id="menu-mobile">
       {
         navLinks.map((link) => (
           <a
@@ -63,6 +63,17 @@ const isCurrent = (href: string) =>
         ))
       }
     </nav>
+    <button
+      type="button"
+      class="hamburger"
+      aria-expanded="false"
+      aria-controls="menu-mobile"
+      aria-label="Abrir menu"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
 
@@ -166,6 +177,108 @@ const isCurrent = (href: string) =>
     gap: 2rem;
   }
 
+  /* Hamburger (só mobile) */
+  .hamburger {
+    display: none;
+    position: relative;
+    z-index: 2;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 0 10px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--ink);
+    transition: color 240ms var(--ease-out);
+  }
+
+  .hamburger span {
+    display: block;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition:
+      transform 250ms var(--ease-out),
+      opacity 200ms ease;
+  }
+
+  .hamburger[aria-expanded='true'] span:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+  }
+
+  .hamburger[aria-expanded='true'] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger[aria-expanded='true'] span:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
+  }
+
+  .header--topo-transparente .hamburger {
+    color: #fff;
+  }
+
+  .header--topo-transparente.header--visible .hamburger {
+    color: var(--ink);
+  }
+
+  @media (max-width: 48rem) {
+    .container {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .hamburger {
+      display: inline-flex;
+    }
+
+    nav {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 8rem 2.5rem 2rem;
+      background: var(--bg);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition:
+        opacity 250ms var(--ease-out),
+        transform 250ms var(--ease-out),
+        visibility 0s 250ms;
+    }
+
+    .header.menu-aberto nav {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition:
+        opacity 250ms var(--ease-out),
+        transform 250ms var(--ease-out);
+    }
+
+    nav .nav-link {
+      font-size: 1.125rem;
+      padding: 1.25rem 0;
+      color: var(--ink);
+      border-bottom: 1px solid var(--accent);
+    }
+
+    nav .nav-link::after {
+      inset: -4px 0;
+    }
+
+    nav .nav-link:hover,
+    nav .nav-link.current {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+  }
+
   .nav-link {
     position: relative;
     padding: 0.5rem 0 4px;
@@ -213,34 +326,60 @@ const isCurrent = (href: string) =>
   @media (prefers-reduced-motion: reduce) {
     .header::before,
     .logo,
-    .logo-img {
+    .logo-img,
+    .hamburger span,
+    nav {
       transition: none;
     }
   }
-
-  @media (max-width: 64rem) {
-    .container {
-      padding: 1.25rem 1.5rem;
-    }
-
-    nav {
-      gap: 1.25rem;
-    }
-  }
-
-  @media (max-width: 30rem) {
-    .container {
-      flex-direction: column;
-      gap: 0.25rem;
-      padding: 1rem 1rem 0.75rem;
-    }
-
-    .logo {
-      font-size: 1.375rem;
-    }
-
-    nav {
-      gap: 1.5rem;
-    }
-  }
 </style>
+
+<script>
+  function initMenu() {
+    const botao = document.querySelector('.hamburger');
+    const menu = document.getElementById('menu-mobile');
+    const headerEl = botao?.closest('.header');
+    if (!botao || !menu || !headerEl || botao.dataset.menuBound) return;
+    botao.dataset.menuBound = '1';
+
+    const fechar = () => {
+      menu.classList.remove('aberto');
+      headerEl.classList.remove('menu-aberto');
+      botao.setAttribute('aria-expanded', 'false');
+      botao.setAttribute('aria-label', 'Abrir menu');
+      document.documentElement.style.overflow = '';
+      if (
+        headerEl.classList.contains('header--topo-transparente') &&
+        window.scrollY <= 40
+      ) {
+        headerEl.classList.remove('header--visible');
+      }
+    };
+
+    botao.addEventListener('click', () => {
+      const aberto = menu.classList.toggle('aberto');
+      headerEl.classList.toggle('menu-aberto', aberto);
+      botao.setAttribute('aria-expanded', String(aberto));
+      botao.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+      document.documentElement.style.overflow = aberto ? 'hidden' : '';
+      if (aberto) headerEl.classList.add('header--visible');
+      else fechar();
+    });
+
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', fechar);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fechar();
+    });
+
+    window
+      .matchMedia('(min-width: 48rem)')
+      .addEventListener('change', (e) => {
+        if (e.matches) fechar();
+      });
+  }
+
+  document.addEventListener('astro:page-load', initMenu);
+</script>

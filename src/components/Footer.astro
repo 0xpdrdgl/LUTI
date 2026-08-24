@@ -114,7 +114,6 @@ const externos = (links ?? []).filter((link) => link.href.startsWith('http'));
   }
 
   .container {
-    max-width: 80rem;
     margin-inline: auto;
     padding: 5rem 5rem 0;
   }
@@ -286,10 +285,16 @@ const externos = (links ?? []).filter((link) => link.href.startsWith('http'));
 </style>
 
 <script>
-  document.querySelectorAll('.voltar-topo').forEach((botao) => {
-    botao.addEventListener('click', () => {
-      const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: 0, behavior: reduzir ? 'auto' : 'smooth' });
+  function initVoltarTopo() {
+    document.querySelectorAll('.voltar-topo').forEach((botao) => {
+      if (botao.dataset.topoBound) return;
+      botao.dataset.topoBound = '1';
+      botao.addEventListener('click', () => {
+        const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduzir ? 'auto' : 'smooth' });
+      });
     });
-  });
+  }
+
+  document.addEventListener('astro:page-load', initVoltarTopo);
 </script>
