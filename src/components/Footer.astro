@@ -273,6 +273,15 @@ const externos = (links ?? []).filter((link) => link.href.startsWith('http'));
     .marca {
       grid-column: 1 / -1;
     }
+
+    .coluna--nav,
+    .coluna--contato {
+      grid-column: auto;
+    }
+
+    .base {
+      flex-wrap: wrap;
+    }
   }
 
   @media (max-width: 30rem) {
