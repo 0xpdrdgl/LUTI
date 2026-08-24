@@ -19,29 +19,33 @@ sobreParagrafos:
     atemporal.
 sobreLinkLabel: CONHEÇA NOSSO PROCESSO
 sobreLinkHref: '#processo'
+ctaTitulo: |-
+  Vamos conversar sobre o
+  seu projeto?
+ctaLinkLabel: ENTRAR EM CONTATO
+ctaLinkHref: /contato
 areasTitulo: Áreas de Atuação
 areas:
   - titulo: Residencial
     descricao: >-
-      Casas e apartamentos projetados a partir do modo de viver de cada
-      família — nada de soluções de catálogo.
+      Casas e apartamentos projetados a partir do modo de viver de cada família
+      — nada de soluções de catálogo.
   - titulo: Interiores
     descricao: >-
-      Interiores que unem estética e função, da seleção de materiais ao
-      projeto luminotécnico.
+      Interiores que unem estética e função, da seleção de materiais ao projeto
+      luminotécnico.
   - titulo: Design de Mobiliário
     descricao: >-
       Peças sob medida, desenhadas para cada projeto e produzidas com
       marcenarias parceiras.
   - titulo: Comercial
-    descricao: >-
-      Espaços de trabalho e comércio com identidade própria e fluidez de uso.
+    descricao: Espaços de trabalho e comércio com identidade própria e fluidez de uso.
 processoTitulo: Como trabalhamos
 processo:
   - titulo: Briefing
     descricao: >-
-      Escuta profunda: entendemos a rotina, os desejos e as necessidades de
-      quem vai habitar o espaço.
+      Escuta profunda: entendemos a rotina, os desejos e as necessidades de quem
+      vai habitar o espaço.
   - titulo: Conceito
     descricao: >-
       Pesquisa e partido de projeto: a narrativa que vai guiar todas as
@@ -50,13 +54,4 @@ processo:
     descricao: >-
       Desenvolvimento completo — plantas, perspectivas, especificação de
       materiais e mobiliário.
-  - titulo: Obra
-    descricao: >-
-      Acompanhamento próximo da execução, garantindo que cada detalhe saia
-      como foi desenhado.
 faixaFrase: Cada espaço conta a história de quem habita.
-ctaTitulo: |-
-  Vamos conversar sobre o
-  seu projeto?
-ctaLinkLabel: ENTRAR EM CONTATO
-ctaLinkHref: /contato
