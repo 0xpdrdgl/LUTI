@@ -109,6 +109,9 @@ export default config({
         ctaLinkLabel: fields.text({ label: 'CTA — link (texto)' }),
         ctaLinkHref: fields.text({ label: 'CTA — link (URL)' }),
         areasTitulo: fields.text({ label: 'Áreas — título da seção' }),
+        areasNota: fields.text({
+          label: 'Áreas — observação (ex.: atendimento em todo o Brasil)',
+        }),
         areas: fields.array(
           fields.object({
             titulo: fields.text({ label: 'Título' }),
