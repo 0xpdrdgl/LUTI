@@ -1,0 +1,24 @@
+heroImagem: hero.webp
+heroTitulo: Transformando sonhos em espaços reais. Além da arquitetura.
+heroBotaoLabel: VER PROJETOS
+heroBotaoHref: /projetos
+sobreTitulo: Sobre a Autora
+sobreFoto: sobre-298808.webp
+sobreParagrafos:
+  - >-
+    Acreditamos que a arquitetura deve ir além da forma; ela deve ser a
+    materialização do abrigo, um reflexo íntimo de quem o habita. Cada projeto é
+    concebido como uma narrativa visual, onde proporção, luz e materialidade
+    convergem para criar espaços de quietude e pertencimento.
+  - >-
+    Com uma abordagem editorial e um cuidado meticuloso aos detalhes, nosso
+    escritório busca o equilíbrio perfeito entre o rigor técnico e a
+    sensibilidade humana, rejeitando o excesso em favor de uma sofisticação
+    atemporal.
+sobreLinkLabel: CONHEÇA NOSSO PROCESSO
+sobreLinkHref: /sobre
+ctaTitulo: |-
+  Vamos conversar sobre o
+  seu projeto?
+ctaLinkLabel: ENTRAR EM CONTATO
+ctaLinkHref: /contato

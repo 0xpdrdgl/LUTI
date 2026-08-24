@@ -1,0 +1,102 @@
+---
+interface Props {
+  brand: string;
+  copyright: string;
+  links: { label: string; href: string }[];
+  logo?: string | null;
+}
+
+const { brand, copyright, links, logo } = Astro.props;
+const year = new Date().getFullYear();
+
+const copyrightTexto = copyright?.replace('{ano}', String(year)) ?? '';
+---
+
+<footer class="footer">
+  <div class="container">
+    {
+      logo ? (
+        <img src={logo} alt={brand} class="brand-img" />
+      ) : (
+        <span class="label brand">{brand}</span>
+      )
+    }
+    <p class="copyright">{copyrightTexto}</p>
+    <div class="social">
+      {
+        (links ?? []).map((link) => (
+          <a
+            href={link.href}
+            target={link.href.startsWith('http') ? '_blank' : undefined}
+            rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+            class="label"
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--surface);
+    border-top: 1px solid var(--accent);
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 4rem 5rem;
+  }
+
+  .brand {
+    color: var(--ink);
+  }
+
+  .brand-img {
+    display: block;
+    max-height: 1.75rem;
+    width: auto;
+  }
+
+  .copyright {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .social {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .social a {
+    position: relative;
+    color: var(--muted);
+    transition: color 150ms ease;
+  }
+
+  .social a::after {
+    content: '';
+    position: absolute;
+    inset: -14px -10px;
+  }
+
+  .social a:hover {
+    color: var(--ink);
+  }
+
+  @media (max-width: 64rem) {
+    .container {
+      flex-direction: column;
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+  }
+</style>

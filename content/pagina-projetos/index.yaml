@@ -1,0 +1,22 @@
+titulo: Projetos
+descricao: >-
+  Uma seleção do nosso portfólio. Arquitetura e interiores com foco em
+  materialidade, luz natural e a essência do habitar.
+filtros:
+  - label: Todos
+    slug: todos
+  - label: Interiores
+    slug: interiores
+  - label: Design de Mobiliário
+    slug: mobiliario
+  - label: Projetos Residenciais
+    slug: residenciais
+  - label: Comercial
+    slug: comercial
+moodboardTitulo: |-
+  A materialidade do
+  espaço.
+moodboardTexto: >-
+  Nosso processo busca texturas que contam histórias. A escolha de cada pedra,
+  madeira e tecido é um ato curatorial para criar lares com alma.
+moodboardBotao: VER MANIFESTO

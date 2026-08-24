@@ -1,0 +1,39 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BaseLayout from './BaseLayout.astro';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+import { siteImage } from '../lib/images';
+
+interface Props {
+  title: string;
+  description?: string;
+  fullBleed?: boolean;
+}
+
+const { title, description, fullBleed = false } = Astro.props;
+
+const site = await createReader(process.cwd(), keystaticConfig).singletons.site.read();
+const logo = siteImage(site?.logo);
+---
+
+<BaseLayout title={title} description={description}>
+  <Header brand={site?.brand ?? 'LUIZA TINOCO'} logo={logo} />
+  <main id="main" class:list={{ 'com-header': !fullBleed }}>
+    <slot />
+  </main>
+  <Footer
+    brand={site?.brand ?? 'LUIZA TINOCO'}
+    copyright={site?.copyright ?? ''}
+    links={site?.links ?? []}
+    logo={logo}
+  />
+</BaseLayout>
+
+<style>
+  .com-header {
+    padding-top: 6.125rem;
+  }
+</style>

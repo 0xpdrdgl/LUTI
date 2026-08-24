@@ -1,0 +1,352 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+
+const pagina = await createReader(process.cwd(), keystaticConfig).singletons.paginaContato.read();
+
+const segundaLinha = pagina?.tituloLinha2 ?? '';
+const corte = segundaLinha.lastIndexOf(' ');
+const linha2Inicio = corte === -1 ? '' : segundaLinha.slice(0, corte + 1);
+const palavraFinal = corte === -1 ? segundaLinha : segundaLinha.slice(corte + 1);
+---
+
+<PageLayout
+  title="Contato — LUIZA TINOCO"
+  description="Vamos criar algo atemporal. Entre em contato para discutirmos seu próximo projeto."
+>
+  <section class="contato">
+    <div class="contato-grid">
+      <div class="contato-info" data-reveal>
+        <h1>
+          <span class="linha-1">{pagina?.tituloLinha1}</span><br />
+          {linha2Inicio}<em>{palavraFinal}</em>
+        </h1>
+        <p class="contato-lead">{pagina?.lead}</p>
+
+        <div class="links-diretos">
+          {
+            (pagina?.links ?? []).map((link) => (
+              <a href={link.href} target="_blank" rel="noopener noreferrer" class="link-direto">
+                <span class="link-icone" aria-hidden="true">
+                  {link.icone === 'whatsapp' && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 3.5a8.5 8.5 0 0 0-7.2 13L4 20l3.6-.9A8.5 8.5 0 1 0 12 3.5Z"
+                        stroke="currentColor"
+                        stroke-width="1.2"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M9.3 8.6c-.3.6-.3 1.7.6 3.1 1 1.5 2.1 2.4 3.7 2.9.9.3 1.5-.1 1.8-.7.2-.4.1-.7-.2-.9l-1.2-.8c-.3-.2-.6-.1-.8.1l-.4.4c-.9-.4-1.8-1.3-2.2-2.1l.4-.5c.2-.2.2-.5.1-.8l-.7-1.3c-.2-.3-.5-.4-.9-.2-.1 0-.2.1-.2.2Z"
+                        stroke="currentColor"
+                        stroke-width="1.1"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  )}
+                  {link.icone === 'instagram' && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <rect
+                        x="3.5"
+                        y="3.5"
+                        width="17"
+                        height="17"
+                        rx="5"
+                        stroke="currentColor"
+                        stroke-width="1.2"
+                      />
+                      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.2" />
+                      <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" />
+                    </svg>
+                  )}
+                  {link.icone === 'email' && (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <rect
+                        x="3.5"
+                        y="5.5"
+                        width="17"
+                        height="13"
+                        rx="2"
+                        stroke="currentColor"
+                        stroke-width="1.2"
+                      />
+                      <path
+                        d="m4.5 7.5 7.5 5.5 7.5-5.5"
+                        stroke="currentColor"
+                        stroke-width="1.2"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  )}
+                </span>
+                <span class="link-texto">
+                  <span class="label link-label">{link.label}</span>
+                  <span class="link-valor">{link.valor}</span>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="form-card" data-reveal>
+        <div class="form-canto" aria-hidden="true"></div>
+        <h2>{pagina?.formTitulo}</h2>
+        <form action={pagina?.formEndpoint ?? '#'} method="POST">
+          <div class="campo">
+            <label for="nome" class="label">{pagina?.nomeLabel}</label>
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder={pagina?.nomePlaceholder}
+              required
+            />
+          </div>
+          <div class="campo">
+            <label for="email" class="label">{pagina?.emailLabel}</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder={pagina?.emailPlaceholder}
+              required
+            />
+          </div>
+          <div class="campo">
+            <label for="mensagem" class="label">{pagina?.mensagemLabel}</label>
+            <textarea
+              id="mensagem"
+              name="mensagem"
+              rows="5"
+              placeholder={pagina?.mensagemPlaceholder}
+              required></textarea>
+          </div>
+          <button type="submit" class="label btn-enviar">
+            {pagina?.botaoTexto}
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M1 6h9M6.5 2 10.5 6 6.5 10" stroke="currentColor"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .contato {
+    max-width: 70rem;
+    margin-inline: auto;
+    padding: 4rem 1.5rem 8rem;
+  }
+
+  .contato-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4rem;
+  }
+
+  /* Coluna esquerda */
+  .contato-info {
+    max-width: 28.25rem;
+    padding-top: 2.75rem;
+  }
+
+  .contato-info h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    line-height: 1.09;
+    color: var(--ink);
+  }
+
+  .contato-info h1 em {
+    font-style: italic;
+  }
+
+  .linha-1 {
+    white-space: nowrap;
+  }
+
+  .contato-lead {
+    margin-top: 2rem;
+    max-width: 26rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--body-color);
+  }
+
+  .links-diretos {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+
+  .link-direto {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 160ms var(--ease-out);
+  }
+
+  .link-direto:active {
+    transform: scale(0.97);
+  }
+
+  .link-icone {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid var(--accent);
+    color: var(--ink);
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .link-direto:hover .link-icone {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .link-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .link-label {
+    color: var(--body-color);
+  }
+
+  .link-valor {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  /* Card do formulário */
+  .form-card {
+    position: relative;
+    width: 32rem;
+    max-width: 100%;
+    flex-shrink: 0;
+    background: var(--surface);
+    padding: 2rem;
+  }
+
+  .form-canto {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    width: 6rem;
+    height: 6rem;
+    background: var(--accent);
+    z-index: -1;
+  }
+
+  .form-card h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 2rem;
+  }
+
+  .campo {
+    margin-bottom: 2rem;
+  }
+
+  .campo label {
+    display: block;
+    color: var(--body-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .campo input,
+  .campo textarea {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--accent);
+    transition: border-color 150ms ease;
+  }
+
+  .campo input::placeholder,
+  .campo textarea::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+
+  .campo input:focus,
+  .campo textarea:focus {
+    border-color: var(--ink);
+  }
+
+  .campo input:focus-visible,
+  .campo textarea:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .campo textarea {
+    resize: vertical;
+    min-height: 7.5rem;
+  }
+
+  .btn-enviar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      transform 160ms var(--ease-out);
+  }
+
+  .btn-enviar:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .btn-enviar:active {
+    transform: scale(0.97);
+  }
+
+  @media (max-width: 64rem) {
+    .contato {
+      padding-block: 2rem 5rem;
+    }
+
+    .contato-grid {
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .contato-info {
+      padding-top: 0;
+    }
+
+    .form-card {
+      width: 100%;
+    }
+  }
+</style>

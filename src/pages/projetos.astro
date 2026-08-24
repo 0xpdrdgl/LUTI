@@ -1,0 +1,129 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+import projAlvorada from '../assets/images/projetos/projeto-alvorada.webp';
+import projJardim from '../assets/images/projetos/projeto-jardim.webp';
+import projStudio from '../assets/images/projetos/projeto-studio.webp';
+import mood1 from '../assets/images/projetos/mood-1.webp';
+import mood2 from '../assets/images/projetos/mood-2.webp';
+import { Image } from 'astro:assets';
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const pagina = await reader.singletons.paginaProjetos.read();
+const projetos = await reader.collections.projetos.all();
+
+const projetoImagens = {
+  'projeto-alvorada': projAlvorada,
+  'projeto-jardim': projJardim,
+  'projeto-studio': projStudio,
+};
+
+const projects = projetos.map(({ slug, entry }) => ({
+  slug,
+  numero: String(entry.ano ?? ''),
+  categoria: entry.categoria,
+  titulo: entry.titulo,
+  local: entry.local ?? '',
+  capa: entry.capa,
+  largura: 736,
+  altura: 552,
+}));
+
+const classes = ['p1', 'p2', 'p3', 'p4'];
+projetos.forEach((card, i) => (card.classe = classes[i % classes.length]));
+---
+
+<PageLayout title="Projetos — LUIZA TINOCO">
+  <section class="hero">
+    <h1>{pagina?.titulo}</h1>
+    <p class="hero-sub">{pagina?.descricao}</p>
+    <div class="filtros" role="group" aria-label="Filtrar projetos">
+      {
+        (pagina?.filtros ?? []).map((filtro, i) => (
+          <button
+            type="button"
+            class:list={['label', 'filtro', { ativo: i === 0 }]}
+            data-filtro={filtro.slug}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >
+            {filtro.label}
+          </button>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="grid-section">
+    <div class="grid" id="projetos-grid" data-reveal>
+      {
+        cards.map((p) => {
+          const capaImage = projetoImagens[p.capa];
+          return (
+            <article class:list={['card', p.classe]} data-categoria={p.categoria}>
+              <a href={`/projetos/${p.slug}`} class="card-imagem">
+                {capaImage && (
+                  <div class="card-image-wrapper">
+                    <img
+                      src={capaImage}
+                      alt={p.titulo}
+                      loading="lazy"
+                      width={p.largura}
+                      height={p.altura}
+                    />
+                  </div>
+                )}
+                <div class="card-caption">
+                  <div class="card-texto">
+                    <span class="label card-categoria">{p.numero} / {p.categoria}</span>
+                    <h2>{p.titulo}</h2>
+                  </div>
+                  {p.local && <span class="card-local">{p.local}</span>}
+                </div>
+              </a>
+            </article>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  <section class="moodboard">
+    <div class="moodboard-grid" data-reveal>
+      <div class="moodboard-texto">
+        <h2 class="moodboard-titulo">{pagina?.moodboardTitulo}</h2>
+        <p>{pagina?.moodboardTexto}</p>
+        <a href="#" class="label manifesto-link">
+          {pagina?.moodboardBotao}
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <path d="M1 5h7M5 1.5 8.5 5 5 8.5" stroke="currentColor"></path>
+          </svg>
+        </a>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <div class="collage-bloco"></div>
+        <div class="collage-image-wrapper">
+          <img
+            src={mood1}
+            alt=""
+            class="collage-grande"
+            loading="lazy"
+          />
+        </div>
+        <div class="collage-image-wrapper">
+          <img
+            src={mood2}
+            alt=""
+            class="collage-quadrada"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Vamos conversar sobre o<br />seu projeto?</h2>
+    <a href="/contato" class="label cta-link">ENTRAR EM CONTATO</a>
+  </section>
+</PageLayout>

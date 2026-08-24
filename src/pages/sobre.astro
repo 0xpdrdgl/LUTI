@@ -1,0 +1,214 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+import retratoImage from '../assets/images/sobre/retrato.webp';
+import { Image } from 'astro:assets';
+
+const pagina = await createReader(process.cwd(), keystaticConfig).singletons.paginaSobre.read();
+---
+
+<PageLayout
+  title="Sobre — LUIZA TINOCO"
+  description="Arquitetura que respira. Uma abordagem autoral que abraça a textura, a luz natural e a verdadeira essência de quem habita."
+>
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-texto" data-reveal>
+        <h1>
+          <span class="linha-1">{pagina?.tituloPrincipal}</span><br />
+          <em>{pagina?.tituloItalico}</em>
+        </h1>
+        <div class="divisor" aria-hidden="true"></div>
+        <p class="hero-lead">{pagina?.lead}</p>
+        <p class="hero-nota">{pagina?.nota}</p>
+      </div>
+      <figure class="hero-retrato" data-reveal>
+        <Image
+          src={retratoImage}
+          alt={pagina?.tituloItalico}
+          format="avif"
+          quality={95}
+          loading="eager"
+          width={896}
+          height={1120}
+        />
+      </figure>
+    </div>
+  </section>
+
+  <section class="visao">
+    <div class="visao-grid" data-reveal>
+      <div class="visao-titulo">
+        <span class="label visao-label">{pagina?.visaoLabel}</span>
+        <h2 class="visao-titulo-texto">{pagina?.visaoTitulo}</h2>
+      </div>
+      <blockquote class="visao-quote">
+        <p>{pagina?.visaoQuote}</p>
+      </blockquote>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  /* Hero editorial */
+  .hero {
+    max-width: 70rem;
+    margin-inline: auto;
+    padding: 4rem 1.5rem 8rem;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 2rem;
+  }
+
+  .hero-texto {
+    grid-column: 1 / span 6;
+    align-self: center;
+  }
+
+  .hero-texto h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    line-height: 1.09;
+    color: var(--ink);
+  }
+
+  .linha-1 {
+    white-space: nowrap;
+  }
+
+  .hero-texto em {
+    font-style: italic;
+  }
+
+  .divisor {
+    width: 3rem;
+    height: 1px;
+    background: var(--accent);
+    margin-block: 2.5rem;
+  }
+
+  .hero-lead {
+    max-width: 28rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: var(--body-color);
+  }
+
+  .hero-nota {
+    margin-top: 2.5rem;
+    max-width: 28rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--body-color);
+  }
+
+  .hero-retrato {
+    grid-column: 8 / span 5;
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: var(--surface);
+  }
+
+  .hero-retrato::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translate(1rem, 1rem);
+    background: var(--surface);
+    z-index: 0;
+  }
+
+  .hero-retrato img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Seção visão */
+  .visao {
+    background: var(--surface);
+    padding: 8rem 1.5rem;
+  }
+
+  .visao-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 2rem;
+    max-width: 70rem;
+    margin-inline: auto;
+  }
+
+  .visao-titulo {
+    grid-column: 1 / span 4;
+  }
+
+  .visao-label {
+    display: block;
+    color: var(--muted);
+  }
+
+  .visao-titulo-texto {
+    margin-top: 2.25rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 2rem;
+    line-height: 1.31;
+    color: var(--ink);
+    white-space: pre-line;
+  }
+
+  .visao-quote {
+    grid-column: 7 / span 6;
+    margin: 0;
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    border-left: 1px solid var(--accent);
+  }
+
+  .visao-quote p {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: var(--body-color);
+  }
+
+  @media (max-width: 64rem) {
+    .hero {
+      padding-block: 3rem 5rem;
+    }
+
+    .hero-grid,
+    .visao-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .hero-texto h1 {
+      white-space: normal;
+    }
+
+    .linha-1 {
+      white-space: normal;
+    }
+
+    .hero-retrato {
+      max-width: 28rem;
+    }
+
+    .visao {
+      padding-block: 5rem;
+    }
+
+    .visao-quote {
+      padding-left: 1.25rem;
+    }
+  }
+</style>

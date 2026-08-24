@@ -1,0 +1,17 @@
+titulo: STUDIO BRANCO
+categoria: comercial
+ano: 2023
+resumo: >-
+  Studio criativo onde a luz difusa e as superfícies brancas compõem um cenário
+  minimalista e atemporal.
+descricao: >-
+  O Studio Branco foi concebido como uma tela em branco para a criatividade.
+  Pé-direito duplo, iluminação zenital controlada e paredes brancas texturizadas
+  criam um ambiente neutro que se adapta a diferentes usos — exposições,
+  ensaios, reuniões. O mobiliário flexível e a infraestrutura técnica oculta
+  permitem reconfigurações rápidas, mantendo a estética limpa e atemporal.
+capa: /images/projetos/studio-branco/capa.png
+galeria:
+  - /images/projetos/studio-branco/galeria/0.png
+  - /images/projetos/studio-branco/galeria/1.png
+destaque: true

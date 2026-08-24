@@ -1,0 +1,76 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Portfólio de arquitetura — Luiza Tinoco' } =
+  Astro.props;
+import { ClientRouter } from 'astro:transitions';
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap"
+    />
+    <ClientRouter />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Pular para o conteúdo</a>
+    <slot />
+    <script>
+      // Reveals com progressive enhancement: conteúdo visível por padrão;
+      // o JS apenas prepara e anima quem ainda não entrou na viewport.
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      function initReveals() {
+        const elementos = document.querySelectorAll('[data-reveal]');
+
+        if (reduced.matches || !('IntersectionObserver' in window)) return;
+
+        elementos.forEach((el) => {
+          if (el.dataset.revealBound) return;
+          el.dataset.revealBound = '1';
+
+          const grupo = el.parentElement
+            ? [...el.parentElement.children].filter((c) =>
+                c.hasAttribute?.('data-reveal'),
+              )
+            : [el];
+          const delay = Math.min(grupo.indexOf(el), 4) * 70;
+
+          el.classList.add('reveal-pendente');
+          el.style.transitionDelay = `${delay}ms`;
+
+          const obs = new IntersectionObserver(
+            (entradas) => {
+              entradas.forEach((entrada) => {
+                if (!entrada.isIntersecting) return;
+                entrada.target.classList.add('reveal-entrou');
+                obs.unobserve(entrada.target);
+              });
+            },
+            { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+          );
+          obs.observe(el);
+        });
+      }
+
+      document.addEventListener('astro:page-load', initReveals);
+    </script>
+  </body>
+</html>

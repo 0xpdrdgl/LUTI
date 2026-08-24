@@ -1,0 +1,23 @@
+tituloLinha1: Vamos criar
+tituloLinha2: algo atemporal.
+lead: >-
+  Entre em contato para discutirmos seu próximo projeto. Acreditamos em uma
+  arquitetura autoral, que reflete a essência de quem a habita.
+links:
+  - label: MENSAGEM RÁPIDA
+    valor: Iniciar no WhatsApp
+    href: 'https://wa.me/5592000000000'
+    icone: whatsapp
+  - label: ACOMPANHE O PROCESSO
+    valor: '@lutiarquitetura'
+    href: https://instagram.com/lutiarquitetura
+    icone: instagram
+formTitulo: Envie uma mensagem
+formEndpoint: 'https://formspree.io/f/seu-form-id'
+nomeLabel: NOME COMPLETO
+nomePlaceholder: Como você gostaria de ser chamado?
+emailLabel: E-MAIL
+emailPlaceholder: seu@email.com
+mensagemLabel: SOBRE O PROJETO
+mensagemPlaceholder: Conte-nos um pouco sobre suas ideias...
+botaoTexto: ENVIAR MENSAGEM
