@@ -40,6 +40,15 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
         <p>{pagina?.visaoQuote}</p>
       </blockquote>
     </div>
+
+    <div class="visao-cta" data-reveal>
+      <a href="/contato" class="label sobre-cta">
+        ENTRAR EM CONTATO
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M1 6h9M6.5 2 10.5 6 6.5 10" stroke="currentColor"></path>
+        </svg>
+      </a>
+    </div>
   </section>
 </PageLayout>
 
@@ -170,6 +179,34 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
     line-height: 1.6;
     letter-spacing: 0.01em;
     color: var(--body-color);
+  }
+
+  .visao-cta {
+    margin-top: 4rem;
+    text-align: center;
+  }
+
+  .sobre-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.75rem;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      transform 160ms var(--ease-out);
+  }
+
+  .sobre-cta:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .sobre-cta:active {
+    transform: scale(0.97);
   }
 
   @media (max-width: 64rem) {
