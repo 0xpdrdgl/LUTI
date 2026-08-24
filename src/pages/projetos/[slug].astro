@@ -1,71 +1,59 @@
 ---
-export const prerender = false;
-
 import PageLayout from '../../layouts/PageLayout.astro';
 import { createReader } from '@keystatic/core/reader';
 import keystaticConfig from '../../../keystatic.config';
 import { projetosImage } from '../../lib/images';
 
-const slug = Astro.params.slug as string;
+export async function getStaticPaths() {
+  const projetos = await createReader(
+    process.cwd(),
+    keystaticConfig,
+  ).collections.projetos.all();
 
-const reader = createReader(process.cwd(), keystaticConfig);
-const [pagina, projeto] = await Promise.all([
-  reader.singletons.paginaProjetos.read(),
-  reader.collections.projetos.read(slug),
-]);
-
-if (!projeto) {
-  return Astro.redirect('/projetos');
+  return projetos.map(({ slug, entry }) => ({
+    params: { slug },
+    props: { projeto: entry },
+  }));
 }
 
-const categoriaLabel =
-  pagina?.filtros?.find((f) => f.slug === projeto.categoria)?.label ??
-  projeto.categoria;
+const { projeto } = Astro.props;
 
-const capa = projetosImage(projeto.capa);
 const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
-const paragrafos = (projeto.descricao ?? '')
-  .split(/\n\s*\n/)
-  .map((p) => p.trim())
-  .filter(Boolean);
 ---
 
 <PageLayout title={`${projeto.titulo} — LUIZA TINOCO`} description={projeto.resumo}>
   <article class="projeto-detalhe">
     <header class="projeto-header">
       <div class="projeto-meta">
-        <span class="label">{categoriaLabel}</span>
-        <span class="label">{projeto.ano}</span>
-        {projeto.local && <span class="label">{projeto.local}</span>}
+        <span class="label">{projeto.categoria}</span>
+        {projeto.ano && <span class="label">{projeto.ano}</span>}
       </div>
       <h1>{projeto.titulo}</h1>
-      <p class="projeto-resumo">{projeto.resumo}</p>
+      {projeto.resumo && <p class="projeto-resumo">{projeto.resumo}</p>}
     </header>
 
     <div class="projeto-galeria">
-      {capa && (
-        <figure class="projeto-capa">
-          <img src={capa} alt={projeto.titulo} />
-        </figure>
-      )}
+      <figure class="projeto-capa">
+        <img src={projetosImage(projeto.capa)} alt={projeto.titulo} />
+      </figure>
 
-      {galeria.length > 0 && (
-        <div class="projeto-thumbs">
-          {galeria.map((img, i) => (
-            <figure class="projeto-thumb">
-              <img src={img} alt={`${projeto.titulo} - vista ${i + 1}`} />
-            </figure>
-          ))}
-        </div>
-      )}
+      {
+        galeria.length > 0 && (
+          <div class="projeto-thumbs">
+            {galeria.map((img, i) => (
+              <figure class="projeto-thumb">
+                <img src={img} alt={`${projeto.titulo} - vista ${i + 1}`} loading="lazy" />
+              </figure>
+            ))}
+          </div>
+        )
+      }
     </div>
 
     {
-      paragrafos.length > 0 && (
+      projeto.descricao && (
         <div class="projeto-descricao">
-          {paragrafos.map((paragrafo) => (
-            <p>{paragrafo}</p>
-          ))}
+          <p>{projeto.descricao}</p>
         </div>
       )
     }
@@ -76,7 +64,7 @@ const paragrafos = (projeto.descricao ?? '')
   .projeto-detalhe {
     max-width: 80rem;
     margin-inline: auto;
-    padding: 8rem 5rem 5rem;
+    padding: 4rem 5rem 5rem;
   }
 
   .projeto-header {
@@ -89,6 +77,10 @@ const paragrafos = (projeto.descricao ?? '')
     margin-bottom: 1rem;
   }
 
+  .projeto-meta .label {
+    color: var(--muted);
+  }
+
   .projeto-header h1 {
     font-family: var(--font-display);
     font-weight: 400;
@@ -96,6 +88,7 @@ const paragrafos = (projeto.descricao ?? '')
     line-height: 1.2;
     letter-spacing: -0.02em;
     color: var(--ink);
+    max-width: 30ch;
   }
 
   .projeto-resumo {
@@ -149,6 +142,7 @@ const paragrafos = (projeto.descricao ?? '')
     font-size: 1.0625rem;
     line-height: 1.8;
     color: var(--body-color);
+    white-space: pre-line;
   }
 
   @media (max-width: 64rem) {
