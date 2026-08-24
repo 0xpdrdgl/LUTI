@@ -15,6 +15,11 @@ const recentes = projetos
     capa: projetosImage(entry.capa),
   }))
   .slice(0, 3);
+
+const frase = home?.faixaFrase ?? '';
+const ultimoEspaco = frase.lastIndexOf(' ');
+const fraseInicio = ultimoEspaco > 0 ? frase.slice(0, ultimoEspaco) : frase;
+const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
 ---
 
 <PageLayout title="LUIZA TINOCO — Arquitetura" fullBleed>
@@ -109,7 +114,9 @@ const recentes = projetos
   </section>
 
   <section class="faixa" data-reveal>
-    <p class="faixa-frase">{home?.faixaFrase}</p>
+    <p class="faixa-frase">
+      {fraseInicio} {fraseFim && <em>{fraseFim}</em>}
+    </p>
   </section>
 
   <section id="processo" class="processo" data-reveal>
@@ -509,11 +516,14 @@ const recentes = projetos
     text-align: center;
     font-family: var(--font-display);
     font-weight: 400;
-    font-style: italic;
     font-size: clamp(1.75rem, 3.5vw, 2.75rem);
     line-height: 1.35;
     color: var(--ink);
     text-wrap: balance;
+  }
+
+  .faixa-frase em {
+    font-style: italic;
   }
 
   /* Processo */
