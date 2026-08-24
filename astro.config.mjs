@@ -9,7 +9,8 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   integrations: [react(), keystatic()],
   adapter: vercel(),
-  rewrites: [
-    { source: '/admin/:path*', destination: '/keystatic/:path*' }
-  ]
+  redirects: {
+    '/admin': '/keystatic',
+    '/admin/:path*': '/keystatic/:path*',
+  },
 });

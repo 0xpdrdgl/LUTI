@@ -1,0 +1,132 @@
+---
+export const prerender = false;
+
+if (import.meta.env.PROD) {
+  return new Response('Not found', { status: 404 });
+}
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Importar projetos (dev only)</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #111;
+        color: #eee;
+        max-width: 44rem;
+        margin: 3rem auto;
+        padding: 0 1.5rem;
+      }
+      h1 { font-size: 1.4rem; }
+      p { color: #999; line-height: 1.6; }
+      code { background: #222; padding: 2px 6px; border-radius: 4px; }
+      #drop {
+        border: 2px dashed #555;
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+        margin: 2rem 0;
+        transition: border-color 150ms, background 150ms;
+      }
+      #drop.sobre { border-color: #8ab4ff; background: #1a2333; }
+      button {
+        background: #eee;
+        color: #111;
+        border: 0;
+        padding: 0.8rem 1.6rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:disabled { opacity: 0.4; cursor: wait; }
+      ul { list-style: none; padding: 0; }
+      li { padding: 0.4rem 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
+      .ok::before { content: '✓ '; color: #6f6; }
+      .dup::before { content: '↷ '; color: #fa0; }
+      .err::before { content: '✗ '; color: #f66; }
+      a { color: #8ab4ff; }
+    </style>
+  </head>
+  <body>
+    <h1>Importar projetos (dev only)</h1>
+    <p>
+      Arraste as imagens baixadas do Instagram. Cada imagem vira um projeto no
+      CMS com placeholders — depois revise em <code>/admin</code>, ajuste
+      título/categoria/descrição e faça commit.
+    </p>
+    <p>
+      💡 Dica: pra baixar as imagens do perfil de uma vez, use uma extensão
+      como <strong>Fatkun Batch Image Downloader</strong> na aba do Instagram.
+    </p>
+    <div id="drop">
+      Arraste as imagens aqui ou
+      <input type="file" id="files" multiple accept="image/*" />
+    </div>
+    <button id="btn" disabled>Importar tudo</button>
+    <ul id="log"></ul>
+
+    <script>
+      const drop = document.getElementById('drop');
+      const input = document.getElementById('files');
+      const btn = document.getElementById('btn');
+      const log = document.getElementById('log');
+      let arquivos = [];
+
+      function setArquivos(lista) {
+        arquivos = [...lista].filter((f) => f.type.startsWith('image/'));
+        btn.disabled = arquivos.length === 0;
+        btn.textContent = arquivos.length
+          ? `Importar ${arquivos.length} imagem(ns)`
+          : 'Importar tudo';
+      }
+
+      input.addEventListener('change', () => setArquivos(input.files));
+      drop.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        drop.classList.add('sobre');
+      });
+      drop.addEventListener('dragleave', () => drop.classList.remove('sobre'));
+      drop.addEventListener('drop', (e) => {
+        e.preventDefault();
+        drop.classList.remove('sobre');
+        setArquivos(e.dataTransfer.files);
+      });
+
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        for (const [i, file] of arquivos.entries()) {
+          const li = document.createElement('li');
+          li.textContent = `${i + 1}/${arquivos.length} — ${file.name}...`;
+          log.appendChild(li);
+          try {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('nome', file.name);
+            const res = await fetch('/api/importar', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.duplicado) {
+              li.className = 'dup';
+              li.textContent += ` duplicado, ignorado (${data.slug})`;
+            } else {
+              li.className = 'ok';
+              li.textContent += ` criado "${data.titulo}" → /projetos/${data.slug}`;
+            }
+          } catch (e) {
+            li.className = 'err';
+            li.textContent += ` ERRO: ${e.message}`;
+          }
+        }
+        btn.disabled = false;
+        btn.textContent = 'Importar mais';
+        const fim = document.createElement('li');
+        fim.innerHTML = `<strong>Pronto!</strong> Revise em <a href="/admin" target="_blank">/admin</a>`;
+        log.appendChild(fim);
+      });
+    </script>
+  </body>
+</html>
