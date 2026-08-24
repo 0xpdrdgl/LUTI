@@ -20,7 +20,11 @@ const logo = siteImage(site?.logo);
 ---
 
 <BaseLayout title={title} description={description}>
-  <Header brand={site?.brand ?? 'LUIZA TINOCO'} logo={logo} />
+  <Header
+    brand={site?.brand ?? 'LUIZA TINOCO'}
+    logo={logo}
+    topoTransparente={fullBleed}
+  />
   <main id="main" class:list={{ 'com-header': !fullBleed }}>
     <slot />
   </main>

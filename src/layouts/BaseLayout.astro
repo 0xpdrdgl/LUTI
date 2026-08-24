@@ -71,6 +71,29 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       document.addEventListener('astro:page-load', initReveals);
+
+      // Header: barra sólida no scroll (só na home, que tem topo transparente)
+      let header = null;
+      let hint = null;
+
+      function atualizarHeader() {
+        if (!header || !header.classList.contains('header--topo-transparente'))
+          return;
+        const visivel = window.scrollY > 40;
+        header.classList.toggle('header--visible', visivel);
+        if (hint) {
+          hint.classList.toggle('scroll-hint--hidden', window.scrollY > 40);
+        }
+      }
+
+      function initHeader() {
+        header = document.querySelector('header');
+        hint = document.querySelector('[data-scroll-hint]');
+        atualizarHeader();
+      }
+
+      window.addEventListener('scroll', atualizarHeader, { passive: true });
+      document.addEventListener('astro:page-load', initHeader);
     </script>
   </body>
 </html>
