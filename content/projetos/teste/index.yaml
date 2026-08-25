@@ -1,7 +1,0 @@
-titulo: teste
-categoria: interiores
-capa: /images/projetos/teste/capa.jpg
-galeria:
-  - /images/projetos/teste/galeria/0.webp
-  - /images/projetos/teste/galeria/1.jpg
-destaque: false

@@ -50,19 +50,100 @@ if (import.meta.env.PROD) {
       .dup::before { content: '↷ '; color: #fa0; }
       .err::before { content: '✗ '; color: #f66; }
       a { color: #8ab4ff; }
+      .modo {
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+      }
+      .modo h2 { font-size: 1.05rem; margin-top: 0; }
+      .linha { display: flex; gap: 0.75rem; margin: 0.75rem 0; flex-wrap: wrap; align-items: center; }
+      input[type="password"], input[type="text"] {
+        flex: 1;
+        min-width: 200px;
+        background: #1a1a1a;
+        border: 1px solid #444;
+        border-radius: 8px;
+        padding: 0.6rem 0.8rem;
+        color: #eee;
+        font-size: 0.95rem;
+      }
+      .check { display: flex; align-items: center; gap: 0.5rem; color: #bbb; font-size: 0.9rem; }
+      #llm-model { max-width: 220px; flex: none; }
+      #posts {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0;
+        max-height: 26rem;
+        overflow-y: auto;
+      }
+      .post {
+        border: 1px solid #333;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        background: #1a1a1a;
+      }
+      .post.selecionado { border-color: #8ab4ff; }
+      .post img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+      .post .legenda {
+        padding: 0.5rem;
+        font-size: 0.72rem;
+        color: #aaa;
+        max-height: 4.5rem;
+        overflow: hidden;
+        text-align: left;
+      }
+      .primario { background: #8ab4ff; }
+      .secundario { background: none; border: 1px solid #555; color: #eee; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; }
     </style>
   </head>
   <body>
     <h1>Importar projetos (dev only)</h1>
-    <p>
-      Arraste as imagens baixadas do Instagram. Cada imagem vira um projeto no
-      CMS com placeholders — depois revise em <code>/admin</code>, ajuste
-      título/categoria/descrição e faça commit.
-    </p>
-    <p>
-      💡 Dica: pra baixar as imagens do perfil de uma vez, use uma extensão
-      como <strong>Fatkun Batch Image Downloader</strong> na aba do Instagram.
-    </p>
+
+    <section class="modo">
+      <h2>① Do Instagram via Apify</h2>
+      <p>
+        Rode o actor
+        <code>apify/instagram-post-scraper</code> com o perfil desejado no
+        Apify, depois cole seu token aqui pra puxar o resultado.
+      </p>
+      <div class="linha">
+        <input type="password" id="apify-token" placeholder="Token da API do Apify" />
+        <button type="button" id="btn-buscar">Buscar posts</button>
+      </div>
+      <div class="linha">
+        <label class="check">
+          <input type="checkbox" id="usar-gemini" checked />
+          Gerar título/descrição/categoria com Gemini
+        </label>
+        <select id="gemini-model">
+          <option value="gemini-2.5-flash" selected>gemini-2.5-flash (rápido)</option>
+          <option value="gemini-2.5-pro">gemini-2.5-pro (melhor)</option>
+          <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+          <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
+        </select>
+        <input
+          type="password"
+          id="gemini-key"
+          placeholder="Chave da API Gemini (aistudio.google.com)"
+        />
+      </div>
+      <div id="posts"></div>
+      <button type="button" id="btn-instagram" disabled class="primario">
+        Importar selecionados
+      </button>
+    </section>
+
+    <section class="modo">
+      <h2>② Do computador (arquivos)</h2>
+      <p>
+        💡 Pra baixar as imagens do perfil de uma vez, use uma extensão
+        como <strong>Fatkun Batch Image Downloader</strong> na aba do Instagram.
+      </p>
+    </section>
+
     <div id="drop">
       Arraste as imagens aqui (ou uma pasta inteira) ou
       <input type="file" id="files" multiple accept="image/*" />
@@ -160,6 +241,108 @@ if (import.meta.env.PROD) {
         }
         btn.disabled = false;
         btn.textContent = 'Importar mais';
+        const fim = document.createElement('li');
+        fim.innerHTML = `<strong>Pronto!</strong> Revise em <a href="/admin" target="_blank">/admin</a>`;
+        log.appendChild(fim);
+      });
+
+      /* ---------- Instagram via Apify ---------- */
+      const tokenInput = document.getElementById('apify-token');
+      const btnBuscar = document.getElementById('btn-buscar');
+      const postsDiv = document.getElementById('posts');
+      const btnInstagram = document.getElementById('btn-instagram');
+      const usarLLMInput = document.getElementById('usar-gemini');
+      const modelInput = document.getElementById('gemini-model');
+      const keyInput = document.getElementById('gemini-key');
+      let postsEncontrados = [];
+
+      btnBuscar.addEventListener('click', async () => {
+        const token = tokenInput.value.trim();
+        if (!token) {
+          status.textContent = 'Cole o token do Apify primeiro';
+          return;
+        }
+        btnBuscar.disabled = true;
+        btnBuscar.textContent = 'Buscando...';
+        postsDiv.innerHTML = '';
+        try {
+          const res = await fetch('/api/instagram-preview', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ token }),
+          });
+          const data = await res.json();
+          if (data.erro) {
+            status.textContent = `Erro: ${data.erro}`;
+            return;
+          }
+          postsEncontrados = data.posts;
+          status.textContent = `${postsEncontrados.length} posts encontrados — desmarque os que não quiser`;
+          postsDiv.innerHTML = '';
+          postsEncontrados.forEach((post, i) => {
+            const card = document.createElement('label');
+            card.className = 'post selecionado';
+            card.innerHTML = `
+              <input type="checkbox" checked data-index="${i}" style="display:none" />
+              <img src="${post.imagem}" loading="lazy" />
+              <div class="legenda">${(post.legenda || '(sem legenda)').slice(0, 120)}</div>
+            `;
+            card.addEventListener('click', () => {
+              card.classList.toggle('selecionado');
+              const check = card.querySelector('input');
+              check.checked = !check.checked;
+            });
+            postsDiv.appendChild(card);
+          });
+          btnInstagram.disabled = postsEncontrados.length === 0;
+          btnInstagram.textContent = `Importar ${postsEncontrados.length} post(s)`;
+        } catch (e) {
+          status.textContent = `Erro: ${e.message}`;
+        } finally {
+          btnBuscar.disabled = false;
+          btnBuscar.textContent = 'Buscar posts';
+        }
+      });
+
+      btnInstagram.addEventListener('click', async () => {
+        const token = tokenInput.value.trim();
+        const selecionados = [...postsDiv.querySelectorAll('.post.selecionado')].map(
+          (card) => postsEncontrados[+card.querySelector('input').dataset.index],
+        );
+        if (!selecionados.length) return;
+
+        btnInstagram.disabled = true;
+        for (const [i, post] of selecionados.entries()) {
+          const li = document.createElement('li');
+          li.textContent = `${i + 1}/${selecionados.length} — importando...`;
+          log.appendChild(li);
+          try {
+            const res = await fetch('/api/importar-instagram', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                token,
+                post,
+                usarGemini: usarLLMInput.checked,
+                geminiModel: modelInput.value,
+                geminiKey: keyInput.value.trim(),
+              }),
+            });
+            const data = await res.json();
+            if (data.erro) {
+              li.className = 'err';
+              li.textContent += ` ERRO: ${data.erro}`;
+            } else {
+              li.className = 'ok';
+              li.textContent += ` criado "${data.titulo}" (${data.categoria}${data.usouLLM ? ', via LLM' : ''}) → /projetos/${data.slug}`;
+            }
+          } catch (e) {
+            li.className = 'err';
+            li.textContent += ` ERRO: ${e.message}`;
+          }
+        }
+        btnInstagram.disabled = false;
+        btnInstagram.textContent = 'Importar mais';
         const fim = document.createElement('li');
         fim.innerHTML = `<strong>Pronto!</strong> Revise em <a href="/admin" target="_blank">/admin</a>`;
         log.appendChild(fim);
