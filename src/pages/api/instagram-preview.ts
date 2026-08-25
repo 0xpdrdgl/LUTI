@@ -1,3 +1,5 @@
+export const prerender = false;
+
 // Reúne todas as imagens de um post (carrosséis incluídos)
 // Compatível com múltiplos actors do Apify: instagram-post-scraper, instagram-scraper, instagram-scraper-2, etc.
 function extrairImagens(it: any): string[] {
@@ -75,7 +77,16 @@ export const POST = async (context: any) => {
     return new Response('Not found', { status: 404 });
   }
 
-  const body = await context.request.json();
+  let body: any;
+  try {
+    body = await context.request.json();
+  } catch {
+    return new Response(
+      JSON.stringify({ erro: 'Corpo da requisição vazio ou inválido' }),
+      { status: 400, headers: { 'content-type': 'application/json' } },
+    );
+  }
+
   let items = body?.items;
 
   if (!items && body?.token) {
