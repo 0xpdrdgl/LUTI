@@ -16,7 +16,7 @@ async function gerarComGemini(
   legenda: string,
   model: string,
   apiKey: string,
-) {
+): Promise<{ titulo: string | null; descricao: string | null; categoria: string | null } | { rateLimited: true } | null> {
   try {
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -41,6 +41,7 @@ async function gerarComGemini(
         signal: AbortSignal.timeout(60000),
       },
     );
+    if (res.status === 429) return { rateLimited: true };
     if (!res.ok) return null;
     const data = await res.json();
     const bruto = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}';
@@ -57,7 +58,6 @@ async function gerarComGemini(
   } catch {
     return null;
   }
-}
 }
 
 export const POST = async (context: any) => {
@@ -90,6 +90,12 @@ export const POST = async (context: any) => {
 
   if (usarGemini && geminiKey) {
     const gerado = await gerarComGemini(legenda, geminiModel, geminiKey);
+    if (gerado && 'rateLimited' in gerado) {
+      return new Response(
+        JSON.stringify({ rateLimited: true }),
+        { status: 429, headers: { 'content-type': 'application/json' } },
+      );
+    }
     if (gerado) {
       usouLLM = true;
       titulo = gerado.titulo ?? '';

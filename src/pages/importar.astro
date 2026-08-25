@@ -311,35 +311,78 @@ if (import.meta.env.PROD) {
         );
         if (!selecionados.length) return;
 
+        const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+        const comGemini = usarLLMInput.checked && keyInput.value.trim();
+
         btnInstagram.disabled = true;
         for (const [i, post] of selecionados.entries()) {
           const li = document.createElement('li');
           li.textContent = `${i + 1}/${selecionados.length} — importando...`;
           log.appendChild(li);
-          try {
-            const res = await fetch('/api/importar-instagram', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({
-                token,
-                post,
-                usarGemini: usarLLMInput.checked,
-                geminiModel: modelInput.value,
-                geminiKey: keyInput.value.trim(),
-              }),
-            });
-            const data = await res.json();
-            if (data.erro) {
-              li.className = 'err';
-              li.textContent += ` ERRO: ${data.erro}`;
-            } else {
-              li.className = 'ok';
-              li.textContent += ` criado "${data.titulo}" (${data.categoria}${data.usouLLM ? ', via LLM' : ''}) → /projetos/${data.slug}`;
+
+          let data = null;
+          let semIA = false;
+
+          for (let tentativa = 0; tentativa < 3; tentativa++) {
+            try {
+              const res = await fetch('/api/importar-instagram', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                  token,
+                  post,
+                  usarGemini: comGemini && !semIA,
+                  geminiModel: modelInput.value,
+                  geminiKey: keyInput.value.trim(),
+                }),
+              });
+
+              if (res.status === 429) {
+                li.textContent = `${i + 1}/${selecionados.length} — limite do Gemini, aguardando 20s (tentativa ${tentativas + 1})...`;
+                await esperar(20000);
+                tentativas++;
+                continue;
+              }
+
+              data = await res.json().catch(() => ({}));
+              break;
+            } catch (e) {
+              data = { erro: e.message };
+              break;
             }
-          } catch (e) {
-            li.className = 'err';
-            li.textContent += ` ERRO: ${e.message}`;
           }
+
+          // limite persistente após 3 tentativas: importa sem IA
+          if (data?.rateLimited) {
+            semIA = true;
+            li.textContent = `${i + 1}/${selecionados.length} — importando sem IA...`;
+            try {
+              const res = await fetch('/api/importar-instagram', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ token, post, usarGemini: false }),
+              });
+              data = await res.json().catch(() => ({}));
+            } catch (e) {
+              data = { erro: e.message };
+            }
+          }
+
+          if (data?.erro) {
+            li.className = 'err';
+            li.textContent += ` ERRO: ${data.erro}`;
+          } else if (data?.duplicado) {
+            li.className = 'dup';
+            li.textContent += ` duplicado, ignorado (${data.slug})`;
+          } else if (data?.slug) {
+            li.className = 'ok';
+            li.textContent += ` criado "${data.titulo}" (${data.categoria}${data.usouLLM ? ', via Gemini' : ', sem IA'}) → /projetos/${data.slug}`;
+          } else {
+            li.className = 'err';
+            li.textContent += ' ERRO desconhecido';
+          }
+
+          if (comGemini && i < selecionados.length - 1) await esperar(2500);
         }
         btnInstagram.disabled = false;
         btnInstagram.textContent = 'Importar mais';
