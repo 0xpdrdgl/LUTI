@@ -79,15 +79,20 @@ export const POST = async (context: any) => {
   let items = body?.items;
 
   if (!items && body?.token) {
+    const runPart = body.runId
+      ? `runs/${encodeURIComponent(body.runId)}`
+      : 'runs/last';
     const url =
-      'https://api.apify.com/v2/acts/apify~instagram-post-scraper/runs/last/dataset/items?token=' +
+      `https://api.apify.com/v2/acts/apify~instagram-post-scraper/${runPart}/dataset/items?token=` +
       encodeURIComponent(body.token) +
       '&clean=true';
     const res = await fetch(url);
     if (!res.ok) {
       return new Response(
         JSON.stringify({
-          erro: 'Token inválido ou nenhum run encontrado — rode o actor apify/instagram-post-scraper primeiro',
+          erro: body.runId
+            ? 'Run não encontrada — confere o Run ID no Apify Console (aba Runs do actor)'
+            : 'Token inválido ou nenhum run encontrado — rode o actor apify/instagram-post-scraper primeiro',
         }),
         { status: 400, headers: { 'content-type': 'application/json' } },
       );

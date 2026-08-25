@@ -114,6 +114,9 @@ if (import.meta.env.PROD) {
         <button type="button" id="btn-buscar">Buscar posts</button>
       </div>
       <div class="linha">
+        <input type="text" id="apify-run-id" placeholder="Run ID (opcional — vazio = última execução)" />
+      </div>
+      <div class="linha">
         <label class="check">
           <input type="checkbox" id="usar-gemini" checked />
           Gerar título/descrição/categoria com Gemini
@@ -252,6 +255,7 @@ if (import.meta.env.PROD) {
 
       /* ---------- Instagram via Apify ---------- */
       const tokenInput = document.getElementById('apify-token');
+      const runIdInput = document.getElementById('apify-run-id');
       const btnBuscar = document.getElementById('btn-buscar');
       const postsDiv = document.getElementById('posts');
       const btnInstagram = document.getElementById('btn-instagram');
@@ -371,6 +375,7 @@ if (import.meta.env.PROD) {
           status.textContent = 'Cole o token do Apify primeiro';
           return;
         }
+        const runId = runIdInput.value.trim();
         btnBuscar.disabled = true;
         btnBuscar.textContent = 'Buscando...';
         postsDiv.innerHTML = '';
@@ -378,7 +383,7 @@ if (import.meta.env.PROD) {
           const res = await fetch('/api/instagram-preview', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ token }),
+            body: JSON.stringify({ token, runId: runId || null }),
           });
           const dados = await res.json();
           if (dados.erro) {
