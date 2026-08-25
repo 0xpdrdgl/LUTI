@@ -4,6 +4,12 @@ import sharp from 'sharp';
 
 export const prerender = false;
 
+const HEADERS_IMG = {
+  'user-agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+  referer: 'https://www.instagram.com/',
+};
+
 const slugify = (s: string) =>
   s
     .normalize('NFD')
@@ -16,7 +22,11 @@ async function gerarComGemini(
   legenda: string,
   model: string,
   apiKey: string,
-): Promise<{ titulo: string | null; descricao: string | null; categoria: string | null } | { rateLimited: true } | null> {
+): Promise<
+  | { titulo: string | null; descricao: string | null; categoria: string | null }
+  | { rateLimited: true }
+  | null
+> {
   try {
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -28,7 +38,7 @@ async function gerarComGemini(
             {
               parts: [
                 {
-                  text: `A seguir, a legenda de um post de Instagram de um escritório de arquitetura.\n\n"""\n${legenda.slice(0, 3000)}\n"""\n\nGere um objeto JSON com: {"titulo": "nome curto do projeto (máximo 5 palavras)", "descricao": "descrição elegante do projeto em 1-2 frases, sem hashtags, emojis ou menções a rede social", "categoria": "residencial" ou "interiores" ou "comercial" ou "mobiliario"}. Use apenas uma das categorias listadas.`,
+                  text: `A seguir, a legenda de um post de Instagram de um escritório de arquitetura.\n\n"""\n${legenda.slice(0, 3000)}\n"""\n\nGere um objeto JSON com: {"titulo": "nome curto do projeto (máximo 5 palavras)", "descricao": "descrição elegante do projeto em 1-2 frases, sem hashtags, emojis ou menções a rede social", "categoria": "residenciais" ou "interiores" ou "comercial" ou "mobiliario"}. Use apenas uma das categorias listadas.`,
                 },
               ],
             },
@@ -49,15 +59,24 @@ async function gerarComGemini(
     return {
       titulo: typeof parsed.titulo === 'string' ? parsed.titulo : null,
       descricao: typeof parsed.descricao === 'string' ? parsed.descricao : null,
-      categoria: ['residencial', 'interiores', 'comercial', 'mobiliario'].includes(
+      categoria: ['residenciais', 'interiores', 'comercial', 'mobiliario'].includes(
         parsed.categoria,
       )
         ? parsed.categoria
-        : null,
+        : 'residenciais',
     };
   } catch {
     return null;
   }
+}
+
+async function baixarImagem(url: string): Promise<Buffer> {
+  const res = await fetch(url, {
+    headers: HEADERS_IMG,
+    signal: AbortSignal.timeout(60000),
+  });
+  if (!res.ok) throw new Error(`download ${res.status}`);
+  return Buffer.from(await res.arrayBuffer());
 }
 
 export const POST = async (context: any) => {
@@ -75,6 +94,9 @@ export const POST = async (context: any) => {
   }
 
   const legenda: string = post.legenda ?? '';
+  const extras: string[] = Array.isArray(post.imagensExtras)
+    ? post.imagensExtras
+    : [];
   const usarGemini: boolean = !!body.usarGemini;
   const geminiModel: string = body.geminiModel || 'gemini-2.5-flash';
   const geminiKey: string = body.geminiKey || '';
@@ -111,35 +133,28 @@ export const POST = async (context: any) => {
   if (!titulo) titulo = `Projeto ${new Date().getFullYear()}`;
 
   let slug = slugify(titulo).slice(0, 60) || `projeto-${Date.now()}`;
-  const contentDir = path.join(process.cwd(), 'content', 'projetos', slug);
+  let finalContentDir = path.join(process.cwd(), 'content', 'projetos', slug);
   let existente = await fs
-    .access(path.join(contentDir, 'index.yaml'))
+    .access(path.join(finalContentDir, 'index.yaml'))
     .then(() => true)
     .catch(() => false);
   let sufixo = 2;
-  while (existente) {
+  while (existente && sufixo <= 20) {
     slug = `${slugify(titulo).slice(0, 55)}-${sufixo}`;
+    finalContentDir = path.join(process.cwd(), 'content', 'projetos', slug);
     existente = await fs
-      .access(
-        path.join(process.cwd(), 'content', 'projetos', slug, 'index.yaml'),
-      )
+      .access(path.join(finalContentDir, 'index.yaml'))
       .then(() => true)
       .catch(() => false);
     sufixo++;
-    if (sufixo > 20) break;
   }
 
   const imgDir = path.join(process.cwd(), 'public', 'images', 'projetos');
-  const finalContentDir = path.join(process.cwd(), 'content', 'projetos', slug);
   const arquivo = `${slug}.webp`;
 
   let buffer: Buffer;
   try {
-    const imgRes = await fetch(post.imagem, {
-      signal: AbortSignal.timeout(60000),
-    });
-    if (!imgRes.ok) throw new Error(`download ${imgRes.status}`);
-    buffer = Buffer.from(await imgRes.arrayBuffer());
+    buffer = await baixarImagem(post.imagem);
   } catch {
     return new Response(
       JSON.stringify({ erro: 'Falha ao baixar a imagem do post' }),
@@ -154,9 +169,27 @@ export const POST = async (context: any) => {
     .webp({ quality: 82 })
     .toFile(path.join(imgDir, arquivo));
 
+  // Imagens extras do carrossel -> galeria
+  const galeria: string[] = [];
+  for (const [i, url] of extras.entries()) {
+    try {
+      const buf = await baixarImagem(url);
+      const arquivoExtra = `${slug}-galeria-${i}.webp`;
+      await sharp(buf)
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toFile(path.join(imgDir, arquivoExtra));
+      galeria.push(`/images/projetos/${arquivoExtra}`);
+    } catch {
+      // extra falhou, segue sem ele
+    }
+  }
+
   const tituloSafe = titulo.replace(/\\/g, '').replace(/"/g, "'");
   const descSafe = descricao.replace(/\\/g, '').replace(/"/g, "'");
-  const ano = post.timestamp ? new Date(post.timestamp).getFullYear() : new Date().getFullYear();
+  const ano = post.timestamp
+    ? new Date(post.timestamp).getFullYear()
+    : new Date().getFullYear();
 
   const yaml = `titulo: "${tituloSafe}"
 categoria: ${categoria}
@@ -166,7 +199,7 @@ resumo: ''
 descricao: >-
   ${descSafe.replace(/\n/g, '\n  ')}
 capa: /images/projetos/${arquivo}
-galeria: []
+galeria: [${galeria.map((g) => `'${g}'`).join(', ')}]
 destaque: false
 `;
 
@@ -179,6 +212,7 @@ destaque: false
       categoria,
       usouLLM,
       capa: `/images/projetos/${arquivo}`,
+      galeria: galeria.length,
     }),
     { headers: { 'content-type': 'application/json' } },
   );

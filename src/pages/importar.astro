@@ -130,6 +130,10 @@ if (import.meta.env.PROD) {
           placeholder="Chave da API Gemini (aistudio.google.com)"
         />
       </div>
+      <div class="linha">
+        <span class="check">ou suba o export do Apify (JSON/CSV):</span>
+        <input type="file" id="arquivo-export" accept=".json,.csv" />
+      </div>
       <div id="posts"></div>
       <button type="button" id="btn-instagram" disabled class="primario">
         Importar selecionados
@@ -254,7 +258,112 @@ if (import.meta.env.PROD) {
       const usarLLMInput = document.getElementById('usar-gemini');
       const modelInput = document.getElementById('gemini-model');
       const keyInput = document.getElementById('gemini-key');
+      const arquivoExport = document.getElementById('arquivo-export');
       let postsEncontrados = [];
+
+      // CSV minimalista com suporte a campos entre aspas
+      function parseCSV(texto) {
+        const linhas = [];
+        let linha = [];
+        let campo = '';
+        let aspas = false;
+        for (let i = 0; i < texto.length; i++) {
+          const ch = texto[i];
+          if (aspas) {
+            if (ch === '"') {
+              if (texto[i + 1] === '"') {
+                campo += '"';
+                i++;
+              } else aspas = false;
+            } else campo += ch;
+          } else if (ch === '"') aspas = true;
+          else if (ch === ',') {
+            linha.push(campo);
+            campo = '';
+          } else if (ch === '\n' || ch === '\r') {
+            if (ch === '\r' && texto[i + 1] === '\n') i++;
+            linha.push(campo);
+            campo = '';
+            if (linha.some((c) => c !== '')) linhas.push(linha);
+            linha = [];
+          } else campo += ch;
+        }
+        if (campo !== '' || linha.length) {
+          linha.push(campo);
+          if (linha.some((c) => c !== '')) linhas.push(linha);
+        }
+        return linhas;
+      }
+
+      function itensDoArquivo(texto, nome) {
+        if (nome.endsWith('.json')) {
+          const dados = JSON.parse(texto);
+          return Array.isArray(dados) ? dados : (dados.data ?? []);
+        }
+        // CSV
+        const linhas = parseCSV(texto);
+        if (linhas.length < 2) return [];
+        const header = linhas[0];
+        const col = (nomes) =>
+          header.findIndex((h) => nomes.some((n) => h.toLowerCase() === n));
+        const cDisplay = col(['displayurl', 'display_url', 'image', 'imagem']);
+        const cCaption = col(['caption', 'legenda']);
+        const cTimestamp = col(['timestamp', 'date', 'data']);
+        const cChild = col(['childposts', 'child_posts']);
+        const cImages = col(['imageurls', 'image_urls', 'images']);
+        return linhas.slice(1).map((linha, i) => {
+          const item = { id: String(i) };
+          if (cDisplay >= 0) item.displayUrl = linha[cDisplay];
+          if (cCaption >= 0) item.caption = linha[cCaption];
+          if (cTimestamp >= 0) item.timestamp = linha[cTimestamp];
+          if (cChild >= 0) {
+            try { item.childPosts = JSON.parse(linha[cChild]); } catch {}
+          }
+          if (cImages >= 0) {
+            try { item.imageUrls = JSON.parse(linha[cImages]); } catch {}
+          }
+          return item;
+        });
+      }
+
+      async function carregarItems(items) {
+        const res = await fetch('/api/instagram-preview', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ items }),
+        });
+        return res.json();
+      }
+
+      function renderPosts(posts) {
+        postsEncontrados = posts;
+        status.textContent = `${posts.length} post(s) encontrado(s) — desmarque os que não quiser`;
+        postsDiv.innerHTML = '';
+        posts.forEach((post, i) => {
+          const card = document.createElement('label');
+          card.className = 'post selecionado';
+          const badge =
+            post.imagensExtras?.length > 0
+              ? `<div class="badge-carrossel">🖼 ${post.imagensExtras.length + 1} imagens</div>`
+              : '';
+          card.innerHTML = `
+            <input type="checkbox" checked data-index="${i}" style="display:none" />
+            <div class="post-thumb">
+              <img src="${post.imagem}" loading="lazy" />
+              ${badge}
+            </div>
+            <div class="legenda">${(post.legenda || '(sem legenda)').slice(0, 120)}</div>
+          `;
+          card.addEventListener('click', () => {
+            card.classList.toggle('selecionado');
+            const check = card.querySelector('input');
+            check.checked = !check.checked;
+          });
+          postsDiv.appendChild(card);
+        });
+        btnInstagram.disabled = posts.length === 0;
+        btnInstagram.textContent = `Importar ${posts.length} post(s)`;
+      }
 
       btnBuscar.addEventListener('click', async () => {
         const token = tokenInput.value.trim();
@@ -271,36 +380,39 @@ if (import.meta.env.PROD) {
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ token }),
           });
-          const data = await res.json();
-          if (data.erro) {
-            status.textContent = `Erro: ${data.erro}`;
+          const dados = await res.json();
+          if (dados.erro) {
+            status.textContent = `Erro: ${dados.erro}`;
             return;
           }
-          postsEncontrados = data.posts;
-          status.textContent = `${postsEncontrados.length} posts encontrados — desmarque os que não quiser`;
-          postsDiv.innerHTML = '';
-          postsEncontrados.forEach((post, i) => {
-            const card = document.createElement('label');
-            card.className = 'post selecionado';
-            card.innerHTML = `
-              <input type="checkbox" checked data-index="${i}" style="display:none" />
-              <img src="${post.imagem}" loading="lazy" />
-              <div class="legenda">${(post.legenda || '(sem legenda)').slice(0, 120)}</div>
-            `;
-            card.addEventListener('click', () => {
-              card.classList.toggle('selecionado');
-              const check = card.querySelector('input');
-              check.checked = !check.checked;
-            });
-            postsDiv.appendChild(card);
-          });
-          btnInstagram.disabled = postsEncontrados.length === 0;
-          btnInstagram.textContent = `Importar ${postsEncontrados.length} post(s)`;
+          renderPosts(dados.posts);
         } catch (e) {
           status.textContent = `Erro: ${e.message}`;
         } finally {
           btnBuscar.disabled = false;
           btnBuscar.textContent = 'Buscar posts';
+        }
+      });
+
+      arquivoExport.addEventListener('change', async () => {
+        const file = arquivoExport.files[0];
+        if (!file) return;
+        status.textContent = 'Lendo arquivo...';
+        try {
+          const texto = await file.text();
+          const items = itensDoArquivo(texto, file.name.toLowerCase());
+          if (!items.length) {
+            status.textContent = 'Nenhum item encontrado no arquivo';
+            return;
+          }
+          const data = await carregarItems(items);
+          if (data.erro) {
+            status.textContent = `Erro: ${data.erro}`;
+            return;
+          }
+          renderPosts(data.posts);
+        } catch (e) {
+          status.textContent = `Erro ao ler arquivo: ${e.message}`;
         }
       });
 
@@ -325,17 +437,27 @@ if (import.meta.env.PROD) {
 
           for (let tentativa = 0; tentativa < 3; tentativa++) {
             try {
-              const res = await fetch('/api/importar-instagram', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({
-                  token,
-                  post,
-                  usarGemini: comGemini && !semIA,
-                  geminiModel: modelInput.value,
-                  geminiKey: keyInput.value.trim(),
-                }),
-              });
+            const res = await fetch('/api/importar-instagram', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                token,
+                post,
+                usarGemini: usarLLMInput.checked,
+                geminiModel: modelInput.value,
+                geminiKey: keyInput.value.trim(),
+              }),
+            });
+
+            if (res.status === 429) {
+              li.textContent = `${i + 1}/${selecionados.length} — limite do Gemini, aguardando 20s (tentativa ${tentativas + 1})...`;
+              await esperar(20000);
+              tentativas++;
+              continue;
+            }
+
+            data = await res.json().catch(() => ({}));
+            break;
 
               if (res.status === 429) {
                 li.textContent = `${i + 1}/${selecionados.length} — limite do Gemini, aguardando 20s (tentativa ${tentativas + 1})...`;
