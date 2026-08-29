@@ -51,18 +51,30 @@ areas:
     descricao: >-
       Projeto e detalhamento de mobiliário sob medida, produzido com
       marcenarias parceiras.
-processoTitulo: Como trabalhamos
+processoTitulo: Etapas do Projeto Executivo
 processo:
   - titulo: Briefing
     descricao: >-
-      Escuta profunda: entendemos a rotina, os desejos e as necessidades de quem
-      vai habitar o espaço.
-  - titulo: Conceito
+      Levantamento do programa de necessidades e do modo de viver de quem vai
+      habitar o espaço.
+  - titulo: Estudo Preliminar
     descricao: >-
-      Pesquisa e partido de projeto: a narrativa que vai guiar todas as
-      decisões, do layout aos materiais.
-  - titulo: Projeto
+      Primeiras soluções de layout, volumetria e partido, alinhando a ideia
+      geral do projeto.
+  - titulo: Anteprojeto
     descricao: >-
-      Desenvolvimento completo - plantas, perspectivas, especificação de
-      materiais e mobiliário.
+      Detalhamento do layout aprovado, com plantas, cortes e especificação
+      inicial de materiais.
+  - titulo: Projeto Executivo
+    descricao: >-
+      Documentação técnica completa para execução: plantas cotadas,
+      detalhamentos e compatibilização com projetos complementares.
+  - titulo: Projeto de Marcenaria
+    descricao: >-
+      Detalhamento técnico do mobiliário sob medida, pronto para produção com
+      marcenarias parceiras.
+  - titulo: Acompanhamento de Obra
+    descricao: >-
+      Visitas técnicas e suporte à execução, garantindo fidelidade ao projeto
+      até a entrega final.
 faixaFrase: Cada espaço conta a história de quem habita.
