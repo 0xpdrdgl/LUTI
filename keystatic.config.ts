@@ -90,6 +90,9 @@ export default config({
         heroTitulo: fields.text({ label: 'Hero — título', multiline: true }),
         heroBotaoLabel: fields.text({ label: 'Hero — botão (texto)' }),
         heroBotaoHref: fields.text({ label: 'Hero — botão (link)' }),
+        projetosNota: fields.text({
+          label: 'Projetos — observação (ex.: atuação em todo o Brasil)',
+        }),
         sobreTitulo: fields.text({ label: 'Sobre a autora — título' }),
         sobreFoto: fields.image({
           label: 'Sobre a autora — foto',

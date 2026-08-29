@@ -45,7 +45,10 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
 
   <section id="projetos" class="projetos">
     <div class="section-header" data-reveal>
-      <h2>Projetos Recentes</h2>
+      <div>
+        <h2>Projetos</h2>
+        {home?.projetosNota && <p class="projetos-nota">{home.projetosNota}</p>}
+      </div>
       <a href="/projetos" class="label ver-todos">VER TODOS</a>
     </div>
 
@@ -266,6 +269,13 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
 
   .ver-todos:hover {
     color: var(--ink);
+  }
+
+  .projetos-nota {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--muted);
   }
 
   .grid {

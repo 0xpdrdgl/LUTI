@@ -48,6 +48,10 @@ const home = authed ? await reader.singletons.home.read() : null
             <input id="f-heroBotaoHref" class="editar-input" type="text" value={home.heroBotaoHref ?? ''} />
           </div>
         </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-projetosNota">Projetos — observação (ex.: atuação em todo o Brasil)</label>
+          <input id="f-projetosNota" class="editar-input" type="text" value={home.projetosNota ?? ''} />
+        </div>
       </section>
 
       <section class="editar-section">
@@ -251,6 +255,7 @@ const home = authed ? await reader.singletons.home.read() : null
         heroTitulo: val('f-heroTitulo'),
         heroBotaoLabel: val('f-heroBotaoLabel'),
         heroBotaoHref: val('f-heroBotaoHref'),
+        projetosNota: val('f-projetosNota'),
         sobreTitulo: val('f-sobreTitulo'),
         sobreParagrafos: readTextArray('sobreParagrafos-list'),
         sobreLinkLabel: val('f-sobreLinkLabel'),
