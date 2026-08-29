@@ -32,6 +32,7 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     <div class="hero-overlay"></div>
     <div class="hero-content" data-reveal>
       <h1>{home?.heroTitulo}</h1>
+      {home?.projetosNota && <p class="label hero-nota">{home.projetosNota}</p>}
       <a href={home?.heroBotaoHref ?? '/projetos'} class="label hero-link">
         {home?.heroBotaoLabel}
       </a>
@@ -45,10 +46,7 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
 
   <section id="projetos" class="projetos">
     <div class="section-header" data-reveal>
-      <div>
-        <h2>Projetos</h2>
-        {home?.projetosNota && <p class="projetos-nota">{home.projetosNota}</p>}
-      </div>
+      <h2>Projetos</h2>
       <a href="/projetos" class="label ver-todos">VER TODOS</a>
     </div>
 
@@ -217,6 +215,12 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
   }
 
+  .hero-nota {
+    margin-top: -1rem;
+    color: rgba(255, 255, 255, 0.75);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  }
+
   .hero-link {
     padding: 1rem 2rem;
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -292,12 +296,6 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     color: var(--ink);
   }
 
-  .projetos-nota {
-    margin-top: 0.5rem;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    color: var(--muted);
-  }
 
   .grid {
     display: grid;

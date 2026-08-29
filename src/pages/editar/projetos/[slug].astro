@@ -12,9 +12,8 @@ const slug = Astro.params.slug as string
 const projeto = authed ? await reader.collections.projetos.read(slug) : null
 
 const CATEGORIAS = [
-  { label: 'Interiores', value: 'interiores' },
-  { label: 'Design de Mobiliário', value: 'mobiliario' },
-  { label: 'Projetos Residenciais', value: 'residenciais' },
+  { label: 'Residencial', value: 'residencial' },
+  { label: 'Apartamento', value: 'apartamento' },
   { label: 'Comercial', value: 'comercial' },
 ]
 ---

@@ -5,12 +5,10 @@ descricao: >-
 filtros:
   - label: Todos
     slug: todos
-  - label: Interiores
-    slug: interiores
-  - label: Design de Mobiliário
-    slug: mobiliario
-  - label: Projetos Residenciais
-    slug: residenciais
+  - label: Residencial
+    slug: residencial
+  - label: Apartamento
+    slug: apartamento
   - label: Comercial
     slug: comercial
 moodboardTitulo: |-

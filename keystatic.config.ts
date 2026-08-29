@@ -23,12 +23,11 @@ export default config({
         categoria: fields.select({
           label: 'Categoria',
           options: [
-            { label: 'Interiores', value: 'interiores' },
-            { label: 'Design de Mobiliário', value: 'mobiliario' },
-            { label: 'Projetos Residenciais', value: 'residenciais' },
+            { label: 'Residencial', value: 'residencial' },
+            { label: 'Apartamento', value: 'apartamento' },
             { label: 'Comercial', value: 'comercial' },
           ],
-          defaultValue: 'interiores',
+          defaultValue: 'residencial',
         }),
         ano: fields.number({ label: 'Ano' }),
         local: fields.text({ label: 'Local (ex.: São Paulo, SP)' }),
