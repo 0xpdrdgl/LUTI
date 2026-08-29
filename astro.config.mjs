@@ -12,9 +12,11 @@ import vercel from '@astrojs/vercel';
 // time, not build time) need every content yaml file listed explicitly to
 // be available at runtime on Vercel.
 const projetosDir = fileURLToPath(new URL('content/projetos', import.meta.url));
-const projetoFiles = readdirSync(projetosDir, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && existsSync(`${projetosDir}/${entry.name}/index.yaml`))
-  .map((entry) => `content/projetos/${entry.name}/index.yaml`);
+const projetoFiles = existsSync(projetosDir)
+  ? readdirSync(projetosDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && existsSync(`${projetosDir}/${entry.name}/index.yaml`))
+      .map((entry) => `content/projetos/${entry.name}/index.yaml`)
+  : [];
 
 // https://astro.build/config
 export default defineConfig({
