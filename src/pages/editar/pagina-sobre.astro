@@ -56,22 +56,6 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
         </div>
       </section>
 
-      <section class="editar-section">
-        <h2>Visão</h2>
-        <div class="editar-field">
-          <label class="editar-label" for="f-visaoLabel">Label</label>
-          <input id="f-visaoLabel" class="editar-input" type="text" value={pagina.visaoLabel ?? ''} />
-        </div>
-        <div class="editar-field">
-          <label class="editar-label" for="f-visaoTitulo">Título</label>
-          <textarea id="f-visaoTitulo" class="editar-textarea">{pagina.visaoTitulo ?? ''}</textarea>
-        </div>
-        <div class="editar-field">
-          <label class="editar-label" for="f-visaoQuote">Citação</label>
-          <textarea id="f-visaoQuote" class="editar-textarea">{pagina.visaoQuote ?? ''}</textarea>
-        </div>
-      </section>
-
       <footer class="editar-form-actions">
         <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
         <button type="button" id="editar-save" class="editar-save">
@@ -127,9 +111,6 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
         tituloItalico: val('f-tituloItalico'),
         lead: val('f-lead'),
         nota: val('f-nota'),
-        visaoLabel: val('f-visaoLabel'),
-        visaoTitulo: val('f-visaoTitulo'),
-        visaoQuote: val('f-visaoQuote'),
       }
 
       const formData = new FormData()

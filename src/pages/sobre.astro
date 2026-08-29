@@ -31,16 +31,6 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
   </section>
 
   <section class="visao">
-    <div class="visao-grid" data-reveal>
-      <div class="visao-titulo">
-        <span class="label visao-label">{pagina?.visaoLabel}</span>
-        <h2 class="visao-titulo-texto">{pagina?.visaoTitulo}</h2>
-      </div>
-      <blockquote class="visao-quote">
-        <p>{pagina?.visaoQuote}</p>
-      </blockquote>
-    </div>
-
     <div class="visao-cta" data-reveal>
       <a href="/contato" class="label sobre-cta">
         ENTRAR EM CONTATO
@@ -140,47 +130,6 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
     padding: 8rem 1.5rem;
   }
 
-  .visao-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    column-gap: 2rem;
-    max-width: 70rem;
-    margin-inline: auto;
-  }
-
-  .visao-titulo {
-    grid-column: 1 / span 4;
-  }
-
-  .visao-label {
-    display: block;
-    color: var(--muted);
-  }
-
-  .visao-titulo-texto {
-    margin-top: 2.25rem;
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 2rem;
-    line-height: 1.31;
-    color: var(--ink);
-    white-space: pre-line;
-  }
-
-  .visao-quote {
-    grid-column: 7 / span 6;
-    margin: 0;
-    padding: 0.5rem 0 0.5rem 1.5rem;
-    border-left: 1px solid var(--accent);
-  }
-
-  .visao-quote p {
-    font-size: 1.125rem;
-    line-height: 1.6;
-    letter-spacing: 0.01em;
-    color: var(--body-color);
-  }
-
   .visao-cta {
     margin-top: 4rem;
     text-align: center;
@@ -235,10 +184,6 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
 
     .visao {
       padding-block: 5rem;
-    }
-
-    .visao-quote {
-      padding-left: 1.25rem;
     }
   }
 </style>
