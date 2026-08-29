@@ -21,23 +21,18 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
         <div class="divisor" aria-hidden="true"></div>
         <p class="hero-lead">{pagina?.lead}</p>
         <p class="hero-nota">{pagina?.nota}</p>
+        <a href="/contato" class="label sobre-cta">
+          ENTRAR EM CONTATO
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M1 6h9M6.5 2 10.5 6 6.5 10" stroke="currentColor"></path>
+          </svg>
+        </a>
       </div>
       <figure class="hero-retrato" data-reveal>
         {pagina?.retrato && (
           <img src={siteImage(pagina.retrato)} alt={pagina?.tituloItalico} />
         )}
       </figure>
-    </div>
-  </section>
-
-  <section class="visao">
-    <div class="visao-cta" data-reveal>
-      <a href="/contato" class="label sobre-cta">
-        ENTRAR EM CONTATO
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          <path d="M1 6h9M6.5 2 10.5 6 6.5 10" stroke="currentColor"></path>
-        </svg>
-      </a>
     </div>
   </section>
 </PageLayout>
@@ -124,21 +119,11 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
     object-fit: cover;
   }
 
-  /* CTA de contato (antiga seção Nossa Visão) */
-  .visao {
-    background: var(--surface);
-    padding: 5rem 1.5rem;
-  }
-
-  .visao-cta {
-    margin-top: 0;
-    text-align: center;
-  }
-
   .sobre-cta {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
+    margin-top: 2.5rem;
     padding: 0.9rem 1.75rem;
     border: 1px solid var(--border-strong);
     color: var(--ink);
@@ -179,10 +164,6 @@ const pagina = await createReader(process.cwd(), keystaticConfig).singletons.pag
 
     .hero-retrato {
       max-width: 28rem;
-    }
-
-    .visao {
-      padding-block: 5rem;
     }
   }
 </style>

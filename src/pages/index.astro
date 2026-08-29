@@ -64,16 +64,16 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     </div>
   </section>
 
-  <section class="areas" data-reveal>
+  <section class="areas">
     <div class="areas-grid">
-      <div class="areas-header">
+      <div class="areas-header" data-reveal>
         <h2>{home?.areasTitulo}</h2>
         {home?.areasNota && <p class="areas-nota">{home?.areasNota}</p>}
       </div>
       <ul class="areas-lista">
         {
           (home?.areas ?? []).map((area, i) => (
-            <li class="area-item">
+            <li class="area-item" data-reveal style={`--stack-index: ${i}`}>
               <span class="label area-num">
                 {String(i + 1).padStart(2, '0')}
               </span>
@@ -191,7 +191,7 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(12, 12, 12, 0.31);
+    background: rgba(12, 12, 12, 0.36);
   }
 
   .hero-content {
@@ -212,13 +212,11 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     letter-spacing: -0.027em;
     color: #fff;
     white-space: pre-line;
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
   }
 
   .hero-nota {
     margin-top: -1rem;
-    color: rgba(255, 255, 255, 0.75);
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+    color: rgba(255, 255, 255, 0.95);
   }
 
   .hero-link {
@@ -474,6 +472,15 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
   .areas-header {
     grid-column: 1 / span 4;
     grid-row: 1;
+    position: sticky;
+    top: 6.5rem;
+    align-self: start;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .areas-header {
+      position: static;
+    }
   }
 
   .areas-header h2 {
@@ -500,15 +507,26 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
   }
 
   .area-item {
+    position: sticky;
+    top: calc(6.5rem + var(--stack-index) * 3rem);
+    z-index: calc(1 + var(--stack-index));
     display: grid;
     grid-template-columns: 3.5rem 1fr;
     gap: 1.5rem;
+    min-height: 9rem;
     padding-block: 2rem;
+    background: var(--bg);
     border-top: 1px solid var(--accent);
   }
 
   .areas-lista li:last-child {
     border-bottom: 1px solid var(--accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .area-item {
+      position: static;
+    }
   }
 
   .area-num {
@@ -572,8 +590,8 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
 
   .processo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
     margin-top: 3rem;
   }
 
@@ -630,6 +648,7 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
   }
 
   .depoimento {
+    max-width: 42rem;
     margin: 0;
     padding: 0.5rem 0 0.5rem 1.5rem;
     border-left: 1px solid var(--accent);

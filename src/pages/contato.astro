@@ -9,6 +9,9 @@ const segundaLinha = pagina?.tituloLinha2 ?? '';
 const corte = segundaLinha.lastIndexOf(' ');
 const linha2Inicio = corte === -1 ? '' : segundaLinha.slice(0, corte + 1);
 const palavraFinal = corte === -1 ? segundaLinha : segundaLinha.slice(corte + 1);
+
+const whatsappLink = (pagina?.links ?? []).find((link) => link.icone === 'whatsapp');
+const whatsappNumero = whatsappLink?.href.replace(/\D/g, '') ?? '';
 ---
 
 <PageLayout
@@ -93,7 +96,7 @@ const palavraFinal = corte === -1 ? segundaLinha : segundaLinha.slice(corte + 1)
       <div class="form-card" data-reveal>
         <div class="form-canto" aria-hidden="true"></div>
         <h2>{pagina?.formTitulo}</h2>
-        <form action={pagina?.formEndpoint ?? '#'} method="POST">
+        <form id="contato-form" data-whatsapp={whatsappNumero} action={pagina?.formEndpoint ?? '#'} method="POST">
           <div class="campo">
             <label for="nome" class="label">{pagina?.nomeLabel}</label>
             <input
@@ -134,6 +137,33 @@ const palavraFinal = corte === -1 ? segundaLinha : segundaLinha.slice(corte + 1)
     </div>
   </section>
 </PageLayout>
+
+<script>
+  function initContatoForm() {
+    const form = document.getElementById('contato-form') as HTMLFormElement | null;
+    if (!form || form.dataset.whatsappBound) return;
+    form.dataset.whatsappBound = '1';
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const numero = form.dataset.whatsapp;
+      const nome = (form.querySelector('#nome') as HTMLInputElement)?.value.trim() ?? '';
+      const email = (form.querySelector('#email') as HTMLInputElement)?.value.trim() ?? '';
+      const mensagem = (form.querySelector('#mensagem') as HTMLTextAreaElement)?.value.trim() ?? '';
+
+      const partes = [`Olá! Meu nome é ${nome}.`];
+      if (email) partes.push(`E-mail: ${email}`);
+      if (mensagem) partes.push(mensagem);
+
+      const texto = encodeURIComponent(partes.join('\n\n'));
+      window.open(`https://wa.me/${numero}?text=${texto}`, '_blank', 'noopener');
+      form.reset();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initContatoForm);
+</script>
 
 <style>
   .contato {
