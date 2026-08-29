@@ -31,7 +31,7 @@ ctaTitulo: |-
 ctaLinkLabel: ENTRAR EM CONTATO
 ctaLinkHref: /contato
 areasTitulo: Áreas de Atuação
-areasNota: Atendimento presencial em Manaus-AM e projetos em todo o Brasil.
+areasNota: ''
 areas:
   - titulo: Residencial
     descricao: >-

@@ -17,7 +17,7 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
         <h1 class="editar-page-title">Página Sobre</h1>
         <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
       </div>
-      <p class="editar-page-hint">Título, texto de apresentação, retrato e a seção de visão.</p>
+      <p class="editar-page-hint">Título, texto de apresentação e retrato.</p>
 
       <section class="editar-section">
         <h2>Cabeçalho</h2>
@@ -70,7 +70,7 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Página Sobre', text: 'Título, texto de apresentação, retrato e a seção de visão.' },
+    { selector: '.editar-topbar-inner', title: 'Página Sobre', text: 'Título, texto de apresentação e retrato.' },
     { selector: '.editar-image-field', title: 'Retrato', text: 'A foto usada na página Sobre.' },
     { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
   ]
