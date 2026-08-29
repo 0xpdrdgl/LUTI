@@ -136,6 +136,18 @@ export default config({
             itemLabel: (props) => props.fields.titulo.value || 'Passo',
           },
         ),
+        depoimentosTitulo: fields.text({ label: 'Depoimentos — título da seção' }),
+        depoimentos: fields.array(
+          fields.object({
+            nome: fields.text({ label: 'Nome' }),
+            relacao: fields.text({ label: 'Relação (ex.: Cliente, Ex-estagiária)' }),
+            texto: fields.text({ label: 'Depoimento', multiline: true }),
+          }),
+          {
+            label: 'Depoimentos',
+            itemLabel: (props) => props.fields.nome.value || 'Depoimento',
+          },
+        ),
         faixaFrase: fields.text({
           label: 'Faixa editorial — frase',
           multiline: true,

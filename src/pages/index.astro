@@ -141,6 +141,27 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     </div>
   </section>
 
+  {(home?.depoimentos ?? []).length > 0 && (
+    <section class="depoimentos" data-reveal>
+      <div class="depoimentos-inner">
+        <h2 class="label depoimentos-titulo">{home?.depoimentosTitulo}</h2>
+        <div class="depoimentos-grid">
+          {
+            (home?.depoimentos ?? []).map((dep) => (
+              <blockquote class="depoimento">
+                <p>&ldquo;{dep.texto}&rdquo;</p>
+                <footer>
+                  <span class="depoimento-nome">{dep.nome}</span>
+                  {dep.relacao && <span class="depoimento-relacao"> — {dep.relacao}</span>}
+                </footer>
+              </blockquote>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="cta" data-reveal>
     <h2 class="cta-titulo">{home?.ctaTitulo}</h2>
     <a href={home?.ctaLinkHref ?? '/contato'} class="label cta-link">
@@ -586,6 +607,57 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     font-size: 1rem;
     line-height: 1.6;
     color: var(--body-color);
+  }
+
+  /* Depoimentos */
+  .depoimentos {
+    background: var(--surface);
+    padding: 8rem 5rem;
+  }
+
+  .depoimentos-inner {
+    max-width: 80rem;
+    margin-inline: auto;
+  }
+
+  .depoimentos-titulo {
+    color: var(--muted);
+  }
+
+  .depoimentos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+  }
+
+  .depoimento {
+    margin: 0;
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    border-left: 1px solid var(--accent);
+  }
+
+  .depoimento p {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--body-color);
+  }
+
+  .depoimento footer {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .depoimento-nome {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  @media (max-width: 64rem) {
+    .depoimentos {
+      padding: 5rem 1.5rem;
+    }
   }
 
   @media (max-width: 64rem) {
