@@ -30,18 +30,22 @@ areasNota: Atendimento presencial em Manaus-AM e projetos em todo o Brasil.
 areas:
   - titulo: Residencial
     descricao: >-
-      Casas e apartamentos projetados a partir do modo de viver de cada família
-      — nada de soluções de catálogo.
-  - titulo: Interiores
+      Casas projetadas a partir do modo de viver de cada família — nada de
+      soluções de catálogo.
+  - titulo: Apartamento
     descricao: >-
-      Interiores que unem estética e função, da seleção de materiais ao projeto
-      luminotécnico.
-  - titulo: Design de Mobiliário
-    descricao: >-
-      Peças sob medida, desenhadas para cada projeto e produzidas com
-      marcenarias parceiras.
+      Projetos de interiores para apartamentos, unindo estética e função da
+      seleção de materiais ao projeto luminotécnico.
   - titulo: Comercial
     descricao: Espaços de trabalho e comércio com identidade própria e fluidez de uso.
+  - titulo: Projeto Executivo Completo
+    descricao: >-
+      Documentação técnica completa, da concepção ao detalhamento, pronta para
+      a execução da obra.
+  - titulo: Marcenaria Completo
+    descricao: >-
+      Projeto e detalhamento de mobiliário sob medida, produzido com
+      marcenarias parceiras.
 processoTitulo: Como trabalhamos
 processo:
   - titulo: Briefing
