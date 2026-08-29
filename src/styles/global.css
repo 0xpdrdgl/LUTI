@@ -9,6 +9,7 @@
 
   --font-display: 'Playfair Display', Georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-h1: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   --label: 500 0.75rem/1 var(--font-sans);
   --label-tracking: 0.15em;
