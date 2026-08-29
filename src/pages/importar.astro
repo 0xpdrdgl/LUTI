@@ -101,16 +101,16 @@ if (import.meta.env.PROD) {
       /* Modal de seleção de posts */
       #modal-selecao {
         width: 92vw;
-        height: 90vh;
-        max-width: none;
-        max-height: none;
-        border: 1px solid #444;
+        height: 75vh;
+        max-width: 880px;
+        max-height: 75vh;
+        border: 1px solid #333;
         border-radius: 12px;
         padding: 0;
-        background: #181818;
+        background: #111;
         color: #eee;
       }
-      #modal-selecao::backdrop { background: rgba(0,0,0,0.7); }
+      #modal-selecao::backdrop { background: rgba(0,0,0,0.6); }
       .modal-corpo {
         display: flex;
         flex-direction: column;
@@ -120,60 +120,93 @@ if (import.meta.env.PROD) {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #333;
+        padding: 0.6rem 1rem;
+        border-bottom: 1px solid #2a2a2a;
       }
-      .modal-topo h2 { font-size: 1.1rem; margin: 0; }
+      .modal-topo h2 { font-size: 0.9rem; margin: 0; font-weight: 500; }
       #modal-fechar {
-        background: none; border: none; color: #aaa;
-        font-size: 1.8rem; cursor: pointer; line-height: 1;
+        background: none; border: none; color: #888;
+        font-size: 1.4rem; cursor: pointer; line-height: 1;
         padding: 0.2rem 0.5rem;
       }
       #modal-fechar:hover { color: #fff; }
       #modal-posts {
         flex: 1;
         overflow-y: auto;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 1.25rem;
-        padding: 1.5rem;
-        align-content: start;
+        padding: 0;
       }
-      .post {
-        border: 2px solid #333;
-        border-radius: 12px;
-        overflow: hidden;
-        cursor: pointer;
-        background: #1a1a1a;
-        transition: border-color 150ms, transform 150ms;
-      }
-      .post:hover { transform: translateY(-2px); }
-      .post.selecionado { border-color: #8ab4ff; background: #1a2333; }
-      .post-thumb { position: relative; }
-      .post img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
-      .badge-carrossel {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        background: rgba(0,0,0,0.75);
-        color: #fff;
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        border-radius: 10px;
-      }
-      .post .legenda {
-        padding: 0.6rem 0.75rem;
+      .posts-table {
+        width: 100%;
+        border-collapse: collapse;
         font-size: 0.78rem;
-        color: #aaa;
-        max-height: 3.5rem;
-        overflow: hidden;
-        text-align: left;
-        line-height: 1.4;
       }
+      .posts-table thead th {
+        position: sticky;
+        top: 0;
+        background: #111;
+        z-index: 1;
+      }
+      .posts-table th,
+      .posts-table td {
+        padding: 0.35rem 0.6rem;
+        border-bottom: 1px solid #1f1f1f;
+        text-align: left;
+        vertical-align: middle;
+      }
+      .posts-table th {
+        color: #777;
+        font-weight: 500;
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .posts-table tr:hover td {
+        background: #181818;
+      }
+      .posts-table .col-check { width: 36px; }
+      .posts-table .col-thumb { width: 40px; }
+      .posts-table .col-legenda { min-width: 0; }
+      .posts-table .col-meta { width: 120px; color: #666; font-size: 0.68rem; white-space: nowrap; }
+      .posts-table .thumb {
+        width: 28px;
+        height: 28px;
+        object-fit: cover;
+        border-radius: 3px;
+        display: block;
+        flex-shrink: 0;
+      }
+      .posts-table .legenda {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #ddd;
+        font-size: 0.78rem;
+        line-height: 1.3;
+      }
+      .posts-table .badge-carrossel {
+        display: inline-block;
+        background: #2a2a2a;
+        color: #999;
+        font-size: 0.58rem;
+        padding: 1px 5px;
+        border-radius: 10px;
+        margin-left: 0.4rem;
+      }
+      .posts-table input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+        accent-color: #8ab4ff;
+        cursor: pointer;
+      }
+      .posts-table tr.selecionado td {
+        background: #15202d;
+      }
+      .posts-table tr.selecionado .legenda { color: #fff; }
       .modal-rodape {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid #333;
-        text-align: center;
+        padding: 0.6rem 1rem;
+        border-top: 1px solid #2a2a2a;
+        text-align: right;
       }
     </style>
   </head>
@@ -435,8 +468,9 @@ if (import.meta.env.PROD) {
         return res.json();
       }
 
-      function proxyUrl(url) {
-        return `/api/ig-image?url=${encodeURIComponent(url)}`;
+      function proxyUrl(url, width) {
+        const base = `/api/ig-image?url=${encodeURIComponent(url)}`;
+        return width ? `${base}&w=${width}` : base;
       }
 
 function renderPosts(posts) {
@@ -444,31 +478,69 @@ function renderPosts(posts) {
         status.textContent = `${posts.length} post(s) encontrado(s) - desmarque os que não quiser`;
         postsDiv.innerHTML = '';
         const modalPosts = document.getElementById('modal-posts');
-        modalPosts.innerHTML = '';
+        modalPosts.innerHTML = `
+          <table class="posts-table">
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" id="select-all" /></th>
+                <th class="col-thumb">Imagem</th>
+                <th class="col-legenda">Legenda</th>
+                <th class="col-meta">Data / Carrossel</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        `;
+        const tbody = modalPosts.querySelector('tbody');
+        const selectAll = modalPosts.querySelector('#select-all');
+
         posts.forEach((post, i) => {
-          const card = document.createElement('label');
-          card.className = 'post selecionado';
+          const tr = document.createElement('tr');
+          tr.className = 'selecionado';
           const badge =
             post.imagensExtras?.length > 0
-              ? `<div class="badge-carrossel">🖼 ${post.imagensExtras.length + 1} imagens</div>`
+              ? `<span class="badge-carrossel">🖼 ${post.imagensExtras.length + 1} imgs</span>`
               : '';
-          const thumbSrc = post.imagem?.startsWith('/api/ig-image') ? post.imagem : proxyUrl(post.imagem);
-          card.innerHTML = `
-            <input type="checkbox" checked data-index="${i}" style="display:none" />
-            <div class="post-thumb">
-              <img src="${proxyUrl(post.imagem)}" loading="lazy" alt="${post.titulo || 'imagem'}" />
-              ${badge}
-            </div>
-            <div class="legenda">${(post.legenda || '(sem legenda)').slice(0, 120)}</div>
+          const dateStr = post.timestamp
+            ? new Date(post.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+            : '—';
+          tr.innerHTML = `
+            <td class="col-check"><input type="checkbox" checked data-index="${i}" /></td>
+            <td class="col-thumb"><img class="thumb" src="${proxyUrl(post.imagem, 100)}" loading="lazy" decoding="async" alt="" /></td>
+            <td class="col-legenda">
+              <div class="legenda">${(post.legenda || '(sem legenda)').slice(0, 100)}</div>
+            </td>
+            <td class="col-meta">${dateStr}${badge}</td>
           `;
-          card.addEventListener('click', (e) => {
-            if (e.target.tagName === 'INPUT') return;
-            card.classList.toggle('selecionado');
-            const check = card.querySelector('input');
-            check.checked = !check.checked;
+          const checkbox = tr.querySelector('input');
+          checkbox.addEventListener('change', () => {
+            tr.classList.toggle('selecionado', checkbox.checked);
+            updateSelectAll();
           });
-          modalPosts.appendChild(card);
+          tbody.appendChild(tr);
         });
+
+        function updateSelectAll() {
+          const checkboxes = tbody.querySelectorAll('input[data-index]');
+          const checked = [...checkboxes].filter((c) => c.checked).length;
+          selectAll.checked = checked === checkboxes.length;
+          selectAll.indeterminate = checked > 0 && checked < checkboxes.length;
+        }
+
+        selectAll.addEventListener('change', () => {
+          tbody.querySelectorAll('input[data-index]').forEach((cb) => {
+            cb.checked = selectAll.checked;
+            cb.dispatchEvent(new Event('change'));
+          });
+        });
+
+        modalEl.showModal();
+      }
+
+      modalFechar.addEventListener('click', () => modalEl.close());
+      modalEl.addEventListener('click', (e) => {
+        if (e.target === modalEl) modalEl.close();
+      });
 
       btnBuscar.addEventListener('click', async () => {
         const token = tokenInput.value.trim();
@@ -524,8 +596,9 @@ function renderPosts(posts) {
 
       btnInstagram.addEventListener('click', async () => {
         const token = tokenInput.value.trim();
-        const selecionados = [...postsDiv.querySelectorAll('.post.selecionado')].map(
-          (card) => postsEncontrados[+card.querySelector('input').dataset.index],
+        const modalPosts = document.getElementById('modal-posts');
+        const selecionados = [...modalPosts.querySelectorAll('tr.selecionado')].map(
+          (tr) => postsEncontrados[+tr.querySelector('input[data-index]').dataset.index],
         );
         if (!selecionados.length) return;
 
@@ -538,37 +611,33 @@ function renderPosts(posts) {
           li.textContent = `${i + 1}/${selecionados.length} — importando...`;
           log.appendChild(li);
 
+          console.log('📤 Enviando post:', {
+            shortCode: post.shortCode,
+            hasImagem: !!post.imagem,
+            imagensExtrasCount: post.imagensExtras?.length || 0,
+            imagensExtras: post.imagensExtras
+          });
+
           let data = null;
           let semIA = false;
 
           for (let tentativa = 0; tentativa < 3; tentativa++) {
             try {
-            const res = await fetch('/api/importar-instagram', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({
-                token,
-                post,
-                usarGemini: usarLLMInput.checked,
-                geminiModel: modelInput.value,
-                geminiKey: keyInput.value.trim(),
-              }),
-            });
-
-            if (res.status === 429) {
-              li.textContent = `${i + 1}/${selecionados.length} — limite do Gemini, aguardando 20s (tentativa ${tentativas + 1})...`;
-              await esperar(20000);
-              tentativas++;
-              continue;
-            }
-
-            data = await res.json().catch(() => ({}));
-            break;
+              const res = await fetch('/api/importar-instagram', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                  token,
+                  post,
+                  usarGemini: usarLLMInput.checked,
+                  geminiModel: modelInput.value,
+                  geminiKey: keyInput.value.trim(),
+                }),
+              });
 
               if (res.status === 429) {
-                li.textContent = `${i + 1}/${selecionados.length} — limite do Gemini, aguardando 20s (tentativa ${tentativas + 1})...`;
+                li.textContent = `${i + 1}/${selecionados.length} — limite do Gemini, aguardando 20s (tentativa ${tentativa + 1})...`;
                 await esperar(20000);
-                tentativas++;
                 continue;
               }
 
