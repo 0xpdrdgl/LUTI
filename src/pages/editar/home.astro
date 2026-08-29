@@ -17,10 +17,10 @@ const home = authed ? await reader.singletons.home.read() : null
         <h1 class="editar-page-title">Página inicial</h1>
         <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
       </div>
-      <p class="editar-page-hint">Hero, sobre a autora, chamada, áreas de atuação e processo de trabalho.</p>
+      <p class="editar-page-hint">Hero, sobre a autora, chamada, áreas de atuação, processo de trabalho e depoimentos.</p>
 
       <section class="editar-section">
-        <h2>Hero</h2>
+        <h2>Hero e Projetos</h2>
         <div class="editar-field">
           <label class="editar-label">Imagem de fundo</label>
           <div class="editar-image-field">
@@ -213,6 +213,7 @@ const home = authed ? await reader.singletons.home.read() : null
     { selector: '#sobreParagrafos-list', title: 'Sobre a autora', text: 'Arraste pelo ⠿ para reordenar os parágrafos.' },
     { selector: '#areas-list', title: 'Áreas de atuação', text: 'Cada área tem um título e uma descrição.' },
     { selector: '#processo-list', title: 'Processo', text: 'Os passos do seu processo de trabalho, em ordem.' },
+    { selector: '#depoimentos-list', title: 'Depoimentos', text: 'Depoimentos de clientes ou colaboradores — nome, relação e o texto do depoimento.' },
     { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
   ]
   const HOME_TOUR_KEY = 'editar_tour_home_seen'
