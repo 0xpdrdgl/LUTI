@@ -191,7 +191,7 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(12, 12, 12, 0.34);
+    background: rgba(12, 12, 12, 0.36);
   }
 
   .hero-content {
@@ -206,24 +206,19 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
 
   .hero-content h1 {
     font-family: var(--font-h1);
-    font-weight: 500;
+    font-weight: 400;
     font-size: clamp(2rem, 4.5vw, 3rem);
     line-height: 1.47;
     letter-spacing: -0.027em;
     color: #fff;
     white-space: pre-line;
-    text-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.65),
-      0 6px 20px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
   }
 
   .hero-nota {
     margin-top: -1rem;
-    font-weight: 600;
-    color: #fff;
-    text-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.7),
-      0 4px 14px rgba(0, 0, 0, 0.35);
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
   }
 
   .hero-link {
