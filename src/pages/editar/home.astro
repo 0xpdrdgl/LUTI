@@ -1,0 +1,290 @@
+---
+export const prerender = false
+import EditarLayout from '../../layouts/EditarLayout.astro'
+import './shared.css'
+import { reader } from '../../lib/keystatic'
+import { hasValidSession } from '../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const home = authed ? await reader.singletons.home.read() : null
+---
+<EditarLayout title="Home" authed={authed} active="home">
+  {home && (
+    <div class="editar-form-page">
+      <div class="editar-page-header">
+        <h1 class="editar-page-title">Página inicial</h1>
+        <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+      </div>
+      <p class="editar-page-hint">Hero, sobre a autora, chamada, áreas de atuação e processo de trabalho.</p>
+
+      <section class="editar-section">
+        <h2>Hero</h2>
+        <div class="editar-field">
+          <label class="editar-label">Imagem de fundo</label>
+          <div class="editar-image-field">
+            {home.heroImagem && <img src={home.heroImagem} alt="" class="editar-image-preview" />}
+            <div class="editar-image-controls">
+              <label class="editar-file-btn">
+                Escolher imagem
+                <input id="f-heroImagem" type="file" accept="image/*" hidden />
+              </label>
+              <span id="f-heroImagem-name" class="editar-file-name"></span>
+            </div>
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-heroTitulo">Título</label>
+          <textarea id="f-heroTitulo" class="editar-textarea">{home.heroTitulo ?? ''}</textarea>
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-heroBotaoLabel">Botão — texto</label>
+            <input id="f-heroBotaoLabel" class="editar-input" type="text" value={home.heroBotaoLabel ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-heroBotaoHref">Botão — link</label>
+            <input id="f-heroBotaoHref" class="editar-input" type="text" value={home.heroBotaoHref ?? ''} />
+          </div>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Sobre a autora</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-sobreTitulo">Título</label>
+          <input id="f-sobreTitulo" class="editar-input" type="text" value={home.sobreTitulo ?? ''} />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label">Foto</label>
+          <div class="editar-image-field">
+            {home.sobreFoto && <img src={home.sobreFoto} alt="" class="editar-image-preview" />}
+            <div class="editar-image-controls">
+              <label class="editar-file-btn">
+                Escolher imagem
+                <input id="f-sobreFoto" type="file" accept="image/*" hidden />
+              </label>
+              <span id="f-sobreFoto-name" class="editar-file-name"></span>
+            </div>
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label">Textos</label>
+          <div id="sobreParagrafos-list" class="editar-array-list">
+            {(home.sobreParagrafos ?? []).map((p: string) => (
+              <div class="editar-array-row" draggable="true">
+                <span class="editar-drag-handle" title="Arraste para reordenar">⠿</span>
+                <textarea class="editar-textarea" data-key="value">{p}</textarea>
+                <button type="button" class="editar-array-remove">Remover</button>
+              </div>
+            ))}
+          </div>
+          <button type="button" id="sobreParagrafos-add" class="editar-array-add">+ Adicionar parágrafo</button>
+        </div>
+        <div class="editar-field-row" style="margin-top: 16px;">
+          <div class="editar-field">
+            <label class="editar-label" for="f-sobreLinkLabel">Link — texto</label>
+            <input id="f-sobreLinkLabel" class="editar-input" type="text" value={home.sobreLinkLabel ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-sobreLinkHref">Link — URL</label>
+            <input id="f-sobreLinkHref" class="editar-input" type="text" value={home.sobreLinkHref ?? ''} />
+          </div>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Chamada (CTA)</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-ctaTitulo">Título</label>
+          <textarea id="f-ctaTitulo" class="editar-textarea">{home.ctaTitulo ?? ''}</textarea>
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-ctaLinkLabel">Link — texto</label>
+            <input id="f-ctaLinkLabel" class="editar-input" type="text" value={home.ctaLinkLabel ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-ctaLinkHref">Link — URL</label>
+            <input id="f-ctaLinkHref" class="editar-input" type="text" value={home.ctaLinkHref ?? ''} />
+          </div>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Áreas de atuação</h2>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-areasTitulo">Título da seção</label>
+            <input id="f-areasTitulo" class="editar-input" type="text" value={home.areasTitulo ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-areasNota">Observação</label>
+            <input id="f-areasNota" class="editar-input" type="text" value={home.areasNota ?? ''} />
+          </div>
+        </div>
+        <div id="areas-list" class="editar-array-list">
+          {(home.areas ?? []).map((area: any) => (
+            <div class="editar-array-row editar-array-row-multi" draggable="true">
+              <span class="editar-drag-handle" title="Arraste para reordenar">⠿</span>
+              <div class="editar-array-row-fields">
+                <input class="editar-input" type="text" placeholder="Título" value={area.titulo ?? ''} data-key="titulo" />
+                <textarea class="editar-textarea" placeholder="Descrição" data-key="descricao">{area.descricao ?? ''}</textarea>
+              </div>
+              <button type="button" class="editar-array-remove">Remover</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" id="areas-add" class="editar-array-add">+ Adicionar área</button>
+      </section>
+
+      <section class="editar-section">
+        <h2>Processo de trabalho</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-processoTitulo">Título da seção</label>
+          <input id="f-processoTitulo" class="editar-input" type="text" value={home.processoTitulo ?? ''} />
+        </div>
+        <div id="processo-list" class="editar-array-list">
+          {(home.processo ?? []).map((passo: any) => (
+            <div class="editar-array-row editar-array-row-multi" draggable="true">
+              <span class="editar-drag-handle" title="Arraste para reordenar">⠿</span>
+              <div class="editar-array-row-fields">
+                <input class="editar-input" type="text" placeholder="Título" value={passo.titulo ?? ''} data-key="titulo" />
+                <textarea class="editar-textarea" placeholder="Descrição" data-key="descricao">{passo.descricao ?? ''}</textarea>
+              </div>
+              <button type="button" class="editar-array-remove">Remover</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" id="processo-add" class="editar-array-add">+ Adicionar passo</button>
+      </section>
+
+      <section class="editar-section">
+        <h2>Faixa editorial</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-faixaFrase">Frase</label>
+          <textarea id="f-faixaFrase" class="editar-textarea">{home.faixaFrase ?? ''}</textarea>
+        </div>
+      </section>
+
+      <footer class="editar-form-actions">
+        <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
+        <button type="button" id="editar-save" class="editar-save">
+          <span class="editar-save-label">Salvar alterações</span>
+        </button>
+      </footer>
+    </div>
+  )}
+</EditarLayout>
+<script>
+  import { setStatus, makeTextRow, readTextArray, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
+
+  const homeTourSteps: TourStep[] = [
+    { selector: '.editar-topbar-inner', title: 'Página inicial', text: 'Hero, sobre a autora, chamada, áreas de atuação e processo de trabalho.' },
+    { selector: '#f-heroTitulo', title: 'Hero', text: 'Imagem de fundo e título de entrada do site.' },
+    { selector: '#sobreParagrafos-list', title: 'Sobre a autora', text: 'Arraste pelo ⠿ para reordenar os parágrafos.' },
+    { selector: '#areas-list', title: 'Áreas de atuação', text: 'Cada área tem um título e uma descrição.' },
+    { selector: '#processo-list', title: 'Processo', text: 'Os passos do seu processo de trabalho, em ordem.' },
+    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+  ]
+  const HOME_TOUR_KEY = 'editar_tour_home_seen'
+  maybeStartTour(homeTourSteps, HOME_TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(homeTourSteps, HOME_TOUR_KEY))
+
+  enableDragReorder(document.getElementById('sobreParagrafos-list') as HTMLDivElement, '.editar-array-row')
+  enableDragReorder(document.getElementById('areas-list') as HTMLDivElement, '.editar-array-row')
+  enableDragReorder(document.getElementById('processo-list') as HTMLDivElement, '.editar-array-row')
+
+  document.getElementById('sobreParagrafos-add')?.addEventListener('click', () => {
+    document.getElementById('sobreParagrafos-list')?.appendChild(makeTextRow('', 'Parágrafo'))
+  })
+  document.getElementById('areas-add')?.addEventListener('click', () => {
+    document.getElementById('areas-list')?.appendChild(
+      makeObjectRow([
+        { key: 'titulo', type: 'text', placeholder: 'Título' },
+        { key: 'descricao', type: 'textarea', placeholder: 'Descrição' },
+      ])
+    )
+  })
+  document.getElementById('processo-add')?.addEventListener('click', () => {
+    document.getElementById('processo-list')?.appendChild(
+      makeObjectRow([
+        { key: 'titulo', type: 'text', placeholder: 'Título' },
+        { key: 'descricao', type: 'textarea', placeholder: 'Descrição' },
+      ])
+    )
+  })
+  document.body.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.editar-array-remove') as HTMLButtonElement | null
+    if (btn) btn.closest('.editar-array-row')?.remove()
+  })
+
+  function bindImagePicker(fieldId: string) {
+    let file: File | null = null
+    const input = document.getElementById(`f-${fieldId}`) as HTMLInputElement | null
+    const nameEl = document.getElementById(`f-${fieldId}-name`) as HTMLSpanElement | null
+    input?.addEventListener('change', () => {
+      const f = input.files?.[0]
+      if (!f) return
+      file = f
+      if (nameEl) nameEl.textContent = f.name
+    })
+    return () => file
+  }
+  const getHeroImagem = bindImagePicker('heroImagem')
+  const getSobreFoto = bindImagePicker('sobreFoto')
+
+  const saveBtn = document.getElementById('editar-save') as HTMLButtonElement
+  const statusEl = document.getElementById('editar-status') as HTMLSpanElement
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true
+    saveBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Salvando...')
+
+    try {
+      const val = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement)?.value ?? ''
+
+      const fields = {
+        heroTitulo: val('f-heroTitulo'),
+        heroBotaoLabel: val('f-heroBotaoLabel'),
+        heroBotaoHref: val('f-heroBotaoHref'),
+        sobreTitulo: val('f-sobreTitulo'),
+        sobreParagrafos: readTextArray('sobreParagrafos-list'),
+        sobreLinkLabel: val('f-sobreLinkLabel'),
+        sobreLinkHref: val('f-sobreLinkHref'),
+        ctaTitulo: val('f-ctaTitulo'),
+        ctaLinkLabel: val('f-ctaLinkLabel'),
+        ctaLinkHref: val('f-ctaLinkHref'),
+        areasTitulo: val('f-areasTitulo'),
+        areasNota: val('f-areasNota'),
+        areas: readObjectArray('areas-list', ['titulo', 'descricao']),
+        processoTitulo: val('f-processoTitulo'),
+        processo: readObjectArray('processo-list', ['titulo', 'descricao']),
+        faixaFrase: val('f-faixaFrase'),
+      }
+
+      const formData = new FormData()
+      formData.set('singleton', 'home')
+      formData.set('fields', JSON.stringify(fields))
+      const heroImagem = getHeroImagem()
+      const sobreFoto = getSobreFoto()
+      if (heroImagem) formData.set('image__heroImagem', heroImagem)
+      if (sobreFoto) formData.set('image__sobreFoto', sobreFoto)
+
+      const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+
+      setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      setTimeout(() => location.reload(), 800)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.classList.remove('is-loading')
+    }
+  })
+</script>

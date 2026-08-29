@@ -1,0 +1,164 @@
+---
+export const prerender = false
+import EditarLayout from '../../layouts/EditarLayout.astro'
+import './shared.css'
+import { reader } from '../../lib/keystatic'
+import { hasValidSession } from '../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const projetos = authed
+  ? (await reader.collections.projetos.all()).map(({ slug, entry }) => ({ ...entry, slug }))
+  : []
+
+const CATEGORIAS = [
+  { label: 'Interiores', value: 'interiores' },
+  { label: 'Design de Mobiliário', value: 'mobiliario' },
+  { label: 'Projetos Residenciais', value: 'residenciais' },
+  { label: 'Comercial', value: 'comercial' },
+]
+---
+<EditarLayout title="Projetos" authed={authed} active="projetos">
+  <div class="editar-form-page" style="max-width: 1200px;">
+    <div class="editar-page-header">
+      <h1 class="editar-page-title">Projetos</h1>
+      <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+    </div>
+    <p class="editar-page-hint">Clique em um projeto para editar. A ordem aqui é a mesma exibida no site.</p>
+
+    <section class="editar-section" id="novo-projeto-section" data-open="false">
+      <h2>Novo projeto</h2>
+      <button type="button" id="novo-projeto-toggle" class="editar-array-add" style="margin-bottom: 16px;">+ Adicionar projeto</button>
+      <div id="novo-projeto-form" hidden>
+        <div class="editar-field">
+          <label class="editar-label" for="n-titulo">Título</label>
+          <input id="n-titulo" class="editar-input" type="text" />
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="n-categoria">Categoria</label>
+            <select id="n-categoria" class="editar-select">
+              {CATEGORIAS.map((c) => <option value={c.value}>{c.label}</option>)}
+            </select>
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="n-ano">Ano</label>
+            <input id="n-ano" class="editar-input" type="number" />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="n-local">Local</label>
+            <input id="n-local" class="editar-input" type="text" placeholder="Ex: São Paulo, SP" />
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="n-resumo">Resumo</label>
+          <textarea id="n-resumo" class="editar-textarea"></textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="n-descricao">Descrição (corpo do projeto)</label>
+          <textarea id="n-descricao" class="editar-textarea"></textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label">Imagem de capa</label>
+          <input id="n-capa" type="file" accept="image/*" class="editar-input" />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label">Galeria (opcional — pode adicionar mais depois)</label>
+          <input id="n-galeria" type="file" accept="image/*" multiple class="editar-input" />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" style="display:flex; align-items:center; gap:8px; text-transform:none; opacity:1; font-weight:400;">
+            <input id="n-destaque" type="checkbox" style="width:auto;" />
+            Destacar na home
+          </label>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <button type="button" id="n-criar" class="editar-save"><span class="editar-save-label">Criar projeto</span></button>
+          <span id="n-status" class="editar-status" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="editar-projetos-grid" id="projetos-grid">
+      {projetos.map((p: any) => (
+        <a href={`/editar/projetos/${p.slug}`} class="editar-projeto-card">
+          {p.capa && <img src={p.capa} alt="" loading="lazy" />}
+          <div class="editar-projeto-card-body">
+            <p class="editar-projeto-card-titulo">{p.titulo}</p>
+            <div class="editar-projeto-card-meta">
+              <span>{p.ano} · {p.categoria}</span>
+              {p.destaque && <span class="editar-projeto-badge">Destaque</span>}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</EditarLayout>
+<script>
+  import { setStatus } from '../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
+
+  const tourSteps: TourStep[] = [
+    { selector: '.editar-topbar-inner', title: 'Projetos', text: 'Aqui ficam todos os projetos do portfólio.' },
+    { selector: '#novo-projeto-toggle', title: 'Novo projeto', text: 'Clique aqui pra adicionar um projeto novo com capa, galeria e textos.' },
+    { selector: '#projetos-grid', title: 'Editar', text: 'Clique em qualquer card pra editar aquele projeto, trocar imagens ou excluir.' },
+  ]
+  const TOUR_KEY = 'editar_tour_projetos_seen'
+  maybeStartTour(tourSteps, TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(tourSteps, TOUR_KEY))
+
+  const toggleBtn = document.getElementById('novo-projeto-toggle') as HTMLButtonElement
+  const form = document.getElementById('novo-projeto-form') as HTMLDivElement
+  toggleBtn.addEventListener('click', () => {
+    form.hidden = !form.hidden
+    toggleBtn.textContent = form.hidden ? '+ Adicionar projeto' : '- Cancelar'
+  })
+
+  const criarBtn = document.getElementById('n-criar') as HTMLButtonElement
+  const statusEl = document.getElementById('n-status') as HTMLSpanElement
+
+  criarBtn.addEventListener('click', async () => {
+    const titulo = (document.getElementById('n-titulo') as HTMLInputElement).value
+    const capaInput = document.getElementById('n-capa') as HTMLInputElement
+    if (!titulo.trim()) {
+      setStatus(statusEl, 'Informe um título.', 'error')
+      return
+    }
+    if (!capaInput.files?.[0]) {
+      setStatus(statusEl, 'Selecione uma imagem de capa.', 'error')
+      return
+    }
+
+    criarBtn.disabled = true
+    criarBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Criando...')
+
+    try {
+      const formData = new FormData()
+      formData.set('titulo', titulo)
+      formData.set('categoria', (document.getElementById('n-categoria') as HTMLSelectElement).value)
+      formData.set('ano', (document.getElementById('n-ano') as HTMLInputElement).value)
+      formData.set('local', (document.getElementById('n-local') as HTMLInputElement).value)
+      formData.set('resumo', (document.getElementById('n-resumo') as HTMLTextAreaElement).value)
+      formData.set('descricao', (document.getElementById('n-descricao') as HTMLTextAreaElement).value)
+      formData.set('destaque', String((document.getElementById('n-destaque') as HTMLInputElement).checked))
+      formData.set('capa', capaInput.files[0])
+      const galeriaInput = document.getElementById('n-galeria') as HTMLInputElement
+      for (const file of galeriaInput.files ?? []) formData.append('galeria', file)
+
+      const res = await fetch('/api/editar-create', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao criar')
+
+      setStatus(statusEl, 'Criado com sucesso!', 'success')
+      setTimeout(() => { location.href = `/editar/projetos/${data.slug}` }, 600)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao criar', 'error')
+    } finally {
+      criarBtn.disabled = false
+      criarBtn.classList.remove('is-loading')
+    }
+  })
+</script>

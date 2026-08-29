@@ -1,0 +1,222 @@
+---
+export const prerender = false
+import EditarLayout from '../../../layouts/EditarLayout.astro'
+import '../shared.css'
+import { reader } from '../../../lib/keystatic'
+import { hasValidSession } from '../../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const slug = Astro.params.slug as string
+const projeto = authed ? await reader.collections.projetos.read(slug) : null
+
+const CATEGORIAS = [
+  { label: 'Interiores', value: 'interiores' },
+  { label: 'Design de Mobiliário', value: 'mobiliario' },
+  { label: 'Projetos Residenciais', value: 'residenciais' },
+  { label: 'Comercial', value: 'comercial' },
+]
+---
+<EditarLayout title={projeto?.titulo ?? 'Projeto'} authed={authed} active="projetos">
+  {authed && !projeto && (
+    <div class="editar-form-page">
+      <p class="editar-page-hint">Projeto não encontrado. <a href="/editar" style="color: var(--accent);">Voltar para a lista</a>.</p>
+    </div>
+  )}
+  {projeto && (
+    <div class="editar-form-page">
+      <div class="editar-page-header">
+        <h1 class="editar-page-title">{projeto.titulo}</h1>
+        <a href="/editar" class="editar-tour-restart">← Voltar para projetos</a>
+      </div>
+      <p class="editar-page-hint">Editando o projeto identificado por <code>{slug}</code>. O identificador da URL não pode ser alterado aqui — para renomear, exclua e crie de novo.</p>
+
+      <section class="editar-section">
+        <h2>Informações</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-titulo">Título</label>
+          <input id="f-titulo" class="editar-input" type="text" value={projeto.titulo ?? ''} />
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-categoria">Categoria</label>
+            <select id="f-categoria" class="editar-select">
+              {CATEGORIAS.map((c) => <option value={c.value} selected={projeto.categoria === c.value}>{c.label}</option>)}
+            </select>
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-ano">Ano</label>
+            <input id="f-ano" class="editar-input" type="number" value={projeto.ano ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-local">Local</label>
+            <input id="f-local" class="editar-input" type="text" value={projeto.local ?? ''} />
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-resumo">Resumo</label>
+          <textarea id="f-resumo" class="editar-textarea">{projeto.resumo ?? ''}</textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-descricao">Descrição (corpo do projeto)</label>
+          <textarea id="f-descricao" class="editar-textarea">{projeto.descricao ?? ''}</textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" style="display:flex; align-items:center; gap:8px; text-transform:none; opacity:1; font-weight:400;">
+            <input id="f-destaque" type="checkbox" checked={projeto.destaque} style="width:auto;" />
+            Destacar na home
+          </label>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Capa</h2>
+        <div class="editar-image-field">
+          {projeto.capa && <img src={projeto.capa} alt="" class="editar-image-preview" />}
+          <div class="editar-image-controls">
+            <label class="editar-file-btn">
+              Trocar imagem
+              <input id="f-capa" type="file" accept="image/*" hidden />
+            </label>
+            <span id="f-capa-name" class="editar-file-name"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Galeria</h2>
+        <div id="galeria-grid" class="editar-gallery-grid">
+          {(projeto.galeria ?? []).map((img: string) => (
+            <div class="editar-gallery-item" draggable="true" data-url={img}>
+              <img src={img} alt="" loading="lazy" />
+              <button type="button" class="editar-gallery-remove" title="Remover">×</button>
+            </div>
+          ))}
+        </div>
+        <label class="editar-file-btn">
+          + Adicionar imagens
+          <input id="f-galeria-new" type="file" accept="image/*" multiple hidden />
+        </label>
+        <span id="f-galeria-new-name" class="editar-file-name"></span>
+      </section>
+
+      <footer class="editar-form-actions">
+        <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
+        <button type="button" id="editar-save" class="editar-save">
+          <span class="editar-save-label">Salvar alterações</span>
+        </button>
+      </footer>
+
+      <section class="editar-section editar-danger-zone" style="margin-top: 32px;">
+        <h2>Excluir projeto</h2>
+        <p class="editar-page-hint" style="margin-bottom: 16px;">Isso remove o projeto e todas as suas imagens permanentemente. Não pode ser desfeito.</p>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <input id="delete-confirm" class="editar-input" type="text" placeholder={`Digite "${slug}" para confirmar`} style="max-width: 280px;" />
+          <button type="button" id="delete-btn" class="editar-delete-btn">Excluir projeto</button>
+          <span id="delete-status" class="editar-status" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+    </div>
+  )}
+</EditarLayout>
+<script define:vars={{ slug }}>
+  window.__editarProjetoSlug = slug
+</script>
+<script>
+  import { setStatus, enableDragReorder } from '../../../lib/editarFormClient'
+
+  const slug = (window as any).__editarProjetoSlug as string
+
+  const galeriaGrid = document.getElementById('galeria-grid') as HTMLDivElement
+  enableDragReorder(galeriaGrid, '.editar-gallery-item')
+  galeriaGrid.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.editar-gallery-remove') as HTMLButtonElement | null
+    if (btn) btn.closest('.editar-gallery-item')?.remove()
+  })
+
+  let capaFile: File | null = null
+  const capaInput = document.getElementById('f-capa') as HTMLInputElement | null
+  const capaName = document.getElementById('f-capa-name') as HTMLSpanElement | null
+  capaInput?.addEventListener('change', () => {
+    const file = capaInput.files?.[0]
+    if (!file) return
+    capaFile = file
+    if (capaName) capaName.textContent = file.name
+  })
+
+  let galeriaNewFiles: File[] = []
+  const galeriaNewInput = document.getElementById('f-galeria-new') as HTMLInputElement | null
+  const galeriaNewName = document.getElementById('f-galeria-new-name') as HTMLSpanElement | null
+  galeriaNewInput?.addEventListener('change', () => {
+    galeriaNewFiles = Array.from(galeriaNewInput.files ?? [])
+    if (galeriaNewName) galeriaNewName.textContent = galeriaNewFiles.length ? `${galeriaNewFiles.length} nova(s) imagem(ns)` : ''
+  })
+
+  const saveBtn = document.getElementById('editar-save') as HTMLButtonElement
+  const statusEl = document.getElementById('editar-status') as HTMLSpanElement
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true
+    saveBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Salvando...')
+
+    try {
+      const val = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)?.value ?? ''
+      const galeriaExisting = Array.from(galeriaGrid.querySelectorAll<HTMLDivElement>('.editar-gallery-item')).map(
+        (el) => el.dataset.url as string
+      )
+
+      const formData = new FormData()
+      formData.set('slug', slug)
+      formData.set('titulo', val('f-titulo'))
+      formData.set('categoria', val('f-categoria'))
+      formData.set('ano', val('f-ano'))
+      formData.set('local', val('f-local'))
+      formData.set('resumo', val('f-resumo'))
+      formData.set('descricao', val('f-descricao'))
+      formData.set('destaque', String((document.getElementById('f-destaque') as HTMLInputElement).checked))
+      formData.set('galeriaExisting', JSON.stringify(galeriaExisting))
+      if (capaFile) formData.set('capa', capaFile)
+      for (const file of galeriaNewFiles) formData.append('galeriaNew', file)
+
+      const res = await fetch('/api/editar-projeto', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+
+      setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      setTimeout(() => location.reload(), 800)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.classList.remove('is-loading')
+    }
+  })
+
+  const deleteBtn = document.getElementById('delete-btn') as HTMLButtonElement
+  const deleteStatus = document.getElementById('delete-status') as HTMLSpanElement
+  const deleteConfirm = document.getElementById('delete-confirm') as HTMLInputElement
+
+  deleteBtn.addEventListener('click', async () => {
+    if (deleteConfirm.value !== slug) {
+      setStatus(deleteStatus, 'Digite o identificador certo para confirmar.', 'error')
+      return
+    }
+    deleteBtn.disabled = true
+    setStatus(deleteStatus, 'Excluindo...')
+    try {
+      const res = await fetch('/api/editar-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, confirm: deleteConfirm.value }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao excluir')
+      location.href = '/editar'
+    } catch (err) {
+      setStatus(deleteStatus, err instanceof Error ? err.message : 'Erro ao excluir', 'error')
+      deleteBtn.disabled = false
+    }
+  })
+</script>

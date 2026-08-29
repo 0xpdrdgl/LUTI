@@ -1,0 +1,315 @@
+---
+// Shared shell for the internal /editar admin tool: dark theme, its own
+// tool-style top nav (not the public site header), session-gated login
+// screen, and the tab bar linking between projects and site singletons.
+interface Props {
+  title: string
+  authed: boolean
+  active?: 'projetos' | 'site' | 'home' | 'pagina-projetos' | 'pagina-contato' | 'pagina-sobre'
+}
+
+const { title, authed, active } = Astro.props
+
+const tabs = [
+  { key: 'projetos', label: 'Projetos', href: '/editar' },
+  { key: 'site', label: 'Site', href: '/editar/site' },
+  { key: 'home', label: 'Home', href: '/editar/home' },
+  { key: 'pagina-projetos', label: 'Página Projetos', href: '/editar/pagina-projetos' },
+  { key: 'pagina-contato', label: 'Página Contato', href: '/editar/pagina-contato' },
+  { key: 'pagina-sobre', label: 'Página Sobre', href: '/editar/pagina-sobre' },
+] as const
+---
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} - Editar</title>
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body>
+    {authed ? (
+      <>
+        <header class="editar-topbar">
+          <div class="editar-topbar-inner">
+            <div class="editar-brand">
+              <span class="editar-brand-mark">⚙</span>
+              Painel · Luiza Tinoco
+            </div>
+            <nav class="editar-tabs">
+              {tabs.map((tab) => (
+                <a href={tab.href} class="editar-tab" aria-current={active === tab.key ? 'page' : undefined}>
+                  {tab.label}
+                </a>
+              ))}
+            </nav>
+            <div class="editar-topbar-actions">
+              <a href="/" target="_blank" rel="noopener" class="editar-view-site">Ver site ↗</a>
+              <button type="button" id="editar-logout" class="editar-logout">Sair</button>
+            </div>
+          </div>
+        </header>
+        <main class="editar-main">
+          <slot />
+        </main>
+      </>
+    ) : (
+      <main class="editar-login-page">
+        <form id="editar-login-form" class="editar-login-box">
+          <h1>Painel · Luiza Tinoco</h1>
+          <label class="editar-label" for="editar-login-password">Senha</label>
+          <input id="editar-login-password" class="editar-input" type="password" autocomplete="current-password" autofocus />
+          <p id="editar-login-error" class="editar-login-error"></p>
+          <button type="submit" class="editar-save">Entrar</button>
+        </form>
+      </main>
+    )}
+  </body>
+</html>
+<style is:global>
+  html body {
+    background-color: #121212 !important;
+    color: #f0f0f0 !important;
+  }
+  html:root {
+    --font-color: #f0f0f0 !important;
+  }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+  }
+</style>
+<style is:global>
+  .editar-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #181818;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .editar-topbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    height: 56px;
+  }
+  .editar-brand {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.9;
+  }
+  .editar-brand-mark {
+    color: var(--accent, #8a6d4a);
+  }
+  .editar-tabs {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    overflow-x: auto;
+  }
+  .editar-tab {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+  }
+  .editar-tab:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #f0f0f0;
+  }
+  .editar-tab[aria-current='page'] {
+    background: rgba(138, 109, 74, 0.16);
+    color: var(--accent, #8a6d4a);
+  }
+  .editar-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .editar-view-site {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+  }
+  .editar-view-site:hover {
+    color: #f0f0f0;
+  }
+  .editar-logout {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: transparent;
+    color: #f0f0f0;
+    transition: background 0.15s;
+  }
+  .editar-logout:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .editar-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 5% 100px;
+  }
+
+  /* Login screen */
+  .editar-login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .editar-login-box {
+    width: 100%;
+    max-width: 340px;
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .editar-login-box h1 {
+    margin: 0 0 16px;
+    font-size: 18px;
+  }
+  .editar-login-box .editar-save {
+    margin-top: 16px;
+    justify-content: center;
+  }
+  .editar-login-error {
+    min-height: 18px;
+    color: #e05252;
+    font-size: 13px;
+    margin: 6px 0 0;
+  }
+
+  /* Shared form primitives, reused across every /editar page */
+  .editar-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.55;
+    margin: 0 0 6px;
+  }
+  .editar-input,
+  .editar-textarea,
+  .editar-select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #2a2a2a;
+    color: #f0f0f0;
+    transition: border-color 0.15s;
+  }
+  .editar-input::placeholder,
+  .editar-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+  .editar-input:focus,
+  .editar-textarea:focus,
+  .editar-select:focus {
+    outline: none;
+    border-color: var(--accent, #8a6d4a);
+  }
+  .editar-textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+  .editar-save {
+    background: var(--accent, #8a6d4a);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: filter 0.15s;
+  }
+  .editar-save:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  .editar-save:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .editar-save.is-loading .editar-save-label::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: editar-spin 0.6s linear infinite;
+  }
+  @keyframes editar-spin {
+    to { transform: rotate(360deg); }
+  }
+  .editar-status {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+  .editar-status[data-state='error'] {
+    color: #e05252;
+    opacity: 1;
+  }
+  .editar-status[data-state='success'] {
+    color: #4fbf7f;
+    opacity: 1;
+  }
+</style>
+<script>
+  const loginForm = document.getElementById('editar-login-form') as HTMLFormElement | null
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const passwordInput = document.getElementById('editar-login-password') as HTMLInputElement
+    const errorEl = document.getElementById('editar-login-error') as HTMLParagraphElement
+    errorEl.textContent = ''
+    try {
+      const res = await fetch('/api/editar-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: passwordInput.value }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao entrar')
+      location.reload()
+    } catch (err) {
+      errorEl.textContent = err instanceof Error ? err.message : 'Erro ao entrar'
+    }
+  })
+
+  const logoutBtn = document.getElementById('editar-logout')
+  logoutBtn?.addEventListener('click', async () => {
+    await fetch('/api/editar-logout', { method: 'POST' })
+    location.href = '/editar'
+  })
+</script>

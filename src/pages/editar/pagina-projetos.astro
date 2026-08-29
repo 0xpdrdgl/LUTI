@@ -1,0 +1,190 @@
+---
+export const prerender = false
+import EditarLayout from '../../layouts/EditarLayout.astro'
+import './shared.css'
+import { reader } from '../../lib/keystatic'
+import { hasValidSession } from '../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
+---
+<EditarLayout title="Página Projetos" authed={authed} active="pagina-projetos">
+  {pagina && (
+    <div class="editar-form-page">
+      <div class="editar-page-header">
+        <h1 class="editar-page-title">Página Projetos</h1>
+        <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+      </div>
+      <p class="editar-page-hint">Cabeçalho, filtros de categoria e moodboard da listagem de projetos.</p>
+
+      <section class="editar-section">
+        <h2>Cabeçalho</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-titulo">Título</label>
+          <input id="f-titulo" class="editar-input" type="text" value={pagina.titulo ?? ''} />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-descricao">Descrição</label>
+          <textarea id="f-descricao" class="editar-textarea">{pagina.descricao ?? ''}</textarea>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Categorias (filtros)</h2>
+        <p class="editar-field-hint" style="margin-bottom: 12px;">O slug precisa corresponder à categoria escolhida em cada projeto.</p>
+        <div id="filtros-list" class="editar-array-list">
+          {(pagina.filtros ?? []).map((filtro: any) => (
+            <div class="editar-array-row" draggable="true">
+              <span class="editar-drag-handle" title="Arraste para reordenar">⠿</span>
+              <input class="editar-input" type="text" placeholder="Nome exibido" value={filtro.label ?? ''} data-key="label" />
+              <input class="editar-input" type="text" placeholder="Slug (ex: interiores)" value={filtro.slug ?? ''} data-key="slug" />
+              <button type="button" class="editar-array-remove">Remover</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" id="filtros-add" class="editar-array-add">+ Adicionar categoria</button>
+      </section>
+
+      <section class="editar-section">
+        <h2>Moodboard</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-moodboardTitulo">Título</label>
+          <textarea id="f-moodboardTitulo" class="editar-textarea">{pagina.moodboardTitulo ?? ''}</textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-moodboardTexto">Texto</label>
+          <textarea id="f-moodboardTexto" class="editar-textarea">{pagina.moodboardTexto ?? ''}</textarea>
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label">Imagem grande</label>
+            <div class="editar-image-field">
+              {pagina.moodboardImagem1 && <img src={pagina.moodboardImagem1} alt="" class="editar-image-preview" />}
+              <div class="editar-image-controls">
+                <label class="editar-file-btn">
+                  Escolher imagem
+                  <input id="f-moodboardImagem1" type="file" accept="image/*" hidden />
+                </label>
+                {pagina.moodboardImagem1 && <button type="button" id="f-moodboardImagem1-remove" class="editar-file-remove">Remover</button>}
+                <span id="f-moodboardImagem1-name" class="editar-file-name"></span>
+              </div>
+            </div>
+          </div>
+          <div class="editar-field">
+            <label class="editar-label">Imagem sobreposta</label>
+            <div class="editar-image-field">
+              {pagina.moodboardImagem2 && <img src={pagina.moodboardImagem2} alt="" class="editar-image-preview" />}
+              <div class="editar-image-controls">
+                <label class="editar-file-btn">
+                  Escolher imagem
+                  <input id="f-moodboardImagem2" type="file" accept="image/*" hidden />
+                </label>
+                {pagina.moodboardImagem2 && <button type="button" id="f-moodboardImagem2-remove" class="editar-file-remove">Remover</button>}
+                <span id="f-moodboardImagem2-name" class="editar-file-name"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="editar-form-actions">
+        <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
+        <button type="button" id="editar-save" class="editar-save">
+          <span class="editar-save-label">Salvar alterações</span>
+        </button>
+      </footer>
+    </div>
+  )}
+</EditarLayout>
+<script>
+  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
+
+  const tourSteps: TourStep[] = [
+    { selector: '.editar-topbar-inner', title: 'Página Projetos', text: 'Cabeçalho, filtros de categoria e moodboard da listagem de projetos.' },
+    { selector: '#filtros-list', title: 'Categorias', text: 'O slug de cada filtro precisa bater com a categoria escolhida nos projetos.' },
+    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+  ]
+  const TOUR_KEY = 'editar_tour_pagina_projetos_seen'
+  maybeStartTour(tourSteps, TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(tourSteps, TOUR_KEY))
+
+  enableDragReorder(document.getElementById('filtros-list') as HTMLDivElement, '.editar-array-row')
+  document.getElementById('filtros-add')?.addEventListener('click', () => {
+    document.getElementById('filtros-list')?.appendChild(
+      makeObjectRow([
+        { key: 'label', type: 'text', placeholder: 'Nome exibido' },
+        { key: 'slug', type: 'text', placeholder: 'Slug' },
+      ])
+    )
+  })
+  document.body.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.editar-array-remove') as HTMLButtonElement | null
+    if (btn) btn.closest('.editar-array-row')?.remove()
+  })
+
+  function bindImagePicker(fieldId: string) {
+    let file: File | null = null
+    let removed = false
+    const input = document.getElementById(`f-${fieldId}`) as HTMLInputElement | null
+    const nameEl = document.getElementById(`f-${fieldId}-name`) as HTMLSpanElement | null
+    input?.addEventListener('change', () => {
+      const f = input.files?.[0]
+      if (!f) return
+      file = f
+      removed = false
+      if (nameEl) nameEl.textContent = f.name
+    })
+    document.getElementById(`f-${fieldId}-remove`)?.addEventListener('click', () => {
+      file = null
+      removed = true
+      if (nameEl) nameEl.textContent = 'Imagem será removida ao salvar'
+    })
+    return { getFile: () => file, isRemoved: () => removed }
+  }
+  const imagem1 = bindImagePicker('moodboardImagem1')
+  const imagem2 = bindImagePicker('moodboardImagem2')
+
+  const saveBtn = document.getElementById('editar-save') as HTMLButtonElement
+  const statusEl = document.getElementById('editar-status') as HTMLSpanElement
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true
+    saveBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Salvando...')
+
+    try {
+      const val = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement)?.value ?? ''
+
+      const fields = {
+        titulo: val('f-titulo'),
+        descricao: val('f-descricao'),
+        filtros: readObjectArray('filtros-list', ['label', 'slug']),
+        moodboardTitulo: val('f-moodboardTitulo'),
+        moodboardTexto: val('f-moodboardTexto'),
+      }
+
+      const formData = new FormData()
+      formData.set('singleton', 'paginaProjetos')
+      formData.set('fields', JSON.stringify(fields))
+      if (imagem1.getFile()) formData.set('image__moodboardImagem1', imagem1.getFile() as File)
+      if (imagem1.isRemoved()) formData.set('removeImage__moodboardImagem1', 'true')
+      if (imagem2.getFile()) formData.set('image__moodboardImagem2', imagem2.getFile() as File)
+      if (imagem2.isRemoved()) formData.set('removeImage__moodboardImagem2', 'true')
+
+      const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+
+      setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      setTimeout(() => location.reload(), 800)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.classList.remove('is-loading')
+    }
+  })
+</script>

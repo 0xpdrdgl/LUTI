@@ -1,0 +1,202 @@
+---
+export const prerender = false
+import EditarLayout from '../../layouts/EditarLayout.astro'
+import './shared.css'
+import { reader } from '../../lib/keystatic'
+import { hasValidSession } from '../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const pagina = authed ? await reader.singletons.paginaContato.read() : null
+---
+<EditarLayout title="Página Contato" authed={authed} active="pagina-contato">
+  {pagina && (
+    <div class="editar-form-page">
+      <div class="editar-page-header">
+        <h1 class="editar-page-title">Página Contato</h1>
+        <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+      </div>
+      <p class="editar-page-hint">Título, texto principal, links diretos e o formulário de contato.</p>
+
+      <section class="editar-section">
+        <h2>Cabeçalho</h2>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-tituloLinha1">Título — primeira linha</label>
+            <input id="f-tituloLinha1" class="editar-input" type="text" value={pagina.tituloLinha1 ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-tituloLinha2">Título — segunda linha</label>
+            <input id="f-tituloLinha2" class="editar-input" type="text" value={pagina.tituloLinha2 ?? ''} />
+            <p class="editar-field-hint">A última palavra fica em itálico.</p>
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-lead">Texto principal</label>
+          <textarea id="f-lead" class="editar-textarea">{pagina.lead ?? ''}</textarea>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Links diretos</h2>
+        <div id="links-list" class="editar-array-list">
+          {(pagina.links ?? []).map((link: any) => (
+            <div class="editar-array-row editar-array-row-multi" draggable="true">
+              <span class="editar-drag-handle" title="Arraste para reordenar">⠿</span>
+              <div class="editar-array-row-fields">
+                <input class="editar-input" type="text" placeholder="Rótulo (texto pequeno)" value={link.label ?? ''} data-key="label" />
+                <input class="editar-input" type="text" placeholder="Texto do link" value={link.valor ?? ''} data-key="valor" />
+                <input class="editar-input" type="text" placeholder="URL" value={link.href ?? ''} data-key="href" />
+                <select class="editar-select" data-key="icone">
+                  <option value="whatsapp" selected={link.icone === 'whatsapp'}>WhatsApp</option>
+                  <option value="instagram" selected={link.icone === 'instagram'}>Instagram</option>
+                  <option value="email" selected={link.icone === 'email'}>E-mail</option>
+                </select>
+              </div>
+              <button type="button" class="editar-array-remove">Remover</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" id="links-add" class="editar-array-add">+ Adicionar link</button>
+      </section>
+
+      <section class="editar-section">
+        <h2>Formulário</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-formTitulo">Título do formulário</label>
+          <input id="f-formTitulo" class="editar-input" type="text" value={pagina.formTitulo ?? ''} />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-formEndpoint">Endpoint de envio</label>
+          <input id="f-formEndpoint" class="editar-input" type="text" value={pagina.formEndpoint ?? ''} />
+          <p class="editar-field-hint">Ex: URL de um formulário do Formspree.</p>
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-nomeLabel">Campo nome — rótulo</label>
+            <input id="f-nomeLabel" class="editar-input" type="text" value={pagina.nomeLabel ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-nomePlaceholder">Campo nome — placeholder</label>
+            <input id="f-nomePlaceholder" class="editar-input" type="text" value={pagina.nomePlaceholder ?? ''} />
+          </div>
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-emailLabel">Campo e-mail — rótulo</label>
+            <input id="f-emailLabel" class="editar-input" type="text" value={pagina.emailLabel ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-emailPlaceholder">Campo e-mail — placeholder</label>
+            <input id="f-emailPlaceholder" class="editar-input" type="text" value={pagina.emailPlaceholder ?? ''} />
+          </div>
+        </div>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-mensagemLabel">Campo mensagem — rótulo</label>
+            <input id="f-mensagemLabel" class="editar-input" type="text" value={pagina.mensagemLabel ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-mensagemPlaceholder">Campo mensagem — placeholder</label>
+            <input id="f-mensagemPlaceholder" class="editar-input" type="text" value={pagina.mensagemPlaceholder ?? ''} />
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-botaoTexto">Botão de envio — texto</label>
+          <input id="f-botaoTexto" class="editar-input" type="text" value={pagina.botaoTexto ?? ''} />
+        </div>
+      </section>
+
+      <footer class="editar-form-actions">
+        <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
+        <button type="button" id="editar-save" class="editar-save">
+          <span class="editar-save-label">Salvar alterações</span>
+        </button>
+      </footer>
+    </div>
+  )}
+</EditarLayout>
+<script>
+  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
+
+  const tourSteps: TourStep[] = [
+    { selector: '.editar-topbar-inner', title: 'Página Contato', text: 'Título, texto principal, links diretos e o formulário de contato.' },
+    { selector: '#links-list', title: 'Links diretos', text: 'WhatsApp, Instagram, e-mail — escolha o ícone certo para cada um.' },
+    { selector: '#f-formEndpoint', title: 'Formulário', text: 'Endpoint pra onde o formulário de contato envia as mensagens.' },
+    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+  ]
+  const TOUR_KEY = 'editar_tour_pagina_contato_seen'
+  maybeStartTour(tourSteps, TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(tourSteps, TOUR_KEY))
+
+  enableDragReorder(document.getElementById('links-list') as HTMLDivElement, '.editar-array-row')
+  document.getElementById('links-add')?.addEventListener('click', () => {
+    document.getElementById('links-list')?.appendChild(
+      makeObjectRow([
+        { key: 'label', type: 'text', placeholder: 'Rótulo (texto pequeno)' },
+        { key: 'valor', type: 'text', placeholder: 'Texto do link' },
+        { key: 'href', type: 'text', placeholder: 'URL' },
+        {
+          key: 'icone',
+          type: 'select',
+          options: [
+            { label: 'WhatsApp', value: 'whatsapp' },
+            { label: 'Instagram', value: 'instagram' },
+            { label: 'E-mail', value: 'email' },
+          ],
+        },
+      ])
+    )
+  })
+  document.body.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.editar-array-remove') as HTMLButtonElement | null
+    if (btn) btn.closest('.editar-array-row')?.remove()
+  })
+
+  const saveBtn = document.getElementById('editar-save') as HTMLButtonElement
+  const statusEl = document.getElementById('editar-status') as HTMLSpanElement
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true
+    saveBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Salvando...')
+
+    try {
+      const val = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement)?.value ?? ''
+
+      const fields = {
+        tituloLinha1: val('f-tituloLinha1'),
+        tituloLinha2: val('f-tituloLinha2'),
+        lead: val('f-lead'),
+        links: readObjectArray('links-list', ['label', 'valor', 'href', 'icone']),
+        formTitulo: val('f-formTitulo'),
+        formEndpoint: val('f-formEndpoint'),
+        nomeLabel: val('f-nomeLabel'),
+        nomePlaceholder: val('f-nomePlaceholder'),
+        emailLabel: val('f-emailLabel'),
+        emailPlaceholder: val('f-emailPlaceholder'),
+        mensagemLabel: val('f-mensagemLabel'),
+        mensagemPlaceholder: val('f-mensagemPlaceholder'),
+        botaoTexto: val('f-botaoTexto'),
+      }
+
+      const formData = new FormData()
+      formData.set('singleton', 'paginaContato')
+      formData.set('fields', JSON.stringify(fields))
+
+      const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+
+      setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      setTimeout(() => location.reload(), 800)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.classList.remove('is-loading')
+    }
+  })
+</script>

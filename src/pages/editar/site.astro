@@ -1,0 +1,147 @@
+---
+export const prerender = false
+import EditarLayout from '../../layouts/EditarLayout.astro'
+import './shared.css'
+import { reader } from '../../lib/keystatic'
+import { hasValidSession } from '../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const site = authed ? await reader.singletons.site.read() : null
+---
+<EditarLayout title="Site" authed={authed} active="site">
+  {site && (
+    <div class="editar-form-page">
+      <div class="editar-page-header">
+        <h1 class="editar-page-title">Site (footer e marca)</h1>
+        <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+      </div>
+      <p class="editar-page-hint">Marca, logo, copyright e links do rodapé. Aparecem em todas as páginas.</p>
+
+      <section class="editar-section">
+        <h2>Marca</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-brand">Nome da marca</label>
+          <input id="f-brand" class="editar-input" type="text" value={site.brand ?? ''} />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label">Logo (opcional — substitui o texto no header e footer)</label>
+          <div class="editar-image-field">
+            {site.logo && <img src={site.logo} alt="" class="editar-image-preview" />}
+            <div class="editar-image-controls">
+              <label class="editar-file-btn">
+                Escolher imagem
+                <input id="f-logo" type="file" accept="image/*" hidden />
+              </label>
+              {site.logo && <button type="button" id="f-logo-remove" class="editar-file-remove">Remover</button>}
+              <span id="f-logo-name" class="editar-file-name"></span>
+            </div>
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-copyright">Texto de copyright</label>
+          <input id="f-copyright" class="editar-input" type="text" value={site.copyright ?? ''} />
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Links do rodapé</h2>
+        <div id="links-list" class="editar-array-list">
+          {(site.links ?? []).map((link: any) => (
+            <div class="editar-array-row" draggable="true">
+              <span class="editar-drag-handle" title="Arraste para reordenar">⠿</span>
+              <input class="editar-input" type="text" placeholder="Texto" value={link.label ?? ''} data-key="label" />
+              <input class="editar-input" type="text" placeholder="URL" value={link.href ?? ''} data-key="href" />
+              <button type="button" class="editar-array-remove">Remover</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" id="links-add" class="editar-array-add">+ Adicionar link</button>
+      </section>
+
+      <footer class="editar-form-actions">
+        <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
+        <button type="button" id="editar-save" class="editar-save">
+          <span class="editar-save-label">Salvar alterações</span>
+        </button>
+      </footer>
+    </div>
+  )}
+</EditarLayout>
+<script>
+  import { setStatus, makeLinkRow, readLinkArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
+
+  const siteTourSteps: TourStep[] = [
+    { selector: '.editar-topbar-inner', title: 'Site', text: 'Marca, logo, copyright e links do rodapé — aparecem em todas as páginas.' },
+    { selector: '#f-brand', title: 'Marca', text: 'Nome exibido no header e footer, a não ser que você suba um logo.' },
+    { selector: '#links-list', title: 'Links do rodapé', text: 'Arraste pelo ⠿ para reordenar (ex: WhatsApp, Instagram).' },
+    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+  ]
+  const SITE_TOUR_KEY = 'editar_tour_site_seen'
+  maybeStartTour(siteTourSteps, SITE_TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(siteTourSteps, SITE_TOUR_KEY))
+
+  enableDragReorder(document.getElementById('links-list') as HTMLDivElement, '.editar-array-row')
+  document.getElementById('links-add')?.addEventListener('click', () => {
+    document.getElementById('links-list')?.appendChild(makeLinkRow())
+  })
+  document.querySelectorAll<HTMLButtonElement>('.editar-array-remove').forEach((btn) => {
+    btn.addEventListener('click', () => btn.closest('.editar-array-row')?.remove())
+  })
+
+  let logoFile: File | null = null
+  let logoRemoved = false
+  const logoInput = document.getElementById('f-logo') as HTMLInputElement | null
+  const logoName = document.getElementById('f-logo-name') as HTMLSpanElement | null
+  logoInput?.addEventListener('change', () => {
+    const file = logoInput.files?.[0]
+    if (!file) return
+    logoFile = file
+    logoRemoved = false
+    if (logoName) logoName.textContent = file.name
+  })
+  document.getElementById('f-logo-remove')?.addEventListener('click', () => {
+    logoFile = null
+    logoRemoved = true
+    if (logoName) logoName.textContent = 'Logo será removido ao salvar'
+  })
+
+  const saveBtn = document.getElementById('editar-save') as HTMLButtonElement
+  const statusEl = document.getElementById('editar-status') as HTMLSpanElement
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true
+    saveBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Salvando...')
+
+    try {
+      const val = (id: string) => (document.getElementById(id) as HTMLInputElement).value
+
+      const fields = {
+        brand: val('f-brand'),
+        copyright: val('f-copyright'),
+        links: readLinkArray('links-list'),
+      }
+
+      const formData = new FormData()
+      formData.set('singleton', 'site')
+      formData.set('fields', JSON.stringify(fields))
+      if (logoFile) formData.set('image__logo', logoFile)
+      if (logoRemoved) formData.set('removeImage__logo', 'true')
+
+      const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+
+      setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      setTimeout(() => location.reload(), 800)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.classList.remove('is-loading')
+    }
+  })
+</script>

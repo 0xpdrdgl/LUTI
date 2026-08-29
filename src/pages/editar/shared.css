@@ -1,0 +1,316 @@
+.editar-form-page {
+  max-width: 780px;
+}
+.editar-page-title {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+.editar-page-hint {
+  margin: 0 0 32px;
+  font-size: 14px;
+  opacity: 0.6;
+}
+.editar-page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.editar-tour-restart {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: underline;
+}
+.editar-tour-restart:hover {
+  color: #f0f0f0;
+}
+.editar-section {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.editar-section h2 {
+  margin: 0 0 18px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.editar-field {
+  margin-bottom: 16px;
+}
+.editar-field:last-child {
+  margin-bottom: 0;
+}
+.editar-field-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.editar-field-row .editar-field {
+  flex: 1;
+  margin-bottom: 0;
+}
+.editar-field-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.editar-image-field {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.editar-image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #2a2a2a;
+}
+.editar-image-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.editar-file-btn {
+  display: inline-block;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  color: #f0f0f0;
+}
+.editar-file-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.editar-file-remove {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(224, 82, 82, 0.4);
+  background: transparent;
+  color: #e05252;
+  cursor: pointer;
+}
+.editar-file-name {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.editar-array-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.editar-array-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.editar-array-row.is-dragging {
+  opacity: 0.4;
+}
+.editar-drag-handle {
+  cursor: grab;
+  opacity: 0.4;
+  font-size: 16px;
+  padding: 0 2px;
+  user-select: none;
+  flex-shrink: 0;
+}
+.editar-drag-handle:hover {
+  opacity: 0.9;
+}
+.editar-array-row .editar-input {
+  flex: 1;
+}
+.editar-array-remove {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(224, 82, 82, 0.3);
+  background: transparent;
+  color: #e05252;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.editar-array-add {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+.editar-array-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.editar-form-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 16px 0;
+  background: linear-gradient(to top, #121212 60%, transparent);
+}
+
+/* Rows with multiple sub-fields (areas, processo, links de contato) */
+.editar-array-row-multi {
+  align-items: flex-start;
+}
+.editar-array-row-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Gallery image manager (projetos: capa + galeria) */
+.editar-gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.editar-gallery-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #2a2a2a;
+  cursor: grab;
+}
+.editar-gallery-item.is-dragging {
+  opacity: 0.4;
+}
+.editar-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.editar-gallery-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+.editar-gallery-remove:hover {
+  background: #e05252;
+}
+
+/* Projetos list grid */
+.editar-projetos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.editar-projeto-card {
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1a1a1a;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s;
+}
+.editar-projeto-card:hover {
+  border-color: var(--accent);
+}
+.editar-projeto-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: #2a2a2a;
+}
+.editar-projeto-card-body {
+  padding: 12px 14px;
+}
+.editar-projeto-card-titulo {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+.editar-projeto-card-meta {
+  font-size: 12px;
+  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.editar-projeto-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(138, 109, 74, 0.2);
+  color: var(--accent);
+}
+.editar-projeto-new-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+}
+.editar-projeto-new-card:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.editar-danger-zone {
+  border-color: rgba(224, 82, 82, 0.3) !important;
+}
+.editar-delete-btn {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(224, 82, 82, 0.4);
+  background: transparent;
+  color: #e05252;
+  cursor: pointer;
+}
+.editar-delete-btn:hover {
+  background: rgba(224, 82, 82, 0.12);
+}

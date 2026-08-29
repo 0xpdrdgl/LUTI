@@ -1,0 +1,154 @@
+---
+export const prerender = false
+import EditarLayout from '../../layouts/EditarLayout.astro'
+import './shared.css'
+import { reader } from '../../lib/keystatic'
+import { hasValidSession } from '../../lib/editarAuth'
+
+const secret = import.meta.env.EDITAR_SESSION_SECRET
+const authed = hasValidSession(Astro.request, secret)
+
+const pagina = authed ? await reader.singletons.paginaSobre.read() : null
+---
+<EditarLayout title="Página Sobre" authed={authed} active="pagina-sobre">
+  {pagina && (
+    <div class="editar-form-page">
+      <div class="editar-page-header">
+        <h1 class="editar-page-title">Página Sobre</h1>
+        <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+      </div>
+      <p class="editar-page-hint">Título, texto de apresentação, retrato e a seção de visão.</p>
+
+      <section class="editar-section">
+        <h2>Cabeçalho</h2>
+        <div class="editar-field-row">
+          <div class="editar-field">
+            <label class="editar-label" for="f-tituloPrincipal">Título — parte normal</label>
+            <input id="f-tituloPrincipal" class="editar-input" type="text" value={pagina.tituloPrincipal ?? ''} />
+          </div>
+          <div class="editar-field">
+            <label class="editar-label" for="f-tituloItalico">Título — parte em itálico</label>
+            <input id="f-tituloItalico" class="editar-input" type="text" value={pagina.tituloItalico ?? ''} />
+          </div>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-lead">Texto principal</label>
+          <textarea id="f-lead" class="editar-textarea">{pagina.lead ?? ''}</textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-nota">Texto secundário</label>
+          <textarea id="f-nota" class="editar-textarea">{pagina.nota ?? ''}</textarea>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Retrato</h2>
+        <div class="editar-image-field">
+          {pagina.retrato && <img src={pagina.retrato} alt="" class="editar-image-preview" />}
+          <div class="editar-image-controls">
+            <label class="editar-file-btn">
+              Escolher foto
+              <input id="f-retrato" type="file" accept="image/*" hidden />
+            </label>
+            {pagina.retrato && <button type="button" id="f-retrato-remove" class="editar-file-remove">Remover</button>}
+            <span id="f-retrato-name" class="editar-file-name"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="editar-section">
+        <h2>Visão</h2>
+        <div class="editar-field">
+          <label class="editar-label" for="f-visaoLabel">Label</label>
+          <input id="f-visaoLabel" class="editar-input" type="text" value={pagina.visaoLabel ?? ''} />
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-visaoTitulo">Título</label>
+          <textarea id="f-visaoTitulo" class="editar-textarea">{pagina.visaoTitulo ?? ''}</textarea>
+        </div>
+        <div class="editar-field">
+          <label class="editar-label" for="f-visaoQuote">Citação</label>
+          <textarea id="f-visaoQuote" class="editar-textarea">{pagina.visaoQuote ?? ''}</textarea>
+        </div>
+      </section>
+
+      <footer class="editar-form-actions">
+        <span id="editar-status" class="editar-status" role="status" aria-live="polite"></span>
+        <button type="button" id="editar-save" class="editar-save">
+          <span class="editar-save-label">Salvar alterações</span>
+        </button>
+      </footer>
+    </div>
+  )}
+</EditarLayout>
+<script>
+  import { setStatus } from '../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
+
+  const tourSteps: TourStep[] = [
+    { selector: '.editar-topbar-inner', title: 'Página Sobre', text: 'Título, texto de apresentação, retrato e a seção de visão.' },
+    { selector: '.editar-image-field', title: 'Retrato', text: 'A foto usada na página Sobre.' },
+    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+  ]
+  const TOUR_KEY = 'editar_tour_pagina_sobre_seen'
+  maybeStartTour(tourSteps, TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(tourSteps, TOUR_KEY))
+
+  let retratoFile: File | null = null
+  let retratoRemoved = false
+  const retratoInput = document.getElementById('f-retrato') as HTMLInputElement | null
+  const retratoName = document.getElementById('f-retrato-name') as HTMLSpanElement | null
+  retratoInput?.addEventListener('change', () => {
+    const file = retratoInput.files?.[0]
+    if (!file) return
+    retratoFile = file
+    retratoRemoved = false
+    if (retratoName) retratoName.textContent = file.name
+  })
+  document.getElementById('f-retrato-remove')?.addEventListener('click', () => {
+    retratoFile = null
+    retratoRemoved = true
+    if (retratoName) retratoName.textContent = 'Foto será removida ao salvar'
+  })
+
+  const saveBtn = document.getElementById('editar-save') as HTMLButtonElement
+  const statusEl = document.getElementById('editar-status') as HTMLSpanElement
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true
+    saveBtn.classList.add('is-loading')
+    setStatus(statusEl, 'Salvando...')
+
+    try {
+      const val = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement)?.value ?? ''
+
+      const fields = {
+        tituloPrincipal: val('f-tituloPrincipal'),
+        tituloItalico: val('f-tituloItalico'),
+        lead: val('f-lead'),
+        nota: val('f-nota'),
+        visaoLabel: val('f-visaoLabel'),
+        visaoTitulo: val('f-visaoTitulo'),
+        visaoQuote: val('f-visaoQuote'),
+      }
+
+      const formData = new FormData()
+      formData.set('singleton', 'paginaSobre')
+      formData.set('fields', JSON.stringify(fields))
+      if (retratoFile) formData.set('image__retrato', retratoFile)
+      if (retratoRemoved) formData.set('removeImage__retrato', 'true')
+
+      const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+
+      setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      setTimeout(() => location.reload(), 800)
+    } catch (err) {
+      setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.classList.remove('is-loading')
+    }
+  })
+</script>
