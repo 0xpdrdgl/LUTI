@@ -70,9 +70,36 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Página Sobre', text: 'Título, texto de apresentação e retrato.' },
-    { selector: '.editar-image-field', title: 'Retrato', text: 'A foto usada na página Sobre.' },
-    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+    {
+      selector: '.editar-topbar-inner',
+      title: 'Página Sobre',
+      text: 'Conteúdo da página /sobre — a biografia completa da autora (diferente do resumo curto que fica na home).',
+    },
+    {
+      selector: '#f-tituloPrincipal',
+      title: 'Título',
+      text: 'O título grande no topo da página, em duas partes: a primeira em texto normal, a segunda em itálico (ex: "Arquitetura que" + "respira.").',
+    },
+    {
+      selector: '#f-lead',
+      title: 'Texto principal',
+      text: 'O primeiro parágrafo, mais destacado — normalmente a formação e abordagem da autora.',
+    },
+    {
+      selector: '#f-nota',
+      title: 'Texto secundário',
+      text: 'O segundo parágrafo, complementar ao primeiro — normalmente prêmios e reconhecimentos.',
+    },
+    {
+      selector: '.editar-image-field',
+      title: 'Retrato',
+      text: 'A foto da autora que aparece ao lado do título e dos textos, nessa página.',
+    },
+    {
+      selector: '#editar-save',
+      title: 'Salvar',
+      text: 'Nada é salvo automaticamente. Clique aqui depois de editar, e espere a confirmação antes de sair da página.',
+    },
   ]
   const TOUR_KEY = 'editar_tour_pagina_sobre_seen'
   maybeStartTour(tourSteps, TOUR_KEY)

@@ -2,6 +2,9 @@ export interface TourStep {
   selector: string
   title: string
   text: string
+  /** Runs right before this step is shown — use it to expand a collapsed
+   * section so its fields are visible for the spotlight to find. */
+  onEnter?: () => void
 }
 
 const STYLE_ID = 'editar-tour-style'
@@ -130,6 +133,7 @@ export function startTour(steps: TourStep[], storageKey: string) {
 
   function render() {
     const step = steps[index]
+    step.onEnter?.()
     const target = document.querySelector(step.selector) as HTMLElement | null
     if (!target || target.offsetParent === null) {
       index++

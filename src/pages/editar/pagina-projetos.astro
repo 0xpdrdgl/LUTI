@@ -58,7 +58,7 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
           <textarea id="f-moodboardTexto" class="editar-textarea">{pagina.moodboardTexto ?? ''}</textarea>
         </div>
         <div class="editar-field-row">
-          <div class="editar-field">
+          <div class="editar-field" id="f-moodboardImagem1-field">
             <label class="editar-label">Imagem grande</label>
             <div class="editar-image-field">
               {pagina.moodboardImagem1 && <img src={pagina.moodboardImagem1} alt="" class="editar-image-preview" />}
@@ -72,7 +72,7 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
               </div>
             </div>
           </div>
-          <div class="editar-field">
+          <div class="editar-field" id="f-moodboardImagem2-field">
             <label class="editar-label">Imagem sobreposta</label>
             <div class="editar-image-field">
               {pagina.moodboardImagem2 && <img src={pagina.moodboardImagem2} alt="" class="editar-image-preview" />}
@@ -103,9 +103,46 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Página Projetos', text: 'Cabeçalho, filtros de categoria e moodboard da listagem de projetos.' },
-    { selector: '#filtros-list', title: 'Categorias', text: 'O slug de cada filtro precisa bater com a categoria escolhida nos projetos.' },
-    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+    {
+      selector: '.editar-topbar-inner',
+      title: 'Página Projetos',
+      text: 'Conteúdo da página /projetos: o cabeçalho, os filtros de categoria e o moodboard editorial no final da listagem. Os projetos em si (cada um com suas fotos) são editados na aba "Projetos" do menu, não aqui.',
+    },
+    {
+      selector: '#f-titulo',
+      title: 'Cabeçalho — título',
+      text: 'O título grande no topo da página /projetos (ex: "Projetos").',
+    },
+    {
+      selector: '#f-descricao',
+      title: 'Cabeçalho — descrição',
+      text: 'O texto de apresentação logo abaixo do título.',
+    },
+    {
+      selector: '#filtros-list',
+      title: 'Categorias (filtros)',
+      text: 'Os botões de filtro no topo da grade de projetos (ex: Residencial, Apartamento, Comercial). Importante: o "slug" de cada filtro aqui precisa ser IDÊNTICO à categoria escolhida em cada projeto (aba "Projetos" do menu) — senão o filtro não encontra nenhum projeto.',
+    },
+    {
+      selector: '#f-moodboardTitulo',
+      title: 'Moodboard — texto',
+      text: 'O bloco editorial no final da página /projetos, com título, texto e duas imagens sobrepostas.',
+    },
+    {
+      selector: '#f-moodboardImagem1-field',
+      title: 'Moodboard — imagem grande',
+      text: 'A imagem maior, ao fundo, do bloco de moodboard.',
+    },
+    {
+      selector: '#f-moodboardImagem2-field',
+      title: 'Moodboard — imagem sobreposta',
+      text: 'A imagem menor, que aparece por cima da imagem grande.',
+    },
+    {
+      selector: '#editar-save',
+      title: 'Salvar',
+      text: 'Nada é salvo automaticamente. Clique aqui depois de editar, e espere a confirmação antes de sair da página.',
+    },
   ]
   const TOUR_KEY = 'editar_tour_pagina_projetos_seen'
   maybeStartTour(tourSteps, TOUR_KEY)

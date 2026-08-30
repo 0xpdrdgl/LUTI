@@ -27,7 +27,10 @@ const CATEGORIAS = [
     <div class="editar-form-page">
       <div class="editar-page-header">
         <h1 class="editar-page-title">{projeto.titulo}</h1>
-        <a href="/editar" class="editar-tour-restart">← Voltar para projetos</a>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <a href="/editar" class="editar-tour-restart">← Voltar para projetos</a>
+          <button type="button" id="editar-tour-restart" class="editar-tour-restart" title="Rever o tour guiado desta página">Ver tour</button>
+        </div>
       </div>
       <p class="editar-page-hint">Editando o projeto identificado por <code>{slug}</code>. O identificador da URL não pode ser alterado aqui — para renomear, exclua e crie de novo.</p>
 
@@ -124,8 +127,65 @@ const CATEGORIAS = [
 </script>
 <script>
   import { setStatus, enableDragReorder } from '../../../lib/editarFormClient'
+  import { maybeStartTour, startTour, type TourStep } from '../../../lib/editarTour'
 
   const slug = (window as any).__editarProjetoSlug as string
+
+  const tourSteps: TourStep[] = [
+    {
+      selector: '.editar-page-title',
+      title: 'Editando um projeto',
+      text: 'Essa página edita um projeto específico do portfólio. O identificador da URL (o "slug") não pode ser alterado aqui — pra renomear a URL, exclua o projeto e crie de novo.',
+    },
+    {
+      selector: '#f-titulo',
+      title: 'Título',
+      text: 'O nome do projeto, exibido na listagem e na página individual dele.',
+    },
+    {
+      selector: '#f-categoria',
+      title: 'Categoria, ano e local',
+      text: 'A categoria precisa bater com um dos filtros cadastrados em "Página Projetos", senão o projeto não aparece quando alguém filtra por ela. Ano e local são opcionais.',
+    },
+    {
+      selector: '#f-resumo',
+      title: 'Resumo',
+      text: 'Um texto curto do projeto — aparece na página individual dele, logo abaixo do título.',
+    },
+    {
+      selector: '#f-descricao',
+      title: 'Descrição',
+      text: 'O texto mais completo, o corpo do projeto — pode ser mais longo que o resumo.',
+    },
+    {
+      selector: '#f-destaque',
+      title: 'Destacar na home',
+      text: 'Se marcado, esse projeto aparece na seção "Projetos" da página inicial. Só os 3 primeiros marcados como destaque aparecem lá.',
+    },
+    {
+      selector: '.editar-image-field',
+      title: 'Capa',
+      text: 'A imagem principal do projeto — aparece no card da listagem e no topo da página individual.',
+    },
+    {
+      selector: '#galeria-grid',
+      title: 'Galeria',
+      text: 'As demais fotos do projeto (aparecem na página individual e na /galeria do site). Arraste os itens pra reordenar, clique no × pra remover um, ou use "+ Adicionar imagens" pra subir mais fotos.',
+    },
+    {
+      selector: '#editar-save',
+      title: 'Salvar',
+      text: 'Nada é salvo automaticamente. Clique aqui depois de editar, e espere a confirmação antes de sair da página.',
+    },
+    {
+      selector: '#delete-btn',
+      title: 'Excluir projeto',
+      text: 'Remove o projeto e todas as suas imagens permanentemente — não pode ser desfeito. Você precisa digitar o identificador do projeto pra confirmar, evitando exclusão acidental.',
+    },
+  ]
+  const TOUR_KEY = 'editar_tour_projeto_seen'
+  maybeStartTour(tourSteps, TOUR_KEY)
+  document.getElementById('editar-tour-restart')?.addEventListener('click', () => startTour(tourSteps, TOUR_KEY))
 
   const galeriaGrid = document.getElementById('galeria-grid') as HTMLDivElement
   enableDragReorder(galeriaGrid, '.editar-gallery-item')

@@ -99,10 +99,70 @@ const CATEGORIAS = [
   import { setStatus } from '../../lib/editarFormClient'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
+  function openNovoProjetoForm() {
+    const form = document.getElementById('novo-projeto-form') as HTMLDivElement | null
+    const toggle = document.getElementById('novo-projeto-toggle') as HTMLButtonElement | null
+    if (form) form.hidden = false
+    if (toggle) toggle.textContent = '- Cancelar'
+  }
+
   const tourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Projetos', text: 'Aqui ficam todos os projetos do portfólio.' },
-    { selector: '#novo-projeto-toggle', title: 'Novo projeto', text: 'Clique aqui pra adicionar um projeto novo com capa, galeria e textos.' },
-    { selector: '#projetos-grid', title: 'Editar', text: 'Clique em qualquer card pra editar aquele projeto, trocar imagens ou excluir.' },
+    {
+      selector: '.editar-topbar-inner',
+      title: 'Projetos',
+      text: 'Todos os projetos do portfólio (aparecem em /projetos, na home se marcados como destaque, e na /galeria). A ordem aqui é a mesma exibida no site.',
+    },
+    {
+      selector: '#novo-projeto-toggle',
+      title: 'Novo projeto',
+      text: 'Clique aqui pra abrir o formulário de criação de um projeto novo. Vamos abrir ele agora pra ver cada campo.',
+      onEnter: openNovoProjetoForm,
+    },
+    {
+      selector: '#n-titulo',
+      title: 'Título',
+      text: 'O nome do projeto — obrigatório. Vira o nome exibido na listagem e na página individual do projeto.',
+    },
+    {
+      selector: '#n-categoria',
+      title: 'Categoria, ano e local',
+      text: 'A categoria precisa bater com um dos filtros cadastrados em "Página Projetos" (Residencial, Apartamento ou Comercial), senão o projeto não aparece quando alguém filtra por ela. Ano e local, ao lado, são opcionais.',
+    },
+    {
+      selector: '#n-resumo',
+      title: 'Resumo',
+      text: 'Um texto curto do projeto — aparece na página individual dele, logo abaixo do título. Opcional, pode preencher depois.',
+    },
+    {
+      selector: '#n-descricao',
+      title: 'Descrição',
+      text: 'O texto mais completo, o corpo do projeto. Também opcional, pode preencher depois.',
+    },
+    {
+      selector: '#n-capa',
+      title: 'Imagem de capa',
+      text: 'A única coisa realmente obrigatória além do título. É a foto principal — aparece no card da listagem e no topo da página do projeto.',
+    },
+    {
+      selector: '#n-galeria',
+      title: 'Galeria',
+      text: 'As demais fotos do projeto, opcional aqui na criação — dá pra selecionar várias de uma vez, e também pra adicionar mais depois, editando o projeto.',
+    },
+    {
+      selector: '#n-destaque',
+      title: 'Destacar na home',
+      text: 'Se marcado, esse projeto aparece na seção "Projetos" da página inicial (só os 3 primeiros marcados como destaque aparecem lá).',
+    },
+    {
+      selector: '#n-criar',
+      title: 'Criar projeto',
+      text: 'Clique aqui pra criar o projeto com o que foi preenchido. Depois de criado, você é levado direto pra página de edição dele, onde pode ajustar tudo com calma.',
+    },
+    {
+      selector: '#projetos-grid',
+      title: 'Editar um projeto existente',
+      text: 'Clique em qualquer card pra abrir aquele projeto — dá pra trocar título, categoria, textos, capa, adicionar ou remover fotos da galeria, marcar como destaque, ou excluir o projeto.',
+    },
   ]
   const TOUR_KEY = 'editar_tour_projetos_seen'
   maybeStartTour(tourSteps, TOUR_KEY)

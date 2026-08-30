@@ -68,9 +68,9 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
           <input id="f-formTitulo" class="editar-input" type="text" value={pagina.formTitulo ?? ''} />
         </div>
         <div class="editar-field">
-          <label class="editar-label" for="f-formEndpoint">Endpoint de envio</label>
+          <label class="editar-label" for="f-formEndpoint">Endpoint de reserva (fallback)</label>
           <input id="f-formEndpoint" class="editar-input" type="text" value={pagina.formEndpoint ?? ''} />
-          <p class="editar-field-hint">Ex: URL de um formulário do Formspree.</p>
+          <p class="editar-field-hint">O formulário abre o WhatsApp automaticamente (número vem do link com ícone WhatsApp em "Links diretos"). Esse endpoint só é usado como plano B, caso o navegador do visitante não consiga rodar o JavaScript — ex: URL de um formulário do Formspree.</p>
         </div>
         <div class="editar-field-row">
           <div class="editar-field">
@@ -122,10 +122,46 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Página Contato', text: 'Título, texto principal, links diretos e o formulário de contato.' },
-    { selector: '#links-list', title: 'Links diretos', text: 'WhatsApp, Instagram, e-mail — escolha o ícone certo para cada um.' },
-    { selector: '#f-formEndpoint', title: 'Formulário', text: 'Endpoint pra onde o formulário de contato envia as mensagens.' },
-    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+    {
+      selector: '.editar-topbar-inner',
+      title: 'Página Contato',
+      text: 'Conteúdo da página /contato: cabeçalho, links diretos (WhatsApp, Instagram, e-mail) e o formulário de contato.',
+    },
+    {
+      selector: '#f-tituloLinha1',
+      title: 'Cabeçalho',
+      text: 'O título da página, em duas linhas — a última palavra da segunda linha fica em itálico automaticamente.',
+    },
+    {
+      selector: '#links-list',
+      title: 'Links diretos',
+      text: 'Os cartões de contato rápido (WhatsApp, Instagram, e-mail). O número de WhatsApp cadastrado aqui é o mesmo que o formulário usa pra abrir a conversa — se trocar o número, é aqui que muda. Escolha o ícone certo em cada um.',
+    },
+    {
+      selector: '#f-formTitulo',
+      title: 'Formulário — título',
+      text: 'O título do card do formulário (ex: "Envie uma mensagem").',
+    },
+    {
+      selector: '#f-formEndpoint',
+      title: 'Formulário — envio',
+      text: 'O envio principal abre o WhatsApp direto, usando o número dos "Links diretos" acima — esse campo aqui é só um plano B, pra caso o navegador do visitante não consiga rodar o JavaScript.',
+    },
+    {
+      selector: '#f-nomeLabel',
+      title: 'Formulário — campos',
+      text: 'Rótulo e placeholder de cada campo do formulário (nome, e-mail, mensagem) — dá pra ajustar o texto de cada um logo abaixo.',
+    },
+    {
+      selector: '#f-botaoTexto',
+      title: 'Formulário — botão',
+      text: 'O texto do botão de envio do formulário.',
+    },
+    {
+      selector: '#editar-save',
+      title: 'Salvar',
+      text: 'Nada é salvo automaticamente. Clique aqui depois de editar, e espere a confirmação antes de sair da página.',
+    },
   ]
   const TOUR_KEY = 'editar_tour_pagina_contato_seen'
   maybeStartTour(tourSteps, TOUR_KEY)

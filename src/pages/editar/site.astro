@@ -25,7 +25,7 @@ const site = authed ? await reader.singletons.site.read() : null
           <label class="editar-label" for="f-brand">Nome da marca</label>
           <input id="f-brand" class="editar-input" type="text" value={site.brand ?? ''} />
         </div>
-        <div class="editar-field">
+        <div class="editar-field" id="f-logo-field">
           <label class="editar-label">Logo (opcional — substitui o texto no header e footer)</label>
           <div class="editar-image-field">
             {site.logo && <img src={site.logo} alt="" class="editar-image-preview" />}
@@ -74,10 +74,36 @@ const site = authed ? await reader.singletons.site.read() : null
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const siteTourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Site', text: 'Marca, logo, copyright e links do rodapé — aparecem em todas as páginas.' },
-    { selector: '#f-brand', title: 'Marca', text: 'Nome exibido no header e footer, a não ser que você suba um logo.' },
-    { selector: '#links-list', title: 'Links do rodapé', text: 'Arraste pelo ⠿ para reordenar (ex: WhatsApp, Instagram).' },
-    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+    {
+      selector: '.editar-topbar-inner',
+      title: 'Site',
+      text: 'Configurações que aparecem em toda página do site: marca/logo no cabeçalho e o rodapé inteiro. Diferente das outras páginas do menu, aqui não é o conteúdo de uma página específica.',
+    },
+    {
+      selector: '#f-brand',
+      title: 'Marca — nome',
+      text: 'Nome exibido no cabeçalho e no rodapé do site, em texto — só é usado se você não subir um logo (ver o próximo passo).',
+    },
+    {
+      selector: '#f-logo-field',
+      title: 'Marca — logo',
+      text: 'Se você subir uma imagem aqui, ela substitui o nome em texto no cabeçalho e no rodapé. Deixe em branco pra continuar usando só o nome.',
+    },
+    {
+      selector: '#f-copyright',
+      title: 'Copyright',
+      text: 'Texto pequeno que aparece embaixo, no rodapé (ex: "© 2026 LUIZA TINOCO ARQUITETURA...").',
+    },
+    {
+      selector: '#links-list',
+      title: 'Links do rodapé',
+      text: 'Links que aparecem na coluna "Contato" do rodapé (ex: WhatsApp, Instagram). Atenção: o link de WhatsApp daqui é separado do link de WhatsApp em "Página Contato" — se o número mudar, atualize nos dois lugares. Arraste pelo ⠿ pra reordenar.',
+    },
+    {
+      selector: '#editar-save',
+      title: 'Salvar',
+      text: 'Nada é salvo automaticamente. Clique aqui depois de editar, e espere a confirmação antes de sair da página.',
+    },
   ]
   const SITE_TOUR_KEY = 'editar_tour_site_seen'
   maybeStartTour(siteTourSteps, SITE_TOUR_KEY)

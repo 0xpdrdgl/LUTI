@@ -21,7 +21,7 @@ const home = authed ? await reader.singletons.home.read() : null
 
       <section class="editar-section">
         <h2>Hero e Projetos</h2>
-        <div class="editar-field">
+        <div class="editar-field" id="f-heroImagem-field">
           <label class="editar-label">Imagem de fundo</label>
           <div class="editar-image-field">
             {home.heroImagem && <img src={home.heroImagem} alt="" class="editar-image-preview" />}
@@ -60,7 +60,7 @@ const home = authed ? await reader.singletons.home.read() : null
           <label class="editar-label" for="f-sobreTitulo">Título</label>
           <input id="f-sobreTitulo" class="editar-input" type="text" value={home.sobreTitulo ?? ''} />
         </div>
-        <div class="editar-field">
+        <div class="editar-field" id="f-sobreFoto-field">
           <label class="editar-label">Foto</label>
           <div class="editar-image-field">
             {home.sobreFoto && <img src={home.sobreFoto} alt="" class="editar-image-preview" />}
@@ -208,13 +208,76 @@ const home = authed ? await reader.singletons.home.read() : null
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const homeTourSteps: TourStep[] = [
-    { selector: '.editar-topbar-inner', title: 'Página inicial', text: 'Hero, sobre a autora, chamada, áreas de atuação e processo de trabalho.' },
-    { selector: '#f-heroTitulo', title: 'Hero', text: 'Imagem de fundo e título de entrada do site.' },
-    { selector: '#sobreParagrafos-list', title: 'Sobre a autora', text: 'Arraste pelo ⠿ para reordenar os parágrafos.' },
-    { selector: '#areas-list', title: 'Áreas de atuação', text: 'Cada área tem um título e uma descrição.' },
-    { selector: '#processo-list', title: 'Processo', text: 'Os passos do seu processo de trabalho, em ordem.' },
-    { selector: '#depoimentos-list', title: 'Depoimentos', text: 'Depoimentos de clientes ou colaboradores — nome, relação e o texto do depoimento.' },
-    { selector: '#editar-save', title: 'Salvar', text: 'Não esqueça de salvar depois de editar.' },
+    {
+      selector: '.editar-topbar-inner',
+      title: 'Página inicial',
+      text: 'Essa é a página que aparece primeiro quando alguém entra no site. Ela tem 7 blocos, nessa ordem: Hero, Áreas de atuação, Sobre a autora, Faixa editorial, Processo de trabalho, Depoimentos e Chamada final. Vamos passar por cada um.',
+    },
+    {
+      selector: '#f-heroImagem-field',
+      title: 'Hero — imagem de fundo',
+      text: 'A foto grande que ocupa a tela inteira assim que o site carrega. Clique em "Escolher imagem" pra trocar.',
+    },
+    {
+      selector: '#f-heroTitulo',
+      title: 'Hero — título',
+      text: 'O texto grande em cima da foto. Pode usar quebra de linha (Enter) pra controlar onde o texto vira.',
+    },
+    {
+      selector: '#f-heroBotaoLabel',
+      title: 'Hero — botão',
+      text: 'Texto e link do botão que aparece embaixo do título do Hero (normalmente leva pra página de Projetos).',
+    },
+    {
+      selector: '#f-projetosNota',
+      title: 'Observação sobre projetos',
+      text: 'Essa frase pequena aparece logo abaixo do título do Hero — normalmente usada pra dizer onde vocês atendem (ex: "Projetos em todo o Brasil").',
+    },
+    {
+      selector: '#areas-list',
+      title: 'Áreas de atuação',
+      text: 'Lista numerada dos tipos de projeto que vocês fazem (ex: Residencial, Comercial). Cada item tem um título e uma descrição curta. Arraste pelo ⠿ pra reordenar, ou clique em "+ Adicionar área" pra criar um novo.',
+    },
+    {
+      selector: '#f-sobreFoto-field',
+      title: 'Sobre a autora — foto',
+      text: 'Foto da Luiza que aparece ao lado do texto de apresentação, mais abaixo na home.',
+    },
+    {
+      selector: '#sobreParagrafos-list',
+      title: 'Sobre a autora — texto',
+      text: 'Esse é um resumo curto da autora (a biografia completa fica na página /sobre, editável em "Página Sobre"). Arraste pelo ⠿ pra reordenar os parágrafos, ou adicione mais um.',
+    },
+    {
+      selector: '#f-sobreLinkLabel',
+      title: 'Sobre a autora — link',
+      text: 'Texto e destino do link que aparece depois do texto (ex: "CONHEÇA A AUTORA" apontando pra /sobre).',
+    },
+    {
+      selector: '#f-faixaFrase',
+      title: 'Faixa editorial',
+      text: 'Uma frase de destaque, sozinha numa faixa da página, entre a seção "Sobre a autora" e "Processo" — funciona como uma pausa visual.',
+    },
+    {
+      selector: '#processo-list',
+      title: 'Processo de trabalho',
+      text: 'As etapas do processo de trabalho de vocês, numeradas na ordem em que acontecem (ex: Briefing, Anteprojeto, Projeto Executivo...). Arraste pelo ⠿ pra reordenar.',
+    },
+    {
+      selector: '#depoimentos-list',
+      title: 'Depoimentos',
+      text: 'Depoimentos de clientes ou colaboradores. Cada um tem nome, relação (ex: "Cliente", "Ex-estagiária") e o texto do depoimento. Só aparece no site se tiver pelo menos um cadastrado.',
+    },
+    {
+      selector: '#f-ctaTitulo',
+      title: 'Chamada final (CTA)',
+      text: 'O último bloco da home, antes do rodapé — um convite direto pra entrar em contato, com título e botão.',
+    },
+    {
+      selector: '#editar-save',
+      title: 'Salvar',
+      text: 'Nada é salvo automaticamente. Depois de editar qualquer coisa nessa página, clique aqui — e só saia da página depois de ver a confirmação de que salvou.',
+    },
   ]
   const HOME_TOUR_KEY = 'editar_tour_home_seen'
   maybeStartTour(homeTourSteps, HOME_TOUR_KEY)
