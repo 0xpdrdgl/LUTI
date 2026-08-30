@@ -1,0 +1,14 @@
+titulo: HOLIDAY PET
+categoria: comercial
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/holiday-pet.webp
+galeria:
+  - /images/projetos/holiday-pet-galeria-1.webp
+  - /images/projetos/holiday-pet-galeria-2.webp
+  - /images/projetos/holiday-pet-galeria-3.webp
+  - /images/projetos/holiday-pet-galeria-4.webp
+  - /images/projetos/holiday-pet-galeria-5.webp
+  - /images/projetos/holiday-pet-galeria-6.webp
+destaque: false

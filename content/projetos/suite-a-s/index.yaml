@@ -1,0 +1,11 @@
+titulo: SUÍTE A-S
+categoria: apartamento
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/suite-a-s.webp
+galeria:
+  - /images/projetos/suite-a-s-galeria-1.webp
+  - /images/projetos/suite-a-s-galeria-2.webp
+  - /images/projetos/suite-a-s-galeria-3.webp
+destaque: false

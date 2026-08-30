@@ -1,0 +1,11 @@
+titulo: APTO I.V
+categoria: apartamento
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/apto-i-v.webp
+galeria:
+  - /images/projetos/apto-i-v-galeria-1.webp
+  - /images/projetos/apto-i-v-galeria-2.webp
+  - /images/projetos/apto-i-v-galeria-3.webp
+destaque: false

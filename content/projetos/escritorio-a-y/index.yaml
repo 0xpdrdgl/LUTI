@@ -1,0 +1,9 @@
+titulo: Escritório A.Y
+categoria: apartamento
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/escritorio-a-y.webp
+galeria:
+  - /images/projetos/escritorio-a-y-galeria-1.webp
+destaque: false

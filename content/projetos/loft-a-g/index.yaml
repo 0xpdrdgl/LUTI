@@ -1,0 +1,16 @@
+titulo: Loft A.G
+categoria: apartamento
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/loft-a-g.webp
+galeria:
+  - /images/projetos/loft-a-g-galeria-1.webp
+  - /images/projetos/loft-a-g-galeria-2.webp
+  - /images/projetos/loft-a-g-galeria-3.webp
+  - /images/projetos/loft-a-g-galeria-4.webp
+  - /images/projetos/loft-a-g-galeria-5.webp
+  - /images/projetos/loft-a-g-galeria-6.webp
+  - /images/projetos/loft-a-g-galeria-7.webp
+  - /images/projetos/loft-a-g-galeria-8.webp
+destaque: false

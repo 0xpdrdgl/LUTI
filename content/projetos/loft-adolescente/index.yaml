@@ -1,0 +1,12 @@
+titulo: LOFT ADOLESCENTE
+categoria: apartamento
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/loft-adolescente.webp
+galeria:
+  - /images/projetos/loft-adolescente-galeria-1.webp
+  - /images/projetos/loft-adolescente-galeria-2.webp
+  - /images/projetos/loft-adolescente-galeria-3.webp
+  - /images/projetos/loft-adolescente-galeria-4.webp
+destaque: false

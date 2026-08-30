@@ -1,0 +1,11 @@
+titulo: Suíte S.G
+categoria: apartamento
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/suite-s-g.webp
+galeria:
+  - /images/projetos/suite-s-g-galeria-1.webp
+  - /images/projetos/suite-s-g-galeria-2.webp
+  - /images/projetos/suite-s-g-galeria-3.webp
+destaque: false

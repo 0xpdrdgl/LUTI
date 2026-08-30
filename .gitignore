@@ -24,3 +24,8 @@ pnpm-debug.log*
 .idea/
 
 .vercel/
+.vercel
+.env*
+
+# pasta de staging com fotos originais dos projetos (nao processadas)
+/Projetos/
