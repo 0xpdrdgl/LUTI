@@ -1,0 +1,13 @@
+titulo: RES A.O
+categoria: residencial
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/res-a-o.webp
+galeria:
+  - /images/projetos/res-a-o-galeria-1.webp
+  - /images/projetos/res-a-o-galeria-2.webp
+  - /images/projetos/res-a-o-galeria-3.webp
+  - /images/projetos/res-a-o-galeria-4.webp
+  - /images/projetos/res-a-o-galeria-5.webp
+destaque: false

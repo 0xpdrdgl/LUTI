@@ -1,0 +1,10 @@
+titulo: RES M.N.G
+categoria: residencial
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/res-m-n-g.webp
+galeria:
+  - /images/projetos/res-m-n-g-galeria-1.webp
+  - /images/projetos/res-m-n-g-galeria-2.webp
+destaque: false
