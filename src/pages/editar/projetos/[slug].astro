@@ -75,7 +75,7 @@ const CATEGORIAS = [
       <section class="editar-section">
         <h2>Capa</h2>
         <div class="editar-image-field">
-          {projeto.capa && <img src={projeto.capa} alt="" class="editar-image-preview" />}
+          {projeto.capa && <img id="capa-preview" src={projeto.capa} alt="" class="editar-image-preview" />}
           <div class="editar-image-controls">
             <label class="editar-file-btn">
               Trocar imagem
@@ -88,10 +88,12 @@ const CATEGORIAS = [
 
       <section class="editar-section">
         <h2>Galeria</h2>
+        <p class="editar-field-hint" style="margin-bottom: 12px;">Clique na estrela de uma foto pra usá-la como capa — a capa atual volta pra galeria automaticamente.</p>
         <div id="galeria-grid" class="editar-gallery-grid">
           {(projeto.galeria ?? []).map((img: string) => (
             <div class="editar-gallery-item" draggable="true" data-url={img}>
               <img src={img} alt="" loading="lazy" />
+              <button type="button" class="editar-gallery-capa" title="Usar como capa">★</button>
               <button type="button" class="editar-gallery-remove" title="Remover">×</button>
             </div>
           ))}
@@ -165,12 +167,12 @@ const CATEGORIAS = [
     {
       selector: '.editar-image-field',
       title: 'Capa',
-      text: 'A imagem principal do projeto — aparece no card da listagem e no topo da página individual.',
+      text: 'A imagem principal do projeto — aparece no card da listagem e no topo da página individual. Dá pra trocar subindo um arquivo novo aqui, ou escolhendo uma foto já existente na galeria (próximo passo).',
     },
     {
       selector: '#galeria-grid',
       title: 'Galeria',
-      text: 'As demais fotos do projeto (aparecem na página individual e na /galeria do site). Arraste os itens pra reordenar, clique no × pra remover um, ou use "+ Adicionar imagens" pra subir mais fotos.',
+      text: 'As demais fotos do projeto (aparecem na página individual e na /galeria do site). Arraste os itens pra reordenar, clique na ★ pra usar aquela foto como capa (a capa atual volta pra galeria), no × pra remover, ou use "+ Adicionar imagens" pra subir mais fotos.',
     },
     {
       selector: '#editar-save',
@@ -189,18 +191,54 @@ const CATEGORIAS = [
 
   const galeriaGrid = document.getElementById('galeria-grid') as HTMLDivElement
   enableDragReorder(galeriaGrid, '.editar-gallery-item')
-  galeriaGrid.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.editar-gallery-remove') as HTMLButtonElement | null
-    if (btn) btn.closest('.editar-gallery-item')?.remove()
-  })
 
   let capaFile: File | null = null
+  let capaUrlOverride: string | null = null
+
+  function usarComoCapa(item: HTMLElement) {
+    const novoUrl = item.dataset.url as string
+    const preview = document.getElementById('capa-preview') as HTMLImageElement | null
+    const capaAtualUrl = preview?.getAttribute('src') ?? ''
+    const capaNameEl = document.getElementById('f-capa-name') as HTMLSpanElement | null
+
+    if (preview) preview.src = novoUrl
+    capaFile = null
+    capaUrlOverride = novoUrl
+    if (capaNameEl) capaNameEl.textContent = 'Nova capa selecionada da galeria — salve para confirmar.'
+
+    item.remove()
+
+    // Devolve a capa antiga pra galeria, no início da lista, pra nao perder a imagem.
+    if (capaAtualUrl) {
+      const novoItem = document.createElement('div')
+      novoItem.className = 'editar-gallery-item'
+      novoItem.draggable = true
+      novoItem.dataset.url = capaAtualUrl
+      novoItem.innerHTML = `<img src="${capaAtualUrl}" alt="" loading="lazy" /><button type="button" class="editar-gallery-capa" title="Usar como capa">★</button><button type="button" class="editar-gallery-remove" title="Remover">×</button>`
+      galeriaGrid.prepend(novoItem)
+    }
+  }
+
+  galeriaGrid.addEventListener('click', (e) => {
+    const removeBtn = (e.target as HTMLElement).closest('.editar-gallery-remove') as HTMLButtonElement | null
+    if (removeBtn) {
+      removeBtn.closest('.editar-gallery-item')?.remove()
+      return
+    }
+    const capaBtn = (e.target as HTMLElement).closest('.editar-gallery-capa') as HTMLButtonElement | null
+    if (capaBtn) {
+      const item = capaBtn.closest('.editar-gallery-item') as HTMLElement | null
+      if (item) usarComoCapa(item)
+    }
+  })
+
   const capaInput = document.getElementById('f-capa') as HTMLInputElement | null
   const capaName = document.getElementById('f-capa-name') as HTMLSpanElement | null
   capaInput?.addEventListener('change', () => {
     const file = capaInput.files?.[0]
     if (!file) return
     capaFile = file
+    capaUrlOverride = null
     if (capaName) capaName.textContent = file.name
   })
 
@@ -237,6 +275,7 @@ const CATEGORIAS = [
       formData.set('destaque', String((document.getElementById('f-destaque') as HTMLInputElement).checked))
       formData.set('galeriaExisting', JSON.stringify(galeriaExisting))
       if (capaFile) formData.set('capa', capaFile)
+      else if (capaUrlOverride) formData.set('capaUrl', capaUrlOverride)
       for (const file of galeriaNewFiles) formData.append('galeriaNew', file)
 
       const res = await fetch('/api/editar-projeto', { method: 'POST', body: formData })

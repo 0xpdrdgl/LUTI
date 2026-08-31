@@ -35,6 +35,8 @@ export const POST: APIRoute = async ({ request }) => {
   const descricao = form.get('descricao')
   const destaque = form.get('destaque') === 'true'
   const capaFile = form.get('capa')
+  const capaUrlRaw = form.get('capaUrl')
+  const capaUrl = typeof capaUrlRaw === 'string' && capaUrlRaw.startsWith(`${IMG_PUBLIC}/`) ? capaUrlRaw : null
   const galeriaExistingRaw = form.get('galeriaExisting')
   const galeriaNewFiles = form.getAll('galeriaNew').filter((f): f is File => f instanceof File && f.size > 0)
 
@@ -65,15 +67,16 @@ export const POST: APIRoute = async ({ request }) => {
 
   const token = import.meta.env.GITHUB_EDIT_TOKEN
   if (!token) {
-    return updateLocal({ slug, fieldUpdates, capaBuffer, galeriaExisting, galeriaNewBuffers, galeriaNewNames })
+    return updateLocal({ slug, fieldUpdates, capaBuffer, capaUrl, galeriaExisting, galeriaNewBuffers, galeriaNewNames })
   }
-  return updateGitHub({ slug, fieldUpdates, capaBuffer, galeriaExisting, galeriaNewBuffers, galeriaNewNames, token })
+  return updateGitHub({ slug, fieldUpdates, capaBuffer, capaUrl, galeriaExisting, galeriaNewBuffers, galeriaNewNames, token })
 }
 
 async function updateLocal({
   slug,
   fieldUpdates,
   capaBuffer,
+  capaUrl,
   galeriaExisting,
   galeriaNewBuffers,
   galeriaNewNames,
@@ -81,6 +84,7 @@ async function updateLocal({
   slug: string
   fieldUpdates: Record<string, unknown>
   capaBuffer: Buffer | null
+  capaUrl: string | null
   galeriaExisting: string[]
   galeriaNewBuffers: Buffer[]
   galeriaNewNames: string[]
@@ -103,6 +107,8 @@ async function updateLocal({
     await mkdir(path.join(process.cwd(), IMG_DIR), { recursive: true })
     await writeFile(path.join(process.cwd(), IMG_DIR, capaName), capaBuffer)
     currentData.capa = `${IMG_PUBLIC}/${capaName}`
+  } else if (capaUrl) {
+    currentData.capa = capaUrl
   }
 
   const newUrls: string[] = []
@@ -120,6 +126,7 @@ async function updateGitHub({
   slug,
   fieldUpdates,
   capaBuffer,
+  capaUrl,
   galeriaExisting,
   galeriaNewBuffers,
   galeriaNewNames,
@@ -128,6 +135,7 @@ async function updateGitHub({
   slug: string
   fieldUpdates: Record<string, unknown>
   capaBuffer: Buffer | null
+  capaUrl: string | null
   galeriaExisting: string[]
   galeriaNewBuffers: Buffer[]
   galeriaNewNames: string[]
@@ -152,6 +160,8 @@ async function updateGitHub({
       return new Response(JSON.stringify({ error: `Falha ao salvar capa: ${err}` }), { status: 502 })
     }
     currentData.capa = `${IMG_PUBLIC}/${capaName}`
+  } else if (capaUrl) {
+    currentData.capa = capaUrl
   }
 
   const newUrls: string[] = []
