@@ -8,13 +8,18 @@ const reader = createReader(process.cwd(), keystaticConfig);
 const home = await reader.singletons.home.read();
 const projetos = await reader.collections.projetos.all();
 
-const recentes = projetos
+// Projetos marcados como "Destacar na home" aparecem primeiro; se tiver
+// menos de 3 marcados, completa com os demais pra sempre mostrar 3.
+const destacados = projetos.filter(({ entry }) => entry.destaque);
+const outros = projetos.filter(({ entry }) => !entry.destaque);
+
+const recentes = [...destacados, ...outros]
+  .slice(0, 3)
   .map(({ slug, entry }) => ({
     slug,
     titulo: entry.titulo,
     capa: projetosImage(entry.capa),
-  }))
-  .slice(0, 3);
+  }));
 
 const frase = home?.faixaFrase ?? '';
 const ultimoEspaco = frase.lastIndexOf(' ');
