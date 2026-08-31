@@ -41,7 +41,9 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
 
     <div class="projeto-galeria">
       <figure class="projeto-capa">
-        <img src={projetosImage(projeto.capa)} alt={projeto.titulo} />
+        <button type="button" class="projeto-foto" data-src={projetosImage(projeto.capa)} aria-label={`Ampliar imagem de ${projeto.titulo}`}>
+          <img src={projetosImage(projeto.capa)} alt={projeto.titulo} />
+        </button>
       </figure>
 
       {
@@ -49,7 +51,9 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
           <div class="projeto-thumbs">
             {galeria.map((img, i) => (
               <figure class="projeto-thumb">
-                <img src={img} alt={`${projeto.titulo} - vista ${i + 1}`} loading="lazy" />
+                <button type="button" class="projeto-foto" data-src={img} aria-label={`Ampliar imagem ${i + 1} de ${projeto.titulo}`}>
+                  <img src={img} alt={`${projeto.titulo} - vista ${i + 1}`} loading="lazy" />
+                </button>
               </figure>
             ))}
           </div>
@@ -66,6 +70,77 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
     }
   </article>
 </PageLayout>
+
+<dialog class="lightbox">
+  <button type="button" class="lightbox-fechar" aria-label="Fechar">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M4 4l12 12M16 4L4 16" stroke="currentColor"></path>
+    </svg>
+  </button>
+
+  <button type="button" class="lightbox-nav lightbox-nav--anterior" aria-label="Imagem anterior">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M12.5 3 6 10l6.5 7" stroke="currentColor"></path>
+    </svg>
+  </button>
+  <button type="button" class="lightbox-nav lightbox-nav--proxima" aria-label="Próxima imagem">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M7.5 3 14 10l-6.5 7" stroke="currentColor"></path>
+    </svg>
+  </button>
+
+  <figure class="lightbox-corpo">
+    <img src="" alt="" />
+  </figure>
+</dialog>
+
+<script>
+  function initProjetoLightbox() {
+    const dialog = document.querySelector('dialog.lightbox');
+    if (!dialog || dialog.dataset.lightboxBound) return;
+    dialog.dataset.lightboxBound = '1';
+
+    const itens = [...document.querySelectorAll('.projeto-foto')];
+    if (itens.length === 0) return;
+
+    const img = dialog.querySelector('.lightbox-corpo img') as HTMLImageElement;
+    const fecharBtn = dialog.querySelector('.lightbox-fechar') as HTMLButtonElement;
+    const anteriorBtn = dialog.querySelector('.lightbox-nav--anterior') as HTMLButtonElement;
+    const proximaBtn = dialog.querySelector('.lightbox-nav--proxima') as HTMLButtonElement;
+    let indice = 0;
+
+    function mostrar(i: number) {
+      indice = (i + itens.length) % itens.length;
+      const item = itens[indice] as HTMLElement;
+      img.src = item.dataset.src || '';
+      img.alt = item.getAttribute('aria-label') || '';
+    }
+
+    function abrir(i: number) {
+      mostrar(i);
+      (dialog as HTMLDialogElement).showModal();
+    }
+
+    itens.forEach((item, i) => {
+      if ((item as HTMLElement).dataset.lightboxBound) return;
+      (item as HTMLElement).dataset.lightboxBound = '1';
+      item.addEventListener('click', () => abrir(i));
+    });
+
+    anteriorBtn.addEventListener('click', () => mostrar(indice - 1));
+    proximaBtn.addEventListener('click', () => mostrar(indice + 1));
+    fecharBtn.addEventListener('click', () => (dialog as HTMLDialogElement).close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) (dialog as HTMLDialogElement).close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') mostrar(indice - 1);
+      if (e.key === 'ArrowRight') mostrar(indice + 1);
+    });
+  }
+
+  document.addEventListener('astro:page-load', initProjetoLightbox);
+</script>
 
 <style>
   .projeto-detalhe {
@@ -138,6 +213,15 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
     margin-bottom: 2rem;
   }
 
+  .projeto-foto {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+
   .projeto-capa img {
     width: 100%;
     aspect-ratio: 16 / 10;
@@ -179,6 +263,115 @@ const galeria = (projeto.galeria ?? []).map((img) => projetosImage(img));
   @media (max-width: 64rem) {
     .projeto-detalhe {
       padding-inline: 1.5rem;
+    }
+  }
+
+  /* Lightbox */
+  .lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border: 0;
+    padding: 4rem 5rem 3rem;
+    background: rgba(10, 10, 10, 0.96);
+    color: #fff;
+  }
+
+  .lightbox::backdrop {
+    background: rgba(10, 10, 10, 0.96);
+  }
+
+  .lightbox[open] {
+    animation: lightbox-entra 250ms var(--ease-out);
+  }
+
+  @keyframes lightbox-entra {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .lightbox-corpo {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .lightbox-corpo img {
+    max-width: 100%;
+    max-height: 84dvh;
+    object-fit: contain;
+  }
+
+  .lightbox-fechar,
+  .lightbox-nav {
+    position: fixed;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .lightbox-fechar {
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .lightbox-nav--anterior {
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lightbox-nav--proxima {
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lightbox-fechar:hover,
+  .lightbox-nav:hover {
+    background: #fff;
+    color: #0a0a0a;
+  }
+
+  .lightbox-fechar:focus-visible,
+  .lightbox-nav:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox[open] {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .lightbox {
+      padding: 4.5rem 1rem 2rem;
+    }
+
+    .lightbox-nav--anterior {
+      left: 0.75rem;
+    }
+
+    .lightbox-nav--proxima {
+      right: 0.75rem;
     }
   }
 </style>
