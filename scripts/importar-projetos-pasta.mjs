@@ -15,6 +15,14 @@ const CATEGORY_MAP = {
   Residencial: 'residencial',
 }
 
+// Titulo (nome exato da pasta) -> valor do campo Local, pra pastas cujo
+// nome inclui a cidade do projeto.
+const LOCAL_MAP = {
+  'APARTAMENTO F A - São Paulo': 'São Paulo',
+  'PROJETO EM RIBEIRAO PRETO': 'Ribeirão Preto',
+  'RES. D  D (PARINTINS)': 'Parintins',
+}
+
 function slugify(input) {
   return (
     input
@@ -40,7 +48,15 @@ async function main() {
   mkdirSync(IMG_DIR, { recursive: true })
   mkdirSync(CONTENT_DIR, { recursive: true })
 
-  const categoryFolders = readdirSync(SRC_ROOT, { withFileTypes: true }).filter((d) => d.isDirectory())
+  // Uso: node scripts/importar-projetos-pasta.mjs [NomeDaPastaDeCategoria]
+  // Sem argumento, processa todas as pastas de categoria encontradas.
+  const somenteCategoria = process.argv[2]
+
+  let categoryFolders = readdirSync(SRC_ROOT, { withFileTypes: true }).filter((d) => d.isDirectory())
+  if (somenteCategoria) {
+    categoryFolders = categoryFolders.filter((d) => d.name === somenteCategoria)
+    console.log(`Filtrando só a pasta de categoria: ${somenteCategoria}\n`)
+  }
   const allSlugs = []
 
   for (const catDir of categoryFolders) {
@@ -64,10 +80,10 @@ async function main() {
         continue
       }
 
-      let slug = slugify(titulo)
-      let n = 2
-      while (existsSync(path.join(CONTENT_DIR, slug, 'index.yaml'))) {
-        slug = `${slugify(titulo)}-${n++}`
+      const slug = slugify(titulo)
+      if (existsSync(path.join(CONTENT_DIR, slug, 'index.yaml'))) {
+        console.log(`JA EXISTE, pulando: "${titulo}" -> ${slug}`)
+        continue
       }
 
       console.log(`[${categoria}] "${titulo}" -> ${slug} (${files.length} imagens)`)
@@ -86,7 +102,7 @@ async function main() {
         galeria.push(`${IMG_PUBLIC}/${name}`)
       }
 
-      const local = titulo === 'APARTAMENTO F A - São Paulo' ? 'São Paulo' : ''
+      const local = LOCAL_MAP[titulo] ?? ''
 
       const data = {
         titulo,
@@ -106,16 +122,7 @@ async function main() {
     }
   }
 
-  if (allSlugs.length > 0) {
-    const chosen = allSlugs[Math.floor(Math.random() * allSlugs.length)]
-    const yamlPath = path.join(CONTENT_DIR, chosen, 'index.yaml')
-    const parsed = parseYaml(readFileSync(yamlPath, 'utf-8'))
-    parsed.destaque = true
-    writeFileSync(yamlPath, stringifyYaml(parsed), 'utf-8')
-    console.log('\nDestaque escolhido:', chosen)
-  }
-
-  console.log('\nTotal de projetos criados:', allSlugs.length)
+  console.log('\nTotal de projetos criados nessa rodada:', allSlugs.length)
 }
 
 main().catch((err) => {

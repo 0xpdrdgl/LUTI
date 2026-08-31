@@ -1,0 +1,15 @@
+titulo: NONNO RESTAURANTE
+categoria: comercial
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/nonno-restaurante.webp
+galeria:
+  - /images/projetos/nonno-restaurante-galeria-1.webp
+  - /images/projetos/nonno-restaurante-galeria-2.webp
+  - /images/projetos/nonno-restaurante-galeria-3.webp
+  - /images/projetos/nonno-restaurante-galeria-4.webp
+  - /images/projetos/nonno-restaurante-galeria-5.webp
+  - /images/projetos/nonno-restaurante-galeria-6.webp
+  - /images/projetos/nonno-restaurante-galeria-7.webp
+destaque: false

@@ -1,0 +1,14 @@
+titulo: NANICA
+categoria: comercial
+local: ""
+resumo: ""
+descricao: ""
+capa: /images/projetos/nanica.webp
+galeria:
+  - /images/projetos/nanica-galeria-1.webp
+  - /images/projetos/nanica-galeria-2.webp
+  - /images/projetos/nanica-galeria-3.webp
+  - /images/projetos/nanica-galeria-4.webp
+  - /images/projetos/nanica-galeria-5.webp
+  - /images/projetos/nanica-galeria-6.webp
+destaque: false
