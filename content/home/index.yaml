@@ -8,11 +8,10 @@ projetosNota: Projetos em todo o Brasil.
 sobreTitulo: Sobre a Autora
 sobreFoto: /images/sobreFoto.webp
 sobreParagrafos:
-  - >-
-    Formada em Arquitetura e Urbanismo pela Universidade Federal do Amazonas
-    (UFAM), Luiza Tinoco constrói seu trabalho no encontro entre
-    funcionalidade, identidade e sensibilidade estética — com reconhecimentos
-    como Arquiteta Destaque Club&Casa e CASACOR São Paulo.
+  - Formada em Arquitetura e Urbanismo pela Universidade Federal do Amazonas
+    (UFAM), Luiza Tinoco constrói seu trabalho no encontro entre funcionalidade,
+    identidade e sensibilidade estética — com reconhecimentos como Arquiteta
+    Destaque Club&Casa e CASACOR São Paulo.
 sobreLinkLabel: CONHEÇA A AUTORA
 sobreLinkHref: /sobre
 ctaTitulo: |-
@@ -21,59 +20,66 @@ ctaTitulo: |-
 ctaLinkLabel: ENTRAR EM CONTATO
 ctaLinkHref: /contato
 areasTitulo: Áreas de Atuação
-areasNota: ''
+areasNota: ""
 areas:
   - titulo: Residencial
-    descricao: >-
-      Casas projetadas a partir do modo de viver de cada família — nada de
+    descricao: Casas projetadas a partir do modo de viver de cada família — nada de
       soluções de catálogo.
   - titulo: Apartamento
-    descricao: >-
-      Projetos de interiores para apartamentos, unindo estética e função da
+    descricao: Projetos de interiores para apartamentos, unindo estética e função da
       seleção de materiais ao projeto luminotécnico.
   - titulo: Comercial
     descricao: Espaços de trabalho e comércio com identidade própria e fluidez de uso.
   - titulo: Projeto Executivo Completo
-    descricao: >-
-      Documentação técnica completa, da concepção ao detalhamento, pronta para
-      a execução da obra.
+    descricao: Documentação técnica completa, da concepção ao detalhamento, pronta
+      para a execução da obra.
   - titulo: Marcenaria Completa
-    descricao: >-
-      Projeto e detalhamento de mobiliário sob medida, produzido com
+    descricao: Projeto e detalhamento de mobiliário sob medida, produzido com
       marcenarias parceiras.
 processoTitulo: Etapas do Projeto Executivo
 processo:
   - titulo: Briefing
-    descricao: >-
-      Levantamento do programa de necessidades e do modo de viver de quem vai
-      habitar o espaço.
+    descricao: Levantamento do programa de necessidades e do modo de viver de quem
+      vai habitar o espaço.
   - titulo: Estudo Preliminar
-    descricao: >-
-      Primeiras soluções de layout, volumetria e partido, alinhando a ideia
+    descricao: Primeiras soluções de layout, volumetria e partido, alinhando a ideia
       geral do projeto.
   - titulo: Anteprojeto
-    descricao: >-
-      Detalhamento do layout aprovado, com plantas, cortes e especificação
+    descricao: Detalhamento do layout aprovado, com plantas, cortes e especificação
       inicial de materiais.
   - titulo: Detalhamento Executivo
-    descricao: >-
-      Documentação técnica completa para execução: plantas cotadas,
-      detalhamentos e compatibilização com projetos complementares.
+    descricao: "Documentação técnica completa para execução: plantas cotadas,
+      detalhamentos e compatibilização com projetos complementares."
   - titulo: Detalhamento de Marcenaria
-    descricao: >-
-      Detalhamento técnico do mobiliário sob medida, pronto para produção com
-      marcenarias parceiras.
+    descricao: Detalhamento técnico do mobiliário sob medida, pronto para produção
+      com marcenarias parceiras.
   - titulo: Acompanhamento de Obra
-    descricao: >-
-      Visitas técnicas e suporte à execução, garantindo fidelidade ao projeto
-      até a entrega final.
+    descricao: Visitas técnicas e suporte à execução, garantindo fidelidade ao
+      projeto até a entrega final.
 depoimentosTitulo: Depoimentos
 depoimentos:
   - nome: Mudar nome aqui
     relacao: Ex-estagiária
-    texto: >-
-      Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
+    texto: Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
       Luiza, que sempre tiraram as dúvidas mais simples e nunca me negaram
       nenhum aprendizado. Vocês são grandes exemplos das profissionais que
       almejo ser.
+  - nome: Beatriz Bergamasco
+    relacao: Cliente
+    texto: A Luiza é uma profissional ímpar e daquelas pessoas que fazem a gente
+      perceber o quanto um bom projeto vai muito além da estética. Ela tem um
+      olhar extremamente cuidadoso para cada detalhe e consegue unir beleza e
+      funcionalidade de uma forma que, para mim, faz toda a diferença. Uma das
+      coisas que mais admiro no trabalho dela é a capacidade de realmente
+      entender o que o cliente quer. Muitas vezes eu mandava referências ou
+      explicava uma ideia do meu jeito, e ela conseguia captar exatamente o que
+      eu imaginava e transformar em algo ainda mais bonito, bem pensado e
+      funcional. No projeto da minha casa, ela se atentou a detalhes da nossa
+      rotina que eu jamais teria pensado sozinha, e isso diz muito sobre o
+      cuidado que ela coloca em cada escolha. Além de extremamente talentosa, a
+      Luiza é sempre muito disponível, atenciosa e aberta a ouvir, fazer
+      alterações e encontrar soluções. Ela não entrega apenas projetos bonitos,
+      mas espaços pensados para quem realmente vai vivê-los. Ter a Luiza como
+      arquiteta fez toda a diferença para mim e eu indicaria o trabalho dela de
+      olhos fechados.
 faixaFrase: Cada espaço conta a história de quem habita.
