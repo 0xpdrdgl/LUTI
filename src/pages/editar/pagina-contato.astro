@@ -227,7 +227,6 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
-      setTimeout(() => location.reload(), 800)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {

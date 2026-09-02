@@ -99,7 +99,7 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder, updateImagePreview } from '../../lib/editarFormClient'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
@@ -215,8 +215,9 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
+      updateImagePreview('f-moodboardImagem1-field', data.data?.moodboardImagem1)
+      updateImagePreview('f-moodboardImagem2-field', data.data?.moodboardImagem2)
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
-      setTimeout(() => location.reload(), 800)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {

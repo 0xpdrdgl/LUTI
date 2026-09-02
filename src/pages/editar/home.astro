@@ -204,7 +204,7 @@ const home = authed ? await reader.singletons.home.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus, makeTextRow, readTextArray, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { setStatus, makeTextRow, readTextArray, makeObjectRow, readObjectArray, enableDragReorder, updateImagePreview } from '../../lib/editarFormClient'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const homeTourSteps: TourStep[] = [
@@ -381,8 +381,13 @@ const home = authed ? await reader.singletons.home.read() : null
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
+      // Não recarrega a página: em produção ela leria do último deploy, que
+      // ainda não tem o que acabou de ser salvo (o site republica sozinho em
+      // segundo plano, mas leva alguns segundos). Atualiza a tela na hora com
+      // o que o servidor confirmou ter gravado.
+      updateImagePreview('f-heroImagem-field', data.data?.heroImagem)
+      updateImagePreview('f-sobreFoto-field', data.data?.sobreFoto)
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
-      setTimeout(() => location.reload(), 800)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {

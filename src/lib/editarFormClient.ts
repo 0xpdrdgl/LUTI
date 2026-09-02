@@ -4,6 +4,40 @@ export function setStatus(el: HTMLElement, text: string, state?: 'error' | 'succ
   else delete el.dataset.state
 }
 
+/**
+ * Depois de salvar com sucesso, atualiza a pre-visualizacao de um campo de
+ * imagem no lugar, sem recarregar a pagina. Em producao a pagina eh lida do
+ * ultimo deploy publicado - ela ainda nao tem o que acabou de ser salvo (o
+ * site republica sozinho em segundo plano, mas leva alguns segundos). Usar
+ * o valor que o servidor confirmou ter gravado evita mostrar dado velho.
+ *
+ * `outerFieldId` eh o id do wrapper `.editar-field` que contem o
+ * `.editar-image-field` (label + preview + controles), ou o id do
+ * proprio `.editar-image-field` quando nao ha wrapper.
+ */
+export function updateImagePreview(outerFieldId: string, newUrl: string | null | undefined) {
+  const outer = document.getElementById(outerFieldId)
+  const container = outer?.classList.contains('editar-image-field') ? outer : outer?.querySelector('.editar-image-field')
+  if (!container) return
+
+  if (!newUrl) {
+    container.querySelector('img.editar-image-preview')?.remove()
+    return
+  }
+
+  let img = container.querySelector('img.editar-image-preview') as HTMLImageElement | null
+  if (!img) {
+    img = document.createElement('img')
+    img.className = 'editar-image-preview'
+    const controls = container.querySelector('.editar-image-controls')
+    container.insertBefore(img, controls)
+  }
+  img.src = newUrl
+
+  const nameEl = container.querySelector('.editar-file-name') as HTMLSpanElement | null
+  if (nameEl) nameEl.textContent = ''
+}
+
 function makeDragHandle(): HTMLSpanElement {
   const handle = document.createElement('span')
   handle.className = 'editar-drag-handle'

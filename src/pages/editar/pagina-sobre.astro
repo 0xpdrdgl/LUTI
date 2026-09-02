@@ -43,7 +43,7 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
 
       <section class="editar-section">
         <h2>Retrato</h2>
-        <div class="editar-image-field">
+        <div class="editar-image-field" id="f-retrato-field">
           {pagina.retrato && <img src={pagina.retrato} alt="" class="editar-image-preview" />}
           <div class="editar-image-controls">
             <label class="editar-file-btn">
@@ -66,7 +66,7 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus } from '../../lib/editarFormClient'
+  import { setStatus, updateImagePreview } from '../../lib/editarFormClient'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
@@ -150,8 +150,8 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
+      updateImagePreview('f-retrato-field', data.data?.retrato)
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
-      setTimeout(() => location.reload(), 800)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {
