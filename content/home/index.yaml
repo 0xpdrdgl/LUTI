@@ -59,11 +59,19 @@ processo:
 depoimentosTitulo: Depoimentos
 depoimentos:
   - nome: Mudar nome aqui
-    relacao: Eliana Rego - Ex-estagiária
+    relacao: "Eliana Rego - ex estagiária "
     texto: Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
       Luiza, que sempre tiraram as dúvidas mais simples e nunca me negaram
       nenhum aprendizado. Vocês são grandes exemplos das profissionais que
       almejo ser.
+  - nome: Thaís Bergamasco
+    relacao: Cliente
+    texto: Minha experiência com a Luiza foi simplesmente maravilhosa! 🤍 Ela
+      conseguiu captar exatamente tudo o que eu imaginava e transformar meus
+      desejos em cada detalhe do projeto. O resultado não poderia ter ficado
+      mais a minha cara, meu apartamento ficou exatamente do jeitinho que eu
+      sempre sonhei. Sou muito grata por todo o cuidado, dedicação e
+      disponibilidade em cada etapa desse processo
   - nome: Beatriz Bergamasco
     relacao: Cliente
     texto: A Luiza é uma profissional ímpar e daquelas pessoas que fazem a gente
@@ -106,15 +114,16 @@ depoimentos:
       Sou muito grato por todo o cuidado, carinho e dedicação durante esse
       processo. Ela não entregou apenas um projeto. Ela ajudou a realizar um
       sonho nosso e da nossa família. 
-  - nome: Thaís Bergamasco
+  - nome: "Gabriela Cabral "
     relacao: Cliente
-    texto: Minha experiência com a Luiza foi simplesmente maravilhosa! 🤍 Ela
-      conseguiu captar exatamente tudo o que eu imaginava e transformar meus
-      desejos em cada detalhe do projeto. O resultado não poderia ter ficado
-      mais a minha cara, meu apartamento ficou exatamente do jeitinho que eu
-      sempre sonhei. Sou muito grata por todo o cuidado, dedicação e
-      disponibilidade em cada etapa desse processo
-  - nome: "Henrique Borges "
+    texto: A Luiza foi responsável pelo projeto de interiores da nossa casa e
+      conseguiu traduzir muito bem o que queríamos em cada ambiente, sempre com
+      muito bom gosto, atenção aos detalhes e cuidado durante todo o processo.
+      Na época da obra, eu estava no primeiro período de Arquitetura e
+      Urbanismo, e ela foi muito generosa em compartilhar dicas e conhecimentos
+      comigo, o que tornou acompanhar o projeto ainda mais especial. Temos muito
+      carinho pelo resultado e admiramos muito o trabalho dela.
+  - nome: Henrique Borges
     relacao: Cliente
     texto: >-
       Existem profissionais que simplesmente executam um projeto, e  existe a
@@ -154,5 +163,5 @@ depoimentos:
 
 
       Tenho muito orgulho do resultado e uma gratidão imensa por ter escolhido
-      você para fazer parte dessa história. 
+      você para fazer parte dessa história. ❤️
 faixaFrase: Cada espaço conta a história de quem habita.
