@@ -58,6 +58,12 @@ processo:
       projeto até a entrega final.
 depoimentosTitulo: Depoimentos
 depoimentos:
+  - nome: Mudar nome aqui
+    relacao: "Eliana Rego - ex estagiária "
+    texto: Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
+      Luiza, que sempre tiraram as dúvidas mais simples e nunca me negaram
+      nenhum aprendizado. Vocês são grandes exemplos das profissionais que
+      almejo ser.
   - nome: Thaís Bergamasco
     relacao: Cliente
     texto: Minha experiência com a Luiza foi simplesmente maravilhosa! 🤍 Ela
@@ -66,6 +72,24 @@ depoimentos:
       mais a minha cara, meu apartamento ficou exatamente do jeitinho que eu
       sempre sonhei. Sou muito grata por todo o cuidado, dedicação e
       disponibilidade em cada etapa desse processo
+  - nome: Beatriz Bergamasco
+    relacao: Cliente
+    texto: A Luiza é uma profissional ímpar e daquelas pessoas que fazem a gente
+      perceber o quanto um bom projeto vai muito além da estética. Ela tem um
+      olhar extremamente cuidadoso para cada detalhe e consegue unir beleza e
+      funcionalidade de uma forma que, para mim,faz toda a diferença. Uma das
+      coisas que mais admiro no trabalho dela é a capacidade de realmente
+      entender o que o cliente quer. Muitas vezes eu mandava referências ou
+      explicava uma ideia do meu jeito, e ela conseguia captar exatamente o que
+      eu imaginava e transformar em algo ainda mais bonito, bem pensado e
+      funcional. No projeto da minha casa, ela se atentou a detalhes da nossa
+      rotina que eu jamais teria pensado sozinha, e isso diz muito sobre o
+      cuidado que ela coloca em cada escolha. Além de extremamente talentosa, a
+      Luiza é sempre muito disponível, atenciosa e aberta a ouvir, fazer
+      alterações e encontrar soluções. Ela não entrega apenas projetos bonitos,
+      mas espaços pensados para quem realmente vai vivê-los. Ter a Luiza como
+      arquiteta fez toda a diferença para mim e eu indicaria o trabalho dela de
+      olhos fechados.
   - nome: "Gabriel Salgado "
     relacao: "Cliente "
     texto: >-
@@ -99,24 +123,6 @@ depoimentos:
       Urbanismo, e ela foi muito generosa em compartilhar dicas e conhecimentos
       comigo, o que tornou acompanhar o projeto ainda mais especial. Temos muito
       carinho pelo resultado e admiramos muito o trabalho dela.
-  - nome: Beatriz Bergamasco
-    relacao: Cliente
-    texto: A Luiza é uma profissional ímpar e daquelas pessoas que fazem a gente
-      perceber o quanto um bom projeto vai muito além da estética. Ela tem um
-      olhar extremamente cuidadoso para cada detalhe e consegue unir beleza e
-      funcionalidade de uma forma que, para mim,faz toda a diferença. Uma das
-      coisas que mais admiro no trabalho dela é a capacidade de realmente
-      entender o que o cliente quer. Muitas vezes eu mandava referências ou
-      explicava uma ideia do meu jeito, e ela conseguia captar exatamente o que
-      eu imaginava e transformar em algo ainda mais bonito, bem pensado e
-      funcional. No projeto da minha casa, ela se atentou a detalhes da nossa
-      rotina que eu jamais teria pensado sozinha, e isso diz muito sobre o
-      cuidado que ela coloca em cada escolha. Além de extremamente talentosa, a
-      Luiza é sempre muito disponível, atenciosa e aberta a ouvir, fazer
-      alterações e encontrar soluções. Ela não entrega apenas projetos bonitos,
-      mas espaços pensados para quem realmente vai vivê-los. Ter a Luiza como
-      arquiteta fez toda a diferença para mim e eu indicaria o trabalho dela de
-      olhos fechados.
   - nome: Henrique Borges
     relacao: Cliente
     texto: >-
@@ -158,24 +164,4 @@ depoimentos:
 
       Tenho muito orgulho do resultado e uma gratidão imensa por ter escolhido
       você para fazer parte dessa história. ❤️
-  - nome: Eliana Rego
-    relacao: "Ex estagiária "
-    texto: Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
-      Luiza, que sempre tiraram as dúvidas mais simples e nunca me negaram
-      nenhum aprendizado. Vocês são grandes exemplos das profissionais que
-      almejo ser.
-  - nome: Rafaela Santos
-    relacao: Cliente
-    texto: >-
-      A Luiza Tinoco é uma profissional incrível! Já fiz projetos com ela e
-      sempre fiquei apaixonada pelo resultado. Ela consegue entender exatamente
-      o que a gente quer e transformar as ideias em algo ainda mais bonito,
-      funcional e com personalidade.
-
-
-      Além de ter um olhar impecável para cada detalhe, é extremamente
-      atenciosa, dedicada e cuidadosa durante todo o processo. Dá para perceber
-      o carinho e o comprometimento que ela coloca em cada projeto. Confio de
-      olhos fechados e com certeza faria muitos outros projetos com ela.
-      Recomendo demais! 🤍
 faixaFrase: Cada espaço conta a história de quem habita.
