@@ -58,8 +58,8 @@ processo:
       projeto até a entrega final.
 depoimentosTitulo: Depoimentos
 depoimentos:
-  - nome: Mudar nome aqui
-    relacao: "Eliana Rego - ex estagiária "
+  - nome: Eliana Rego
+    relacao: "Ex estagiária "
     texto: Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
       Luiza, que sempre tiraram as dúvidas mais simples e nunca me negaram
       nenhum aprendizado. Vocês são grandes exemplos das profissionais que
