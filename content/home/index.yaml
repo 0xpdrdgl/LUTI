@@ -58,18 +58,26 @@ processo:
       projeto até a entrega final.
 depoimentosTitulo: Depoimentos
 depoimentos:
-  - nome: Mudar nome aqui
-    relacao: Ex-estagiária
+  - nome: Eliana Rego
+    relacao: "Ex estagiária "
     texto: Às minhas mentoras na jornada que precedeu a minha carreira, Jaque e
       Luiza, que sempre tiraram as dúvidas mais simples e nunca me negaram
       nenhum aprendizado. Vocês são grandes exemplos das profissionais que
       almejo ser.
+  - nome: Thaís Bergamasco
+    relacao: Cliente
+    texto: Minha experiência com a Luiza foi simplesmente maravilhosa! 🤍 Ela
+      conseguiu captar exatamente tudo o que eu imaginava e transformar meus
+      desejos em cada detalhe do projeto. O resultado não poderia ter ficado
+      mais a minha cara, meu apartamento ficou exatamente do jeitinho que eu
+      sempre sonhei. Sou muito grata por todo o cuidado, dedicação e
+      disponibilidade em cada etapa desse processo
   - nome: Beatriz Bergamasco
     relacao: Cliente
     texto: A Luiza é uma profissional ímpar e daquelas pessoas que fazem a gente
       perceber o quanto um bom projeto vai muito além da estética. Ela tem um
       olhar extremamente cuidadoso para cada detalhe e consegue unir beleza e
-      funcionalidade de uma forma que, para mim, faz toda a diferença. Uma das
+      funcionalidade de uma forma que, para mim,faz toda a diferença. Uma das
       coisas que mais admiro no trabalho dela é a capacidade de realmente
       entender o que o cliente quer. Muitas vezes eu mandava referências ou
       explicava uma ideia do meu jeito, e ela conseguia captar exatamente o que
@@ -82,4 +90,115 @@ depoimentos:
       mas espaços pensados para quem realmente vai vivê-los. Ter a Luiza como
       arquiteta fez toda a diferença para mim e eu indicaria o trabalho dela de
       olhos fechados.
+  - nome: "Gabriel Salgado "
+    relacao: "Cliente "
+    texto: >-
+      A Luiza foi muito além de uma arquiteta para a gente. Ela conseguiu
+      captar, desde as primeiras conversas e encontros, algo que muitas vezes
+      nem eu sabia explicar direito: o que eu realmente sonhava para a nossa
+      casa.
+
+
+      Ela entendeu nossos desejos, nosso jeito e, principalmente, aquilo que
+      queríamos proporcionar para a nossa família. E conseguiu transformar tudo
+      isso em realidade, cuidando dos pequenos detalhes que fizeram toda a
+      diferença.
+
+
+      Foi muito especial ver um sonho que, às vezes, nem conseguíamos colocar em
+      palavras tomando forma diante dos nossos olhos. A Luiza teve sensibilidade
+      para entender o que estava por trás de cada escolha e competência para
+      transformar isso em um projeto que realmente tem a nossa cara.
+
+
+      Sou muito grato por todo o cuidado, carinho e dedicação durante esse
+      processo. Ela não entregou apenas um projeto. Ela ajudou a realizar um
+      sonho nosso e da nossa família. 
+  - nome: "Gabriela Cabral "
+    relacao: Cliente
+    texto: A Luiza foi responsável pelo projeto de interiores da nossa casa e
+      conseguiu traduzir muito bem o que queríamos em cada ambiente, sempre com
+      muito bom gosto, atenção aos detalhes e cuidado durante todo o processo.
+      Na época da obra, eu estava no primeiro período de Arquitetura e
+      Urbanismo, e ela foi muito generosa em compartilhar dicas e conhecimentos
+      comigo, o que tornou acompanhar o projeto ainda mais especial. Temos muito
+      carinho pelo resultado e admiramos muito o trabalho dela.
+  - nome: Henrique Borges
+    relacao: Cliente
+    texto: >-
+      Existem profissionais que simplesmente executam um projeto, e  existe a
+      Luiza que conseguiu compreender um sonho e transformá-lo em realidade. E
+      foi exatamente isso que você fez por mim.
+
+
+      A construção do meu hospital veterinário representava muito mais do que
+      criar um espaço de trabalho. Era a realização de um sonho construído ao
+      longo de anos, carregado de expectativas, dedicação e amor pela minha
+      profissão. E ter você conduzindo esse projeto fez toda a diferença.
+
+
+      Você conseguiu transformar ideias, desejos e até aquilo que eu não sabia
+      exatamente como expressar em um lugar simplesmente maravilhoso. Cada
+      ambiente, cada detalhe e cada escolha demonstram cuidado, sensibilidade,
+      competência e um olhar extremamente especial.
+
+
+      Hoje, entrar no meu hospital e perceber que aquele espaço que um dia
+      existiu apenas na minha imaginação se tornou realidade é uma sensação
+      difícil de colocar em palavras. Ficou muito além do que eu poderia ter
+      imaginado: bonito, acolhedor, funcional, elegante e, principalmente,
+      agradável para que eu possa exercer diariamente aquilo que escolhi como
+      propósito profissional.
+
+
+      Por isso, minha gratidão vai muito além de um agradecimento pelo trabalho
+      realizado. Obrigado por fazer parte de um dos capítulos mais importantes
+      da minha vida profissional. Obrigado por acreditar nesse projeto, por
+      cuidar dele com tanta dedicação e por conseguir materializar um sonho de
+      uma maneira tão extraordinária.
+
+
+      Você não projetou apenas um hospital veterinário. Você ajudou a construir
+      o lugar onde um dos meus maiores sonhos passou a acontecer todos os dias.
+
+
+      Tenho muito orgulho do resultado e uma gratidão imensa por ter escolhido
+      você para fazer parte dessa história. ❤️
+  - nome: Jaíse Mirpuri
+    relacao: Cliente
+    texto: Nossa família é muito grata pelo trabalho da Luiza! O nosso apartamento
+      ficou ainda mais lindo do que sonhamos, atemporal, discreto, superou todas
+      as expectativas. O quartinho do nosso bebê é tão aconchegante que só de
+      estar lá já nos sentimos bem e não dá vontade de sair. Na verdade, a nossa
+      casa nos abraça. As cores, tons, texturas, todas as escolhas foram bem
+      pensadas e planejadas para ambientes extremamente acolhedores e
+      funcionais. Há espaço para tudo pois ela pensou nos mínimos detalhes do
+      dia a dia. Nós amamos estar em casa e amamos cada cantinho desse lar
+      projetado com muito carinho, dedicação, paciência, empenho e bom gosto. A
+      Luiza é uma profissional competente, acessível a qualquer hora, disposta a
+      ouvir e muito sensível para compreender exatamente o que queremos.
+      Indicamos de olhos fechados a nossa querida e amada arquiteta!
+  - nome: Wellington Flores
+    relacao: Consultor Florense
+    texto: >-
+      É muito bom trabalhar em parceria com a Luiza Tinoco. Ela é uma arquiteta
+      supercriativa, e os projetos dela são sempre muito ousados e fora do
+      comum.
+
+
+      Uma coisa que acho muito legal é ver a animação dela quando está criando.
+      Ela se envolve de verdade com cada ideia, pensa em cada detalhe e vai
+      criando coisas que surpreendem.
+
+
+      Para mim, é uma parceria que dá muito gosto de fazer parte. É muito bom
+      poder acompanhar e contribuir para projetos tão criativos e diferentes. ✨
+  - nome: Amanda Oka
+    relacao: Cliente
+    texto: "A Luiza tem um trabalho maravilhoso, que admiro muito!!! Uma
+      profissional muito competente e criativa que, apesar de todo conhecimento,
+      está sempre aberta a troca de ideias, o que pra mim é um grande
+      diferencial: entender a necessidade do cliente!!! Como resultado, temos
+      sempre projetos únicos, lindos e, principalmente, funcionais! Muito bom
+      poder contar com seu talento!!!"
 faixaFrase: Cada espaço conta a história de quem habita.
