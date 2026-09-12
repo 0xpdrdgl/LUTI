@@ -25,6 +25,19 @@ const frase = home?.faixaFrase ?? '';
 const ultimoEspaco = frase.lastIndexOf(' ');
 const fraseInicio = ultimoEspaco > 0 ? frase.slice(0, ultimoEspaco) : frase;
 const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
+
+// Depoimentos variam de ~35 a ~260 palavras: normaliza espaços, quebra em
+// parágrafos e deixa o card truncar os longos (texto completo abre em dialog).
+const depoimentos = (home?.depoimentos ?? [])
+  .map((dep) => ({
+    nome: dep.nome?.trim() ?? '',
+    relacao: dep.relacao?.trim() ?? '',
+    paragrafos: (dep.texto ?? '')
+      .split(/\n\s*\n/)
+      .map((p) => p.replace(/\s+/g, ' ').trim())
+      .filter(Boolean),
+  }))
+  .filter((dep) => dep.paragrafos.length > 0);
 ---
 
 <PageLayout title="LUIZA TINOCO — Arquitetura" fullBleed>
@@ -144,24 +157,91 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     </div>
   </section>
 
-  {(home?.depoimentos ?? []).length > 0 && (
-    <section class="depoimentos" data-reveal>
+  {depoimentos.length > 0 && (
+    <section class="depoimentos" aria-labelledby="depoimentos-titulo" data-depoimentos>
       <div class="depoimentos-inner">
-        <h2 class="label depoimentos-titulo">{home?.depoimentosTitulo}</h2>
-        <div class="depoimentos-grid">
+        <div class="depoimentos-header" data-reveal>
+          <div>
+            <h2 id="depoimentos-titulo" class="label depoimentos-titulo">
+              {home?.depoimentosTitulo}
+            </h2>
+            <p class="depoimentos-chamada">
+              Nas palavras de quem <em>habita</em>.
+            </p>
+          </div>
+          <div class="depoimentos-controles" data-controles hidden>
+            <button type="button" class="depoimentos-seta" data-anterior aria-label="Depoimentos anteriores">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M14 8H3M7 3.5 2.5 8 7 12.5" stroke="currentColor"></path>
+              </svg>
+            </button>
+            <button type="button" class="depoimentos-seta" data-proximo aria-label="Próximos depoimentos">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <ul class="depoimentos-trilho" data-trilho tabindex="0" aria-label="Lista de depoimentos, role para o lado" data-reveal>
           {
-            (home?.depoimentos ?? []).map((dep) => (
-              <blockquote class="depoimento">
-                <p>&ldquo;{dep.texto}&rdquo;</p>
-                <footer>
-                  <span class="depoimento-nome">{dep.nome}</span>
-                  {dep.relacao && <span class="depoimento-relacao"> — {dep.relacao}</span>}
-                </footer>
-              </blockquote>
+            depoimentos.map((dep, i) => (
+              <li class="depoimento">
+                <figure>
+                  <span class="depoimento-aspas" aria-hidden="true">&ldquo;</span>
+                  <blockquote class="depoimento-texto" data-texto>
+                    {dep.paragrafos.map((p) => <p>{p}</p>)}
+                  </blockquote>
+                  <button type="button" class="label depoimento-mais" data-mais hidden aria-haspopup="dialog">
+                    Ler depoimento completo
+                  </button>
+                  <figcaption class="depoimento-autor">
+                    <span class="depoimento-nome">{dep.nome}</span>
+                    {dep.relacao && <span class="label depoimento-relacao">{dep.relacao}</span>}
+                  </figcaption>
+                </figure>
+              </li>
             ))
           }
+        </ul>
+
+        <div class="depoimentos-rodape" data-progresso-wrap hidden>
+          <div class="depoimentos-progresso" aria-hidden="true">
+            <span data-progresso></span>
+          </div>
+          <div class="depoimentos-controles-mobile">
+            <button type="button" class="depoimentos-seta" data-anterior aria-label="Depoimento anterior">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M14 8H3M7 3.5 2.5 8 7 12.5" stroke="currentColor"></path>
+              </svg>
+            </button>
+            <p class="label depoimentos-contador" aria-live="polite" data-contador>
+              01 / {String(depoimentos.length).padStart(2, '0')}
+            </p>
+            <button type="button" class="depoimentos-seta" data-proximo aria-label="Próximo depoimento">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
+
+      <dialog class="depoimento-dialog" data-dialog aria-labelledby="depoimento-dialog-nome">
+        <div class="depoimento-dialog-corpo">
+          <button type="button" class="depoimento-dialog-fechar" data-fechar aria-label="Fechar depoimento">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 3l10 10M13 3 3 13" stroke="currentColor"></path>
+            </svg>
+          </button>
+          <span class="depoimento-aspas" aria-hidden="true">&ldquo;</span>
+          <blockquote class="depoimento-dialog-texto" data-dialog-texto></blockquote>
+          <p class="depoimento-autor">
+            <span class="depoimento-nome" id="depoimento-dialog-nome" data-dialog-nome></span>
+            <span class="label depoimento-relacao" data-dialog-relacao></span>
+          </p>
+        </div>
+      </dialog>
     </section>
   )}
 
@@ -172,6 +252,133 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
     </a>
   </section>
 </PageLayout>
+
+<script>
+  // Depoimentos: trilho com setas/progresso, truncamento dos textos longos
+  // e dialog com o texto completo. Sem autoplay: textos longos precisam do
+  // tempo de leitura de cada pessoa.
+  const LINHAS_VISIVEIS = 8;
+  let observer: ResizeObserver | null = null;
+
+  function initDepoimentos() {
+    const secao = document.querySelector<HTMLElement>('[data-depoimentos]');
+    if (!secao || secao.dataset.bound) return;
+    secao.dataset.bound = '1';
+
+    const trilho = secao.querySelector<HTMLElement>('[data-trilho]')!;
+    const controles = secao.querySelector<HTMLElement>('[data-controles]')!;
+    // Setas existem em dois lugares: no cabeçalho (desktop) e no rodapé (mobile).
+    const anteriores = [...secao.querySelectorAll<HTMLButtonElement>('[data-anterior]')];
+    const proximos = [...secao.querySelectorAll<HTMLButtonElement>('[data-proximo]')];
+    const progressoWrap = secao.querySelector<HTMLElement>('[data-progresso-wrap]')!;
+    const progresso = secao.querySelector<HTMLElement>('[data-progresso]')!;
+    const contador = secao.querySelector<HTMLElement>('[data-contador]')!;
+    const dialog = secao.querySelector<HTMLDialogElement>('[data-dialog]')!;
+    const cards = [...trilho.children] as HTMLElement[];
+
+    function medirTruncamento() {
+      cards.forEach((card) => {
+        const texto = card.querySelector<HTMLElement>('[data-texto]')!;
+        const mais = card.querySelector<HTMLButtonElement>('[data-mais]')!;
+        const paragrafo = texto.querySelector('p');
+        if (!paragrafo) return;
+        texto.classList.remove('is-truncado');
+        const limite = parseFloat(getComputedStyle(paragrafo).lineHeight) * LINHAS_VISIVEIS;
+        // Folga de ~1,5 linha: não esconde só uma linha solta atrás do botão.
+        const excede = texto.scrollHeight > limite * 1.2;
+        texto.classList.toggle('is-truncado', excede);
+        mais.hidden = !excede;
+      });
+    }
+
+    function atualizarNavegacao() {
+      const max = trilho.scrollWidth - trilho.clientWidth;
+      const temOverflow = max > 2;
+      controles.hidden = !temOverflow;
+      progressoWrap.hidden = !temOverflow;
+      const noInicio = trilho.scrollLeft <= 2;
+      const noFim = trilho.scrollLeft >= max - 2;
+      anteriores.forEach((b) => (b.disabled = noInicio));
+      proximos.forEach((b) => (b.disabled = noFim));
+      const visivel = (trilho.clientWidth + trilho.scrollLeft) / trilho.scrollWidth;
+      progresso.style.setProperty('--progresso', String(Math.min(1, visivel)));
+
+      const { passo: largura } = medidas();
+      const atual = noFim ? cards.length : Math.round(trilho.scrollLeft / largura) + 1;
+      const texto = `${String(atual).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')}`;
+      if (contador.textContent !== texto) contador.textContent = texto;
+    }
+
+    function medidas() {
+      const card = cards[0];
+      const gap = parseFloat(getComputedStyle(trilho).columnGap) || 0;
+      const passo = card.offsetWidth + gap;
+      // Tolerância evita que 2,999 (arredondamento de subpixel) vire 2 cards.
+      const porPagina = Math.max(1, Math.floor((trilho.clientWidth + gap) / passo + 0.05));
+      return { passo, porPagina };
+    }
+
+    function avancar(direcao: 1 | -1) {
+      const { passo, porPagina } = medidas();
+      trilho.scrollBy({ left: direcao * porPagina * passo });
+    }
+
+    anteriores.forEach((b) => b.addEventListener('click', () => avancar(-1)));
+    proximos.forEach((b) => b.addEventListener('click', () => avancar(1)));
+    trilho.addEventListener('scroll', atualizarNavegacao, { passive: true });
+
+    let larguraAnterior = 0;
+    observer?.disconnect();
+    observer = new ResizeObserver(() => {
+      if (trilho.clientWidth === larguraAnterior) return;
+      larguraAnterior = trilho.clientWidth;
+      // Adia para o próximo frame: medir altera a altura do trilho, e fazer
+      // isso dentro do callback gera "ResizeObserver loop" no console.
+      requestAnimationFrame(() => {
+        medirTruncamento();
+        atualizarNavegacao();
+      });
+    });
+    observer.observe(trilho);
+
+    // Dialog
+    const dialogTexto = dialog.querySelector<HTMLElement>('[data-dialog-texto]')!;
+    const dialogNome = dialog.querySelector<HTMLElement>('[data-dialog-nome]')!;
+    const dialogRelacao = dialog.querySelector<HTMLElement>('[data-dialog-relacao]')!;
+    let origem: HTMLElement | null = null;
+
+    cards.forEach((card) => {
+      card.querySelector('[data-mais]')!.addEventListener('click', (e) => {
+        origem = e.currentTarget as HTMLElement;
+        dialogTexto.innerHTML = card.querySelector('[data-texto]')!.innerHTML;
+        dialogNome.textContent = card.querySelector('.depoimento-nome')?.textContent ?? '';
+        const relacao = card.querySelector('.depoimento-relacao')?.textContent ?? '';
+        dialogRelacao.textContent = relacao;
+        dialogRelacao.hidden = !relacao;
+        document.documentElement.style.overflow = 'hidden';
+        dialog.showModal();
+        dialog.querySelector<HTMLElement>('.depoimento-dialog-corpo')!.scrollTop = 0;
+      });
+    });
+
+    dialog.querySelector('[data-fechar]')!.addEventListener('click', () => dialog.close());
+    // Clique no backdrop (fora do corpo) fecha.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+      origem?.focus();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initDepoimentos);
+  document.addEventListener('astro:before-swap', () => {
+    observer?.disconnect();
+    observer = null;
+    document.documentElement.style.overflow = '';
+  });
+</script>
 
 <style>
   /* Hero */
@@ -637,53 +844,386 @@ const fraseFim = ultimoEspaco > 0 ? frase.slice(ultimoEspaco + 1) : '';
   }
 
   .depoimentos-inner {
+    --dep-gap: 2rem;
+    --dep-colunas: 3;
     max-width: 80rem;
     margin-inline: auto;
+  }
+
+  .depoimentos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--accent);
   }
 
   .depoimentos-titulo {
     color: var(--muted);
   }
 
-  .depoimentos-grid {
+  .depoimentos-chamada {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1.3;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .depoimentos-controles {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .depoimentos-controles[hidden],
+  .depoimentos-rodape[hidden],
+  .depoimento-mais[hidden] {
+    display: none;
+  }
+
+  .depoimentos-seta {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2.5rem;
-    margin-top: 3rem;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      opacity 200ms ease,
+      transform 160ms var(--ease-out);
+  }
+
+  .depoimentos-seta:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .depoimentos-seta:not(:disabled):hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+  }
+
+  .depoimentos-seta:not(:disabled):active {
+    transform: scale(0.97);
+  }
+
+  /* Trilho horizontal com scroll-snap: todos os cards com a mesma altura,
+     independentemente do tamanho do texto. */
+  .depoimentos-trilho {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(
+      (100% - (var(--dep-colunas) - 1) * var(--dep-gap)) / var(--dep-colunas)
+    );
+    gap: var(--dep-gap);
+    /* 1px de respiro para as bordas dos cards não serem cortadas pelo overflow */
+    margin: 3rem -1px 0;
+    padding: 1px;
+    scroll-padding-inline: 1px;
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .depoimentos-trilho::-webkit-scrollbar {
+    display: none;
+  }
+
+  .depoimentos-trilho:focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .depoimentos-trilho {
+      scroll-behavior: auto;
+    }
   }
 
   .depoimento {
-    max-width: 42rem;
+    scroll-snap-align: start;
+    display: flex;
+  }
+
+  .depoimento figure,
+  .depoimento-dialog-corpo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     margin: 0;
-    padding: 0.5rem 0 0.5rem 1.5rem;
-    border-left: 1px solid var(--accent);
+    padding: 2.5rem 2rem 2rem;
+    background: var(--bg);
+    border: 1px solid var(--accent);
   }
 
-  .depoimento p {
-    font-size: 1.0625rem;
-    line-height: 1.6;
+  .depoimento-aspas {
+    display: block;
+    height: 2.25rem;
+    font-family: var(--font-display);
+    font-size: 4.5rem;
+    line-height: 1;
+    color: var(--accent);
+    user-select: none;
+  }
+
+  .depoimento-texto,
+  .depoimento-dialog-texto {
+    margin: 1rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+
+  .depoimento-texto p,
+  .depoimento-dialog-texto p {
+    font-size: 1rem;
+    line-height: 1.7;
     color: var(--body-color);
+    text-wrap: pretty;
   }
 
-  .depoimento footer {
+  /* Truncamento só quando o JS confirma que o texto excede o limite. */
+  .depoimento-texto.is-truncado {
+    max-height: calc(1rem * 1.7 * 8);
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  }
+
+  .depoimento-mais {
+    align-self: flex-start;
     margin-top: 1rem;
-    font-size: 0.875rem;
-    color: var(--muted);
+    padding: 0.5rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: opacity 150ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .depoimento-mais:hover {
+      opacity: 0.6;
+    }
+  }
+
+  .depoimento-autor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 2rem;
+  }
+
+  .depoimento figure .depoimento-autor {
+    border-top: 1px solid var(--accent);
+    margin-top: auto;
+    padding-top: 1.5rem;
+  }
+
+  .depoimento figure .depoimento-texto {
+    margin-bottom: 2rem;
+  }
+
+  .depoimento figure .depoimento-mais {
+    margin: -1rem 0 2rem;
   }
 
   .depoimento-nome {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.3;
     color: var(--ink);
-    font-weight: 500;
   }
 
   .depoimento-relacao {
     color: var(--muted);
   }
 
+  .depoimentos-rodape {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .depoimentos-progresso {
+    position: relative;
+    height: 1px;
+    background: var(--accent);
+    overflow: hidden;
+  }
+
+  /* Controles do rodapé só aparecem no mobile (no desktop ficam no cabeçalho). */
+  .depoimentos-controles-mobile {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .depoimentos-contador {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .depoimentos-progresso span {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(var(--progresso, 0.33));
+    transition: transform 200ms var(--ease-out);
+  }
+
+  /* Dialog com o texto completo */
+  .depoimento-dialog {
+    width: min(40rem, calc(100% - 2rem));
+    max-height: calc(100svh - 4rem);
+    /* o reset global zera o margin:auto nativo que centraliza o dialog */
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .depoimento-dialog-corpo {
+    max-height: calc(100svh - 4rem);
+    overflow-y: auto;
+    padding: 3rem 2.5rem 2.5rem;
+  }
+
+  .depoimento-dialog::backdrop {
+    background: rgba(12, 12, 12, 0.5);
+  }
+
+  .depoimento-dialog[open] {
+    animation: dialog-entra 280ms var(--ease-out);
+  }
+
+  .depoimento-dialog[open]::backdrop {
+    animation: backdrop-entra 280ms ease-out;
+  }
+
+  @keyframes dialog-entra {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+
+  @keyframes backdrop-entra {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .depoimento-dialog[open],
+    .depoimento-dialog[open]::backdrop {
+      animation: none;
+    }
+  }
+
+  .depoimento-dialog-texto p {
+    font-size: 1.0625rem;
+  }
+
+  .depoimento-dialog-fechar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--accent);
+    background: var(--bg);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .depoimento-dialog-fechar:hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+  }
+
   @media (max-width: 64rem) {
     .depoimentos {
       padding: 5rem 1.5rem;
     }
+
+    .depoimentos-inner {
+      --dep-colunas: 2;
+      --dep-gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .depoimentos {
+      padding-inline: 0;
+    }
+
+    .depoimentos-header,
+    .depoimentos-rodape {
+      margin-inline: 1.5rem;
+    }
+
+    .depoimentos-chamada {
+      font-size: 1.5rem;
+    }
+
+    .depoimentos-controles {
+      display: none;
+    }
+
+    .depoimentos-controles-mobile {
+      display: flex;
+    }
+
+    /* Área de toque confortável (≥ 44px) */
+    .depoimentos-controles-mobile .depoimentos-seta {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    /* Mobile: um card por vez com "peek" do próximo, sugerindo o swipe. */
+    .depoimentos-trilho {
+      grid-auto-columns: 85%;
+      gap: 1rem;
+      padding-inline: 1.5rem;
+      scroll-padding-inline: 1.5rem;
+    }
+
+    .depoimento figure {
+      padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .depoimento-dialog-corpo {
+      padding: 3rem 1.5rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 64rem) {
 
     .areas {
       padding: 5rem 1.5rem;
