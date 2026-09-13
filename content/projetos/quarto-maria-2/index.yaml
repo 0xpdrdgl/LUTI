@@ -1,0 +1,10 @@
+titulo: QUARTO MARIA
+categoria: apartamento
+ano: 2026
+local: Rio de Janeiro
+resumo: ""
+descricao: ""
+capa: /images/projetos/quarto-maria-2.webp
+galeria:
+  - /images/projetos/quarto-maria-2-galeria-1.webp
+destaque: true
