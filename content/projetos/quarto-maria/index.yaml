@@ -1,0 +1,11 @@
+titulo: QUARTO MARIA
+categoria: apartamento
+ano: 2026
+local: Rio de Janeiro
+resumo: 'A mini cliente só fez dois pedidos pra tia: "quero meu quarto com muito
+  rosa e dinossauro" e assim foi feito!'
+descricao: ""
+capa: /images/projetos/quarto-maria.webp
+galeria:
+  - /images/projetos/quarto-maria-galeria-1.webp
+destaque: true
