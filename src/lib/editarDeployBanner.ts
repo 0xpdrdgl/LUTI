@@ -68,6 +68,12 @@ function unlockButtons() {
   })
 }
 
+// Usado pelas paginas pra mostrar o resultado "otimista" (antes do deploy
+// terminar) -- ex.: esconder da lista um projeto que acabou de ser excluido.
+export function hasPendingDeploy(): boolean {
+  return readPending() !== null
+}
+
 function readPending(): StoredDeploy | null {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY)

@@ -267,6 +267,18 @@
 .editar-projeto-card:hover {
   border-color: var(--accent);
 }
+/* Projeto recem-criado, ainda publicando (ver mostrarCriado em editar/index.astro) */
+.editar-projeto-card.is-publishing {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+  cursor: default;
+}
+.editar-projeto-card.is-publishing .editar-projeto-badge {
+  animation: editar-publishing-pulse 1.2s ease-in-out infinite;
+}
+@keyframes editar-publishing-pulse {
+  50% { opacity: 0.45; }
+}
 .editar-projeto-card img {
   width: 100%;
   aspect-ratio: 4 / 3;
