@@ -81,7 +81,7 @@ const CATEGORIAS = [
 
     <div class="editar-projetos-grid" id="projetos-grid">
       {projetos.map((p: any) => (
-        <a href={`/editar/projetos/${p.slug}`} class="editar-projeto-card">
+        <a href={`/editar/projetos/${p.slug}`} class="editar-projeto-card" data-slug={p.slug}>
           {p.capa && <img src={p.capa} alt="" loading="lazy" />}
           <div class="editar-projeto-card-body">
             <p class="editar-projeto-card-titulo">{p.titulo}</p>
@@ -97,7 +97,7 @@ const CATEGORIAS = [
 </EditarLayout>
 <script>
   import { setStatus } from '../../lib/editarFormClient'
-  import { watchDeploy } from '../../lib/editarDeployBanner'
+  import { watchDeploy, hasPendingDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   function openNovoProjetoForm() {
@@ -176,6 +176,51 @@ const CATEGORIAS = [
     toggleBtn.textContent = form.hidden ? '+ Adicionar projeto' : '- Cancelar'
   })
 
+  // Projeto excluido agora ha pouco: some da lista enquanto o site publica
+  // (o painel le o deploy atual, que ainda tem o projeto).
+  try {
+    const excluido = sessionStorage.getItem('editar_optimistic_deleted')
+    if (excluido && hasPendingDeploy()) {
+      document.querySelector(`.editar-projeto-card[data-slug="${CSS.escape(excluido)}"]`)?.remove()
+    } else if (excluido) {
+      sessionStorage.removeItem('editar_optimistic_deleted')
+    }
+  } catch {
+    // ignore
+  }
+
+  // Projeto criado agora ha pouco: aparece na lista na hora (com a capa local),
+  // sem link ate o site publicar -- o banner recarrega a pagina quando terminar.
+  function mostrarCriado(projeto: { titulo?: string; ano?: number; categoria?: string; destaque?: boolean } | undefined, capa: File) {
+    const grid = document.getElementById('projetos-grid')
+    if (!grid || !projeto) return
+    const card = document.createElement('div')
+    card.className = 'editar-projeto-card is-publishing'
+    const img = document.createElement('img')
+    img.src = URL.createObjectURL(capa)
+    img.alt = ''
+    const body = document.createElement('div')
+    body.className = 'editar-projeto-card-body'
+    const titulo = document.createElement('p')
+    titulo.className = 'editar-projeto-card-titulo'
+    titulo.textContent = projeto.titulo ?? ''
+    const meta = document.createElement('div')
+    meta.className = 'editar-projeto-card-meta'
+    meta.innerHTML = `<span></span><span class="editar-projeto-badge">Publicando…</span>`
+    meta.querySelector('span')!.textContent = `${projeto.ano ?? ''} · ${projeto.categoria ?? ''}`
+    body.append(titulo, meta)
+    card.append(img, body)
+    grid.prepend(card)
+
+    form.hidden = true
+    toggleBtn.textContent = '+ Adicionar projeto'
+    form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((f) => {
+      if (f instanceof HTMLInputElement && f.type === 'checkbox') f.checked = false
+      else f.value = ''
+    })
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
   const criarBtn = document.getElementById('n-criar') as HTMLButtonElement
   const statusEl = document.getElementById('n-status') as HTMLSpanElement
 
@@ -213,8 +258,8 @@ const CATEGORIAS = [
       if (!res.ok) throw new Error(data.error || 'Erro ao criar')
 
       setStatus(statusEl, 'Criado com sucesso!', 'success')
+      mostrarCriado(data.projeto, capaInput.files[0])
       watchDeploy(data.commitSha)
-      setTimeout(() => { location.href = `/editar/projetos/${data.slug}` }, 600)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao criar', 'error')
     } finally {

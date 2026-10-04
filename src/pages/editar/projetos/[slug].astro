@@ -284,8 +284,8 @@ const CATEGORIAS = [
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      mostrarSalvo(data.projeto?.galeria ?? [])
       watchDeploy(data.commitSha)
-      setTimeout(() => location.reload(), 800)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {
@@ -293,6 +293,37 @@ const CATEGORIAS = [
       saveBtn.classList.remove('is-loading')
     }
   })
+
+  // Nao recarrega depois de salvar: o painel le o conteudo do deploy atual, entao
+  // um reload agora mostraria a versao antiga ate a Vercel terminar. Em vez disso
+  // deixa a tela com o que foi salvo (imagens novas via preview local) e o banner
+  // de deploy recarrega a pagina sozinho quando o site estiver publicado.
+  function mostrarSalvo(galeriaFinal: string[]) {
+    const titulo = (document.getElementById('f-titulo') as HTMLInputElement).value.trim()
+    const tituloEl = document.querySelector('.editar-page-title')
+    if (tituloEl && titulo) tituloEl.textContent = titulo
+
+    if (capaFile) {
+      const preview = document.getElementById('capa-preview') as HTMLImageElement | null
+      if (preview) preview.src = URL.createObjectURL(capaFile)
+    }
+    if (capaName) capaName.textContent = ''
+    capaFile = null
+    capaUrlOverride = null
+
+    const novasUrls = galeriaFinal.slice(galeriaFinal.length - galeriaNewFiles.length)
+    galeriaNewFiles.forEach((file, i) => {
+      const item = document.createElement('div')
+      item.className = 'editar-gallery-item'
+      item.draggable = true
+      item.dataset.url = novasUrls[i] ?? ''
+      item.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="" /><button type="button" class="editar-gallery-capa" title="Usar como capa">★</button><button type="button" class="editar-gallery-remove" title="Remover">×</button>`
+      galeriaGrid.appendChild(item)
+    })
+    galeriaNewFiles = []
+    if (galeriaNewInput) galeriaNewInput.value = ''
+    if (galeriaNewName) galeriaNewName.textContent = ''
+  }
 
   const deleteBtn = document.getElementById('delete-btn') as HTMLButtonElement
   const deleteStatus = document.getElementById('delete-status') as HTMLSpanElement
@@ -314,6 +345,11 @@ const CATEGORIAS = [
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro ao excluir')
       watchDeploy(data.commitSha)
+      try {
+        sessionStorage.setItem('editar_optimistic_deleted', slug)
+      } catch {
+        // ignore
+      }
       location.href = '/editar'
     } catch (err) {
       setStatus(deleteStatus, err instanceof Error ? err.message : 'Erro ao excluir', 'error')
