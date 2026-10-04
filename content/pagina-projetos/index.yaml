@@ -1,6 +1,5 @@
 titulo: Projetos
-descricao: >-
-  Uma seleção do nosso portfólio. Arquitetura e interiores com foco em
+descricao: Uma seleção do nosso portfólio. Arquitetura e interiores com foco em
   materialidade, luz natural e a essência do habitar.
 filtros:
   - label: Todos
@@ -14,8 +13,7 @@ filtros:
 moodboardTitulo: |-
   A materialidade do
   espaço.
-moodboardTexto: >-
-  Nosso processo busca texturas que contam histórias. A escolha de cada pedra,
-  madeira e tecido é um ato curatorial para criar lares com alma.
-moodboardImagem1: /images/projetos/mood-1.webp
+moodboardTexto: Nosso processo busca texturas que contam histórias. A escolha de
+  cada pedra, madeira e tecido é um ato curatorial para criar lares com alma.
+moodboardImagem1: /images/projetos/paginaProjetos-moodboardImagem1.webp
 moodboardImagem2: /images/projetos/mood-2.webp
