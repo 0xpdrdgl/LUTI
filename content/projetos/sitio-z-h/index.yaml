@@ -1,10 +1,13 @@
-titulo: SÍTIO Z.H
+titulo: SÍTIO BEIRA RIO
 categoria: residencial
 local: ""
 resumo: ""
 descricao: ""
-capa: /images/projetos/sitio-z-h.webp
+capa: /images/projetos/sitio-z-h-galeria-11.webp
 galeria:
+  - /images/projetos/sitio-z-h-galeria-10.webp
+  - /images/projetos/sitio-z-h-galeria-9.webp
+  - /images/projetos/sitio-z-h.webp
   - /images/projetos/sitio-z-h-galeria-1.webp
   - /images/projetos/sitio-z-h-galeria-2.webp
   - /images/projetos/sitio-z-h-galeria-3.webp
@@ -13,7 +16,4 @@ galeria:
   - /images/projetos/sitio-z-h-galeria-6.webp
   - /images/projetos/sitio-z-h-galeria-7.webp
   - /images/projetos/sitio-z-h-galeria-8.webp
-  - /images/projetos/sitio-z-h-galeria-9.webp
-  - /images/projetos/sitio-z-h-galeria-10.webp
-  - /images/projetos/sitio-z-h-galeria-11.webp
 destaque: false
