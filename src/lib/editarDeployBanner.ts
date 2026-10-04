@@ -16,6 +16,43 @@ export function watchDeploy(commitSha: string | null | undefined) {
   } catch {
     // sessionStorage indisponivel (ex.: modo privado) -- sem banner, tudo bem
   }
+  // setTimeout: as paginas reabilitam o botao no `finally` logo depois de
+  // chamar watchDeploy, entao a trava precisa rodar depois disso. Tambem
+  // ja comeca o banner aqui, pras paginas que nao recarregam depois de salvar.
+  setTimeout(initDeployBanner, 0)
+}
+
+// sha sendo acompanhado agora -- um polling antigo para sozinho se outro comecar.
+let activeSha: string | null = null
+
+// Botoes de salvar/criar/excluir ficam travados enquanto a Vercel publica,
+// pra cliente nao clicar de novo achando que nada aconteceu.
+const LOCK_SELECTOR = '#editar-save, #n-criar, #delete-btn'
+const LOCK_LABEL = 'Publicando… aguarde'
+
+function lockButtons() {
+  document.querySelectorAll<HTMLButtonElement>(LOCK_SELECTOR).forEach((btn) => {
+    btn.disabled = true
+    btn.classList.add('is-loading', 'is-deploy-locked')
+    btn.title = 'Aguarde o site terminar de publicar'
+    const label = btn.querySelector<HTMLElement>('.editar-save-label') ?? btn
+    if (label.dataset.originalText === undefined) label.dataset.originalText = label.textContent ?? ''
+    label.textContent = LOCK_LABEL
+  })
+}
+
+function unlockButtons() {
+  document.querySelectorAll<HTMLButtonElement>(LOCK_SELECTOR).forEach((btn) => {
+    if (!btn.classList.contains('is-deploy-locked')) return
+    btn.disabled = false
+    btn.classList.remove('is-loading', 'is-deploy-locked')
+    btn.removeAttribute('title')
+    const label = btn.querySelector<HTMLElement>('.editar-save-label') ?? btn
+    if (label.dataset.originalText !== undefined) {
+      label.textContent = label.dataset.originalText
+      delete label.dataset.originalText
+    }
+  })
 }
 
 function readPending(): StoredDeploy | null {
@@ -99,6 +136,7 @@ function notify(title: string, body: string) {
 function markReady(el: HTMLDivElement) {
   render(el, 'ready')
   clearPending()
+  unlockButtons()
   notify('Site atualizado ✓', 'As alterações já estão publicadas no site.')
   setTimeout(() => { el.hidden = true }, 10000)
 }
@@ -115,11 +153,16 @@ export function initDeployBanner() {
     return
   }
 
+  activeSha = pending.sha
   render(el, 'polling')
+  lockButtons()
 
   const poll = async () => {
+    if (activeSha !== pending.sha) return
     if (Date.now() - pending.startedAt > MAX_WAIT_MS) {
       render(el, 'timeout')
+      clearPending()
+      unlockButtons()
       return
     }
     try {
@@ -144,6 +187,7 @@ export function initDeployBanner() {
       if (data.state === 'ERROR' || data.state === 'CANCELED') {
         render(el, 'error')
         clearPending()
+        unlockButtons()
         notify('Falha ao publicar', 'As alterações foram salvas, mas o site não atualizou. Avise o suporte.')
         return
       }
