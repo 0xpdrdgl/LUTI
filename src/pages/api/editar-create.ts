@@ -97,7 +97,7 @@ async function createLocal(
   await mkdir(contentDir, { recursive: true })
   await writeFile(path.join(contentDir, 'index.yaml'), stringifyYaml(data), 'utf-8')
 
-  return new Response(JSON.stringify({ ok: true, slug, projeto: data }), { status: 200 })
+  return new Response(JSON.stringify({ ok: true, slug, projeto: data, commitSha: null }), { status: 200 })
 }
 
 async function createGitHub(
@@ -139,6 +139,7 @@ async function createGitHub(
     const err = await putYamlRes.text()
     return new Response(JSON.stringify({ error: `Falha ao salvar projeto: ${err}` }), { status: 502 })
   }
+  const commitSha = (await putYamlRes.json().catch(() => null))?.commit?.sha ?? null
 
-  return new Response(JSON.stringify({ ok: true, slug, projeto: data }), { status: 200 })
+  return new Response(JSON.stringify({ ok: true, slug, projeto: data, commitSha }), { status: 200 })
 }

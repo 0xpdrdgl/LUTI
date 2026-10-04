@@ -62,6 +62,18 @@ PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 
 > Quem edita precisa de conta GitHub com write access no repositório.
 
+### Painel `/editar`
+
+Painel customizado (mais simples que o Keystatic, é o que a cliente usa no dia a dia) — salvar grava direto no GitHub via API (`GITHUB_EDIT_TOKEN`, classic PAT com escopo `repo`) e a Vercel redeploya sozinha.
+
+Depois de salvar, o painel mostra um aviso de "Publicando alterações..." até o deploy da Vercel realmente terminar (evita a cliente achar que não salvou e recriar o conteúdo). Isso consulta o status real do deployment via API da Vercel — requer:
+
+```
+VERCEL_API_TOKEN   # token pessoal/de time com acesso de leitura a Deployments
+```
+
+Sem essa variável configurada, o aviso ainda aparece mas cai numa estimativa de tempo fixa (~90s) em vez do status real.
+
 ## Notas técnicas
 
 - **Imagens:** convertidas para WebP (q82, máx. 1600px) — use `scripts/convert-webp.mjs` para converter arquivos manualmente; uploads novos pelo admin entram no formato original

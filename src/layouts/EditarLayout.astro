@@ -285,8 +285,64 @@ const tabs = [
     color: #4fbf7f;
     opacity: 1;
   }
+
+  /* Banner de status do deploy (ver src/lib/editarDeployBanner.ts) */
+  #editar-deploy-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(520px, calc(100vw - 32px));
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    background: #232323;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    color: #f0f0f0;
+  }
+  #editar-deploy-banner[data-state='ready'] {
+    border-color: rgba(79, 191, 127, 0.4);
+    color: #4fbf7f;
+  }
+  #editar-deploy-banner[data-state='error'] {
+    border-color: rgba(224, 82, 82, 0.4);
+    color: #e05252;
+  }
+  .editar-deploy-notify-btn {
+    flex: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .editar-deploy-notify-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .editar-deploy-spinner {
+    flex: none;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-top-color: var(--accent, #8a6d4a);
+    border-radius: 50%;
+    animation: editar-spin 0.6s linear infinite;
+  }
 </style>
 <script>
+  import { initDeployBanner } from '../lib/editarDeployBanner'
+  initDeployBanner()
+
   const loginForm = document.getElementById('editar-login-form') as HTMLFormElement | null
   loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault()

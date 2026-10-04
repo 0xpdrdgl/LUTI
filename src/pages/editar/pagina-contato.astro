@@ -119,6 +119,7 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
 </EditarLayout>
 <script>
   import { setStatus, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const tourSteps: TourStep[] = [
@@ -227,6 +228,7 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      watchDeploy(data.commitSha)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {

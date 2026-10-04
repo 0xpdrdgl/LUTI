@@ -92,7 +92,7 @@ async function updateLocal(
 
   await mkdir(path.dirname(yamlPath), { recursive: true })
   await writeFile(yamlPath, stringifyYaml(currentData), 'utf-8')
-  return new Response(JSON.stringify({ ok: true, data: currentData }), { status: 200 })
+  return new Response(JSON.stringify({ ok: true, data: currentData, commitSha: null }), { status: 200 })
 }
 
 async function updateGitHub(
@@ -140,6 +140,7 @@ async function updateGitHub(
     const err = await putRes.text()
     return new Response(JSON.stringify({ error: `Falha ao salvar: ${err}` }), { status: 502 })
   }
+  const commitSha = (await putRes.json().catch(() => null))?.commit?.sha ?? null
 
-  return new Response(JSON.stringify({ ok: true, data: currentData }), { status: 200 })
+  return new Response(JSON.stringify({ ok: true, data: currentData, commitSha }), { status: 200 })
 }

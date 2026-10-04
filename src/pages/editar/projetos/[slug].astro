@@ -129,6 +129,7 @@ const CATEGORIAS = [
 </script>
 <script>
   import { setStatus, enableDragReorder } from '../../../lib/editarFormClient'
+  import { watchDeploy } from '../../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../../lib/editarTour'
 
   const slug = (window as any).__editarProjetoSlug as string
@@ -283,6 +284,7 @@ const CATEGORIAS = [
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      watchDeploy(data.commitSha)
       setTimeout(() => location.reload(), 800)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
@@ -311,6 +313,7 @@ const CATEGORIAS = [
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro ao excluir')
+      watchDeploy(data.commitSha)
       location.href = '/editar'
     } catch (err) {
       setStatus(deleteStatus, err instanceof Error ? err.message : 'Erro ao excluir', 'error')
