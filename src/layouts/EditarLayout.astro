@@ -258,6 +258,10 @@ const tabs = [
     opacity: 0.6;
     cursor: default;
   }
+  .editar-save.is-deploy-locked,
+  .editar-delete-btn.is-deploy-locked {
+    cursor: not-allowed;
+  }
   .editar-save.is-loading .editar-save-label::after {
     content: '';
     display: inline-block;
