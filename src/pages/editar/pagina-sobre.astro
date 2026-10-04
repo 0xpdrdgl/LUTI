@@ -66,7 +66,7 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus, updateImagePreview } from '../../lib/editarFormClient'
+  import { setStatus, updateImagePreview, compressImage, checkUploadSize, readApiResponse } from '../../lib/editarFormClient'
   import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
@@ -144,11 +144,13 @@ const pagina = authed ? await reader.singletons.paginaSobre.read() : null
       const formData = new FormData()
       formData.set('singleton', 'paginaSobre')
       formData.set('fields', JSON.stringify(fields))
-      if (retratoFile) formData.set('image__retrato', retratoFile)
+      const retratoUpload = retratoFile ? await compressImage(retratoFile, 2400) : null
+      checkUploadSize([retratoUpload])
+      if (retratoUpload) formData.set('image__retrato', retratoUpload)
       if (retratoRemoved) formData.set('removeImage__retrato', 'true')
 
       const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       updateImagePreview('f-retrato-field', data.data?.retrato)

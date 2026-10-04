@@ -204,7 +204,7 @@ const home = authed ? await reader.singletons.home.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus, makeTextRow, readTextArray, makeObjectRow, readObjectArray, enableDragReorder, updateImagePreview } from '../../lib/editarFormClient'
+  import { setStatus, makeTextRow, readTextArray, makeObjectRow, readObjectArray, enableDragReorder, updateImagePreview, compressImage, checkUploadSize, readApiResponse } from '../../lib/editarFormClient'
   import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
@@ -375,11 +375,14 @@ const home = authed ? await reader.singletons.home.read() : null
       formData.set('fields', JSON.stringify(fields))
       const heroImagem = getHeroImagem()
       const sobreFoto = getSobreFoto()
-      if (heroImagem) formData.set('image__heroImagem', heroImagem)
-      if (sobreFoto) formData.set('image__sobreFoto', sobreFoto)
+      const heroUpload = heroImagem ? await compressImage(heroImagem, 2400) : null
+      const sobreUpload = sobreFoto ? await compressImage(sobreFoto, 2400) : null
+      checkUploadSize([heroUpload, sobreUpload])
+      if (heroUpload) formData.set('image__heroImagem', heroUpload)
+      if (sobreUpload) formData.set('image__sobreFoto', sobreUpload)
 
       const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       // Não recarrega a página: em produção ela leria do último deploy, que

@@ -128,7 +128,7 @@ const CATEGORIAS = [
   window.__editarProjetoSlug = slug
 </script>
 <script>
-  import { setStatus, enableDragReorder } from '../../../lib/editarFormClient'
+  import { setStatus, enableDragReorder, compressImage, checkUploadSize, readApiResponse } from '../../../lib/editarFormClient'
   import { watchDeploy } from '../../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../../lib/editarTour'
 
@@ -275,12 +275,15 @@ const CATEGORIAS = [
       formData.set('descricao', val('f-descricao'))
       formData.set('destaque', String((document.getElementById('f-destaque') as HTMLInputElement).checked))
       formData.set('galeriaExisting', JSON.stringify(galeriaExisting))
-      if (capaFile) formData.set('capa', capaFile)
+      const capaUpload = capaFile ? await compressImage(capaFile) : null
+      const galeriaUpload = await Promise.all(galeriaNewFiles.map((f) => compressImage(f)))
+      checkUploadSize([capaUpload, ...galeriaUpload])
+      if (capaUpload) formData.set('capa', capaUpload)
       else if (capaUrlOverride) formData.set('capaUrl', capaUrlOverride)
-      for (const file of galeriaNewFiles) formData.append('galeriaNew', file)
+      for (const file of galeriaUpload) formData.append('galeriaNew', file)
 
       const res = await fetch('/api/editar-projeto', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
@@ -342,7 +345,7 @@ const CATEGORIAS = [
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug, confirm: deleteConfirm.value }),
       })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao excluir')
       watchDeploy(data.commitSha)
       try {
