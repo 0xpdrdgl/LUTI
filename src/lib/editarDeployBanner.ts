@@ -49,29 +49,29 @@ function ensureBannerEl(): HTMLDivElement {
   return el
 }
 
+const MESSAGES = {
+  polling: { icon: '<span class="editar-deploy-spinner"></span>', title: 'Publicando suas alterações…', body: 'Leva 1–2 minutos. Não precisa salvar de novo.' },
+  ready: { icon: '✓', title: 'Pronto! O site já está atualizado.', body: 'Pode abrir o site para conferir.' },
+  error: { icon: '!', title: 'Não foi possível publicar.', body: 'Suas alterações foram salvas, mas o site não atualizou. Avise o suporte.' },
+  timeout: { icon: '…', title: 'Está demorando mais que o normal.', body: 'Pode continuar editando — o site atualiza sozinho quando terminar.' },
+}
+
 function render(el: HTMLDivElement, state: 'polling' | 'ready' | 'error' | 'timeout') {
   el.dataset.state = state
   el.hidden = false
-  if (state === 'polling') {
-    el.innerHTML = `<span class="editar-deploy-spinner"></span> <span>Publicando alterações no site... geralmente leva 1–2 min. Não precisa salvar de novo.</span>`
-    if (notifyPermission() === 'default') {
-      const btn = document.createElement('button')
-      btn.type = 'button'
-      btn.className = 'editar-deploy-notify-btn'
-      btn.textContent = 'Me avisar quando terminar'
-      btn.addEventListener('click', async () => {
-        // Precisa ser num clique: Safari/Firefox so pedem permissao com gesto do usuario.
-        await Notification.requestPermission().catch(() => 'denied')
-        btn.remove()
-      })
-      el.appendChild(btn)
-    }
-  } else if (state === 'ready') {
-    el.innerHTML = `✓ Alterações publicadas! O site já está atualizado.`
-  } else if (state === 'error') {
-    el.innerHTML = `⚠ O build falhou na Vercel. As alterações foram salvas, mas o site pode não ter atualizado — avise o suporte.`
-  } else {
-    el.innerHTML = `O build está demorando mais que o normal. Pode continuar editando — o site atualiza sozinho quando terminar.`
+  const m = MESSAGES[state]
+  el.innerHTML = `<span class="editar-deploy-icon">${m.icon}</span><span class="editar-deploy-text"><strong>${m.title}</strong><span>${m.body}</span></span>`
+  if (state === 'polling' && notifyPermission() === 'default') {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'editar-deploy-notify-btn'
+    btn.textContent = 'Me avisar quando terminar'
+    btn.addEventListener('click', async () => {
+      // Precisa ser num clique: Safari/Firefox so pedem permissao com gesto do usuario.
+      await Notification.requestPermission().catch(() => 'denied')
+      btn.remove()
+    })
+    el.appendChild(btn)
   }
 }
 
@@ -100,7 +100,7 @@ function markReady(el: HTMLDivElement) {
   render(el, 'ready')
   clearPending()
   notify('Site atualizado ✓', 'As alterações já estão publicadas no site.')
-  setTimeout(() => { el.hidden = true }, 5000)
+  setTimeout(() => { el.hidden = true }, 10000)
 }
 
 export function initDeployBanner() {
