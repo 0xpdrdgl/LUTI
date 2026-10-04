@@ -3,9 +3,8 @@ categoria: apartamento
 local: ""
 resumo: ""
 descricao: ""
-capa: /images/projetos/apartamento-b-f.webp
+capa: /images/projetos/apartamento-b-f-galeria-26.webp
 galeria:
-  - /images/projetos/apartamento-b-f-galeria-26.webp
   - /images/projetos/apartamento-b-f-galeria-24.webp
   - /images/projetos/apartamento-b-f-galeria-25.webp
   - /images/projetos/apartamento-b-f-galeria-27.webp
@@ -30,6 +29,7 @@ galeria:
   - /images/projetos/apartamento-b-f-galeria-13.webp
   - /images/projetos/apartamento-b-f-galeria-20.webp
   - /images/projetos/apartamento-b-f-galeria-5.webp
+  - /images/projetos/apartamento-b-f.webp
   - /images/projetos/apartamento-b-f-galeria-10.webp
   - /images/projetos/apartamento-b-f-galeria-15.webp
   - /images/projetos/apartamento-b-f-galeria-1791150533784-0.webp
