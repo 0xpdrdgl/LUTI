@@ -48,7 +48,7 @@ async function deleteLocal(slug: string) {
 
   await rm(path.join(process.cwd(), 'content/projetos', slug), { recursive: true, force: true })
 
-  return new Response(JSON.stringify({ ok: true }), { status: 200 })
+  return new Response(JSON.stringify({ ok: true, commitSha: null }), { status: 200 })
 }
 
 async function deleteGitHub(slug: string, token: string) {
@@ -72,6 +72,7 @@ async function deleteGitHub(slug: string, token: string) {
     const err = await delRes.text()
     return new Response(JSON.stringify({ error: `Falha ao excluir: ${err}` }), { status: 502 })
   }
+  const commitSha = (await delRes.json().catch(() => null))?.commit?.sha ?? null
 
-  return new Response(JSON.stringify({ ok: true }), { status: 200 })
+  return new Response(JSON.stringify({ ok: true, commitSha }), { status: 200 })
 }

@@ -71,6 +71,7 @@ const site = authed ? await reader.singletons.site.read() : null
 </EditarLayout>
 <script>
   import { setStatus, makeLinkRow, readLinkArray, enableDragReorder, updateImagePreview } from '../../lib/editarFormClient'
+  import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   const siteTourSteps: TourStep[] = [
@@ -163,6 +164,7 @@ const site = authed ? await reader.singletons.site.read() : null
 
       updateImagePreview('f-logo-field', data.data?.logo)
       setStatus(statusEl, 'Salvo com sucesso!', 'success')
+      watchDeploy(data.commitSha)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao salvar', 'error')
     } finally {

@@ -97,6 +97,7 @@ const CATEGORIAS = [
 </EditarLayout>
 <script>
   import { setStatus } from '../../lib/editarFormClient'
+  import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
   function openNovoProjetoForm() {
@@ -212,6 +213,7 @@ const CATEGORIAS = [
       if (!res.ok) throw new Error(data.error || 'Erro ao criar')
 
       setStatus(statusEl, 'Criado com sucesso!', 'success')
+      watchDeploy(data.commitSha)
       setTimeout(() => { location.href = `/editar/projetos/${data.slug}` }, 600)
     } catch (err) {
       setStatus(statusEl, err instanceof Error ? err.message : 'Erro ao criar', 'error')
