@@ -25,12 +25,21 @@ export function watchDeploy(commitSha: string | null | undefined) {
 // sha sendo acompanhado agora -- um polling antigo para sozinho se outro comecar.
 let activeSha: string | null = null
 
-// Botoes de salvar/criar/excluir ficam travados enquanto a Vercel publica,
+// Botoes de salvar/criar/excluir (e os campos) ficam travados enquanto a Vercel publica,
 // pra cliente nao clicar de novo achando que nada aconteceu.
 const LOCK_SELECTOR = '#editar-save, #n-criar, #delete-btn'
 const LOCK_LABEL = 'Publicando… aguarde'
 
+// Campos tambem travam: a pagina recarrega sozinha quando termina, entao
+// nada digitado nesse meio-tempo pode se perder.
+const FIELD_SELECTOR = 'main input, main textarea, main select'
+
 function lockButtons() {
+  document.querySelectorAll<HTMLInputElement>(FIELD_SELECTOR).forEach((f) => {
+    if (f.disabled) return
+    f.disabled = true
+    f.dataset.deployLocked = '1'
+  })
   document.querySelectorAll<HTMLButtonElement>(LOCK_SELECTOR).forEach((btn) => {
     btn.disabled = true
     btn.classList.add('is-loading', 'is-deploy-locked')
@@ -42,6 +51,10 @@ function lockButtons() {
 }
 
 function unlockButtons() {
+  document.querySelectorAll<HTMLInputElement>('[data-deploy-locked]').forEach((f) => {
+    f.disabled = false
+    delete f.dataset.deployLocked
+  })
   document.querySelectorAll<HTMLButtonElement>(LOCK_SELECTOR).forEach((btn) => {
     if (!btn.classList.contains('is-deploy-locked')) return
     btn.disabled = false
@@ -89,11 +102,12 @@ function ensureBannerEl(): HTMLDivElement {
 const MESSAGES = {
   polling: { icon: '<span class="editar-deploy-spinner"></span>', title: 'Publicando suas alterações…', body: 'Leva 1–2 minutos. Não precisa salvar de novo.' },
   ready: { icon: '✓', title: 'Pronto! O site já está atualizado.', body: 'Pode abrir o site para conferir.' },
+  reloading: { icon: '✓', title: 'Pronto! O site já está atualizado.', body: 'Atualizando esta página…' },
   error: { icon: '!', title: 'Não foi possível publicar.', body: 'Suas alterações foram salvas, mas o site não atualizou. Avise o suporte.' },
   timeout: { icon: '…', title: 'Está demorando mais que o normal.', body: 'Pode continuar editando — o site atualiza sozinho quando terminar.' },
 }
 
-function render(el: HTMLDivElement, state: 'polling' | 'ready' | 'error' | 'timeout') {
+function render(el: HTMLDivElement, state: keyof typeof MESSAGES) {
   el.dataset.state = state
   el.hidden = false
   const m = MESSAGES[state]
@@ -133,17 +147,54 @@ function notify(title: string, body: string) {
   }
 }
 
+// O painel le o conteudo do proprio deploy, entao so mostra a versao nova
+// depois que a Vercel termina. Ao ficar pronto, recarregamos a pagina pra
+// cliente ver o efeito -- e o aviso "Pronto!" reaparece depois do reload.
+const JUST_READY_KEY = 'editar_deploy_just_ready'
+const RELOAD_DELAY_MS = 1500
+
 function markReady(el: HTMLDivElement) {
-  render(el, 'ready')
   clearPending()
-  unlockButtons()
+  activeSha = null
   notify('Site atualizado ✓', 'As alterações já estão publicadas no site.')
-  setTimeout(() => { el.hidden = true }, 10000)
+
+  render(el, 'reloading')
+  try {
+    sessionStorage.setItem(JUST_READY_KEY, '1')
+  } catch {
+    // ignore
+  }
+  setTimeout(() => location.reload(), RELOAD_DELAY_MS)
+}
+
+// So esconde se ainda for o aviso de "Pronto" -- nao some com um "Publicando" novo.
+function hideReadyLater(el: HTMLDivElement) {
+  setTimeout(() => {
+    if (el.dataset.state === 'ready') el.hidden = true
+  }, 10000)
+}
+
+function showReadyAfterReload(): boolean {
+  let flag: string | null = null
+  try {
+    flag = sessionStorage.getItem(JUST_READY_KEY)
+    sessionStorage.removeItem(JUST_READY_KEY)
+  } catch {
+    return false
+  }
+  if (!flag) return false
+  const el = ensureBannerEl()
+  render(el, 'ready')
+  hideReadyLater(el)
+  return true
 }
 
 export function initDeployBanner() {
   const pending = readPending()
-  if (!pending) return
+  if (!pending) {
+    showReadyAfterReload()
+    return
+  }
 
   const el = ensureBannerEl()
   const age = Date.now() - pending.startedAt
