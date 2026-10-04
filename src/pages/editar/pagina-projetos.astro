@@ -99,7 +99,7 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder, updateImagePreview } from '../../lib/editarFormClient'
+  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder, updateImagePreview, compressImage, checkUploadSize, readApiResponse } from '../../lib/editarFormClient'
   import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
@@ -207,13 +207,16 @@ const pagina = authed ? await reader.singletons.paginaProjetos.read() : null
       const formData = new FormData()
       formData.set('singleton', 'paginaProjetos')
       formData.set('fields', JSON.stringify(fields))
-      if (imagem1.getFile()) formData.set('image__moodboardImagem1', imagem1.getFile() as File)
+      const img1 = imagem1.getFile() ? await compressImage(imagem1.getFile() as File, 2400) : null
+      const img2 = imagem2.getFile() ? await compressImage(imagem2.getFile() as File, 2400) : null
+      checkUploadSize([img1, img2])
+      if (img1) formData.set('image__moodboardImagem1', img1)
       if (imagem1.isRemoved()) formData.set('removeImage__moodboardImagem1', 'true')
-      if (imagem2.getFile()) formData.set('image__moodboardImagem2', imagem2.getFile() as File)
+      if (img2) formData.set('image__moodboardImagem2', img2)
       if (imagem2.isRemoved()) formData.set('removeImage__moodboardImagem2', 'true')
 
       const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       updateImagePreview('f-moodboardImagem1-field', data.data?.moodboardImagem1)

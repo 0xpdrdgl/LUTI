@@ -218,3 +218,58 @@ export function enableDragReorder(
     onDrop?.(dragEl)
   })
 }
+
+// A Vercel recusa requisicoes acima de 4,5 MB (erro 413), e foto de celular/camera
+// passa disso facil. Reduz no navegador antes de enviar: o servidor ja limita as
+// fotos de projeto a 1600px, entao nao ha perda em relacao ao que vai pro site.
+const SKIP_COMPRESS_TYPES = ['image/svg+xml', 'image/gif']
+const SMALL_FILE_BYTES = 400 * 1024
+
+export async function compressImage(file: File, maxWidth = 1600, quality = 0.86): Promise<File> {
+  if (SKIP_COMPRESS_TYPES.includes(file.type) || file.size < SMALL_FILE_BYTES) return file
+  let bitmap: ImageBitmap
+  try {
+    bitmap = await createImageBitmap(file)
+  } catch {
+    return file // formato que o navegador nao abre (ex.: HEIC no Chrome) -- manda como esta
+  }
+  const scale = Math.min(1, maxWidth / bitmap.width)
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(bitmap.width * scale)
+  canvas.height = Math.round(bitmap.height * scale)
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  bitmap.close()
+
+  let blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/webp', quality))
+  // Safari antigo nao gera webp e devolve PNG -- cai pra JPEG (PNG transparente fica como veio).
+  if (!blob || blob.type !== 'image/webp') {
+    if (file.type === 'image/png') return file
+    blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/jpeg', quality))
+  }
+  if (!blob || blob.size >= file.size) return file
+  const ext = blob.type === 'image/webp' ? 'webp' : 'jpg'
+  return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.' + ext, { type: blob.type })
+}
+
+// Limite real da Vercel e 4,5 MB; sobra margem pros campos de texto.
+const MAX_UPLOAD_BYTES = 4.2 * 1024 * 1024
+
+export function checkUploadSize(files: (File | null | undefined)[]) {
+  const total = files.reduce((sum, f) => sum + (f?.size ?? 0), 0)
+  if (total > MAX_UPLOAD_BYTES) {
+    throw new Error('As imagens são grandes demais para enviar de uma vez. Envie menos fotos por vez (dá pra adicionar mais depois).')
+  }
+}
+
+// Le a resposta da API sem quebrar quando ela nao e JSON (ex.: erro 413 da Vercel).
+export async function readApiResponse(res: Response): Promise<any> {
+  const text = await res.text()
+  try {
+    return JSON.parse(text)
+  } catch {
+    if (res.status === 413) {
+      return { error: 'As imagens são grandes demais para enviar de uma vez. Envie menos fotos por vez.' }
+    }
+    return { error: `Erro no servidor (${res.status}). Tente de novo em instantes.` }
+  }
+}

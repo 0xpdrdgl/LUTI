@@ -118,7 +118,7 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
   )}
 </EditarLayout>
 <script>
-  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder } from '../../lib/editarFormClient'
+  import { setStatus, makeObjectRow, readObjectArray, enableDragReorder, readApiResponse } from '../../lib/editarFormClient'
   import { watchDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
@@ -224,7 +224,7 @@ const pagina = authed ? await reader.singletons.paginaContato.read() : null
       formData.set('fields', JSON.stringify(fields))
 
       const res = await fetch('/api/editar-singleton', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
 
       setStatus(statusEl, 'Salvo com sucesso!', 'success')

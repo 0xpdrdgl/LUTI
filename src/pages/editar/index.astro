@@ -96,7 +96,7 @@ const CATEGORIAS = [
   </div>
 </EditarLayout>
 <script>
-  import { setStatus } from '../../lib/editarFormClient'
+  import { setStatus, compressImage, checkUploadSize, readApiResponse } from '../../lib/editarFormClient'
   import { watchDeploy, hasPendingDeploy } from '../../lib/editarDeployBanner'
   import { maybeStartTour, startTour, type TourStep } from '../../lib/editarTour'
 
@@ -249,12 +249,17 @@ const CATEGORIAS = [
       formData.set('resumo', (document.getElementById('n-resumo') as HTMLTextAreaElement).value)
       formData.set('descricao', (document.getElementById('n-descricao') as HTMLTextAreaElement).value)
       formData.set('destaque', String((document.getElementById('n-destaque') as HTMLInputElement).checked))
-      formData.set('capa', capaInput.files[0])
+      setStatus(statusEl, 'Preparando imagens...')
+      const capa = await compressImage(capaInput.files[0])
       const galeriaInput = document.getElementById('n-galeria') as HTMLInputElement
-      for (const file of galeriaInput.files ?? []) formData.append('galeria', file)
+      const galeria = await Promise.all(Array.from(galeriaInput.files ?? []).map((f) => compressImage(f)))
+      checkUploadSize([capa, ...galeria])
+      formData.set('capa', capa)
+      for (const file of galeria) formData.append('galeria', file)
+      setStatus(statusEl, 'Criando...')
 
       const res = await fetch('/api/editar-create', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await readApiResponse(res)
       if (!res.ok) throw new Error(data.error || 'Erro ao criar')
 
       setStatus(statusEl, 'Criado com sucesso!', 'success')
